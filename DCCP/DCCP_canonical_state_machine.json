@@ -1,0 +1,166 @@
+{
+    "states": [
+      "CLOSED",
+      "LISTEN",
+      "REQUEST",
+      "RESPOND",
+      "PARTOPEN",
+      "OPEN",
+      "CLOSEREQ",
+      "CLOSING",
+      "TIMEWAIT"
+    ],
+    "initial_state": "CLOSED",
+    "final_states": ["CLOSED"],
+    "transitions": [
+      {
+        "from": "CLOSED",
+        "to": "REQUEST",
+        "requisite": "active := True",
+        "actions": ["DCCP_REQUEST!"],
+        "response": ""
+      },
+      {
+        "from": "CLOSED",
+        "to": "LISTEN",
+        "requisite": "active := False",
+        "actions": [],
+        "response": ""
+      },
+      {
+        "from": "LISTEN",
+        "to": "RESPOND",
+        "requisite": "DCCP_REQUEST",
+        "actions": ["DCCP_RESPONSE!"],
+        "response": ""
+      },
+      {
+        "from": "LISTEN",
+        "to": "CLOSED",
+        "requisite": "",
+        "actions": ["timeout"],
+        "response": ""
+      },
+      {
+        "from": "RESPOND",
+        "to": "OPEN",
+        "requisite": "DCCP_ACK or DCCP_DATAACK",
+        "actions": [ ],
+        "response": ""
+      },
+      {
+        "from": "RESPOND",
+        "to": "CLOSED",
+        "requisite": "timeout, then optionally",
+        "actions": ["DCCP_RESET!"],
+        "response": ""
+      },
+      {
+        "from": "RESPOND",
+        "to": "RESPOND",
+        "requisite": "",
+        "actions": ["DCCP_DATA!"],
+        "response": ""
+      },
+      {
+        "from": "REQUEST",
+        "to": "PARTOPEN",
+        "requisite": "DCCP_RESPONSE?",
+        "actions": [ "DCCP_ACK!"],
+        "response": ""
+      },
+      {
+        "from": "REQUEST",
+        "to": "CLOSED",
+        "requisite": "DCCP_RESET? or timeout or DCCP_SYNC?",
+        "actions": [ "DCCP_RESET!"],
+        "response": ""
+      },
+      {
+        "from": "PARTOPEN",
+        "to": "OPEN",
+        "requisite": "DCCP_DATA? or DCCP_DATAACK? or DCCP_ACK?",
+        "actions": [
+          "DCCP_ACK!"
+        ],
+        "response": ""
+      },
+      {
+        "from": "PARTOPEN",
+        "to": "CLOSING",
+        "requisite": "DCCP_CLOSEREQ?",
+        "actions": ["DCCP_CLOSE!"],
+        "response": ""
+      },
+      {
+        "from": "PARTOPEN",
+        "to": "PARTOPEN",
+        "requisite": "",
+        "actions": ["DCCP_DATAACK!"],
+        "response": ""
+      },
+      {
+        "from": "PARTOPEN",
+        "to": "CLOSED",
+        "requisite": "timeout or DCCP_RESET? or DCCP_SYNC?",
+        "actions": ["DCCP_RESET!"],
+        "response": ""
+      },
+      {
+        "from": "OPEN",
+        "to": "OPEN",
+        "requisite": "",
+        "actions": ["DCCP_DATA!", "DCCP_DATAACK!", "DCCP_ACK?", "DCCP_DATA?", "DCCP_DATAACK?"],
+        "response": ""
+      },
+      {
+        "from": "OPEN",
+        "to": "CLOSEREQ",
+        "requisite": "active == true",
+        "actions": ["DCCP_CLOSEREQ!"],
+        "response": ""
+      },
+      {
+        "from": "OPEN",
+        "to": "CLOSING",
+        "requisite": "active == true",
+        "actions": ["DCCP_CLOSE! or DCCP_CLOSEREQ? DCCP_CLOSE!"],
+        "response": ""
+      },
+      {
+        "from": "OPEN",
+        "to": "CLOSED",
+        "requisite": "",
+        "actions": ["DCCP_CLOSE?","DCCP_RESET!"],
+        "response": ""
+      },
+      {
+        "from": "CLOSEREQ",
+        "to": "CLOSED",
+        "requisite": "",
+        "actions": ["DCCP_CLOSE?", "DCCP_RESET?"],
+        "response": ""
+      },
+      {
+        "from": "CLOSING",
+        "to": "TIMEWAIT",
+        "requisite": "",
+        "actions": ["DCCP_RESET?"],
+        "response": ""
+      },
+      {
+        "from": "CLOSING",
+        "to": "CLOSED",
+        "requisite": "",
+        "actions": ["DCCP_CLOSE?", "DCCP_RESET?"],
+        "response": ""
+      },
+      {
+        "from": "TIMEWAIT",
+        "to": "CLOSED",
+        "requisite": "",
+        "actions": ["DCCP_CLOSE?", "DCCP_RESET?"],
+        "response": ""
+      }
+    ]
+  }
