@@ -1,0 +1,162 @@
+{
+    "states": [
+      "Connection Established",
+      "Greeted",
+      "Mail Transaction Started",
+      "Recipient Specified",
+      "Data Entry",
+      "Message Accepted",
+      "Session Terminated"
+    ],
+    "initial_state": "Connection Established",
+    "final_states": ["Session Terminated"],
+    "transitions": [
+      {
+        "from": "Connection Established",
+        "requisite": "Client sends EHLO or HELO after 220 greeting",
+        "to": "Greeted",
+        "actions": ["EHLO", "HELO"],
+        "response": "250 OK"
+      },
+      {
+        "from": "Greeted",
+        "requisite": "MAIL FROM command sent",
+        "to": "Mail Transaction Started",
+        "actions": ["MAIL FROM:<sender>"],
+        "response": "250 OK"
+      },
+      {
+        "from": "Mail Transaction Started",
+        "requisite": "RCPT TO sent",
+        "to": "Recipient Specified",
+        "actions": ["RCPT TO:<recipient>"],
+        "response": "250 OK"
+      },
+      {
+        "from": "Recipient Specified",
+        "requisite": "DATA command sent",
+        "to": "Data Entry",
+        "actions": ["DATA"],
+        "response": "354 Start mail input"
+      },
+      {
+        "from": "Data Entry",
+        "requisite": "Message content sent and ended with <CRLF>.<CRLF>",
+        "to": "Message Accepted",
+        "actions": ["Send message body"],
+        "response": "250 OK"
+      },
+      {
+        "from": "Message Accepted",
+        "requisite": "QUIT sent",
+        "to": "Session Terminated",
+        "actions": ["QUIT"],
+        "response": "221 Bye"
+      },
+      {
+        "from": "Greeted",
+        "requisite": "Client sends RSET",
+        "to": "Greeted",
+        "actions": ["RSET"],
+        "response": "250 OK (reset state)"
+      },
+      {
+        "from": "Mail Transaction Started",
+        "requisite": "Client sends RSET",
+        "to": "Greeted",
+        "actions": ["RSET"],
+        "response": "250 OK (reset state)"
+      },
+      {
+        "from": "Recipient Specified",
+        "requisite": "Client sends RSET",
+        "to": "Greeted",
+        "actions": ["RSET"],
+        "response": "250 OK (reset state)"
+      },
+      {
+        "from": "Data Entry",
+        "requisite": "Client sends RSET before message is complete",
+        "to": "Greeted",
+        "actions": ["RSET"],
+        "response": "250 OK (reset state)"
+      },
+      {
+        "from": "Message Accepted",
+        "requisite": "Client sends RSET",
+        "to": "Greeted",
+        "actions": ["RSET"],
+        "response": "250 OK (reset state)"
+      },
+      {
+        "from": "Greeted",
+        "requisite": "Client sends VRFY or EXPN",
+        "to": "Greeted",
+        "actions": ["VRFY <user>", "EXPN <list>"],
+        "response": "250/550/553 depending on address"
+      },
+      {
+        "from": "Mail Transaction Started",
+        "requisite": "Client sends VRFY or EXPN",
+        "to": "Mail Transaction Started",
+        "actions": ["VRFY", "EXPN"],
+        "response": "250/550/553"
+      },
+      {
+        "from": "Recipient Specified",
+        "requisite": "Client sends VRFY or EXPN",
+        "to": "Recipient Specified",
+        "actions": ["VRFY", "EXPN"],
+        "response": "250/550/553"
+      },
+      {
+        "from": "Data Entry",
+        "requisite": "Client sends VRFY or EXPN",
+        "to": "Data Entry",
+        "actions": ["VRFY", "EXPN"],
+        "response": "250/550/553"
+      },
+      {
+        "from": "Message Accepted",
+        "requisite": "Client sends VRFY or EXPN",
+        "to": "Message Accepted",
+        "actions": ["VRFY", "EXPN"],
+        "response": "250/550/553"
+      },
+      {
+        "from": "Connection Established",
+        "requisite": "Client sends QUIT",
+        "to": "Session Terminated",
+        "actions": ["QUIT"],
+        "response": "221 Bye"
+      },
+      {
+        "from": "Greeted",
+        "requisite": "Client sends QUIT",
+        "to": "Session Terminated",
+        "actions": ["QUIT"],
+        "response": "221 Bye"
+      },
+      {
+        "from": "Mail Transaction Started",
+        "requisite": "Client sends QUIT",
+        "to": "Session Terminated",
+        "actions": ["QUIT"],
+        "response": "221 Bye"
+      },
+      {
+        "from": "Recipient Specified",
+        "requisite": "Client sends QUIT",
+        "to": "Session Terminated",
+        "actions": ["QUIT"],
+        "response": "221 Bye"
+      },
+      {
+        "from": "Data Entry",
+        "requisite": "Client sends QUIT before finishing data",
+        "to": "Session Terminated",
+        "actions": ["QUIT"],
+        "response": "221 Bye"
+      }
+    ]
+  }
