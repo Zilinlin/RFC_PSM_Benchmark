@@ -1,0 +1,90 @@
+{
+    "states": [
+        "Initial Connection",
+        "Authentication",
+        "Transaction",
+        "Quit"
+    ],
+    "initial_state": "Initial Connection",
+    "final_states": [
+        "Quit"
+    ],
+    "transitions": [
+        {
+            "from": "Initial Connection",
+            "requisite": "TCP connection established",
+            "to": "Authentication",
+            "actions": [
+                "server sends greeting"
+            ],
+            "response": ""
+        },
+        {
+            "from": "Authentication",
+            "requisite": "Server requires authentication",
+            "to": "Transaction",
+            "actions": [
+                "AUTHINFO USER",
+                "AUTHINFO PASS"
+            ],
+            "response": ""
+        },
+        {
+            "from": "Authentication",
+            "requisite": "Server does not require authentication",
+            "to": "Transaction",
+            "actions": [
+                "none"
+            ],
+            "response": ""
+        },
+        {
+            "from": "Transaction",
+            "requisite": "Client sends GROUP command",
+            "to": "Transaction",
+            "actions": [
+                "GROUP <group-name>"
+            ],
+            "response": ""
+        },
+        {
+            "from": "Transaction",
+            "requisite": "Client requests article",
+            "to": "Transaction",
+            "actions": [
+                "ARTICLE",
+                "HEAD",
+                "BODY",
+                "STAT"
+            ],
+            "response": ""
+        },
+        {
+            "from": "Transaction",
+            "requisite": "Client submits article",
+            "to": "Transaction",
+            "actions": [
+                "POST"
+            ],
+            "response": ""
+        },
+        {
+            "from": "Transaction",
+            "requisite": "Client ends session",
+            "to": "Quit",
+            "actions": [
+                "QUIT"
+            ],
+            "response": ""
+        },
+        {
+            "from": "Authentication",
+            "requisite": "Client ends session before authentication",
+            "to": "Quit",
+            "actions": [
+                "QUIT"
+            ],
+            "response": ""
+        }
+    ]
+}
