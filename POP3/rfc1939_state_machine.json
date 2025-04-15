@@ -1,0 +1,75 @@
+{
+    "states": [
+        "AUTHORIZATION",
+        "TRANSACTION",
+        "UPDATE",
+        "CLOSED"
+    ],
+    "initial_state": "AUTHORIZATION",
+    "final_states": [
+        "UPDATE"
+    ],
+    "transitions": [
+        {
+            "from": "AUTHORIZATION",
+            "requisite": "TCP connection established",
+            "to": "AUTHORIZATION",
+            "actions": [
+                "server sends greeting +OK POP3 server ready"
+            ],
+            "response": ""
+        },
+        {
+            "from": "AUTHORIZATION",
+            "requisite": "",
+            "to": "TRANSACTION",
+            "actions": [
+                "send USER/PASS or APOP"
+            ],
+            "response": "server locks the user's mailbox"
+        },
+        {
+            "from": "AUTHORIZATION",
+            "requisite": "",
+            "to": "CLOSED",
+            "actions": [
+                "QUIT"
+            ],
+            "response": "exit"
+        },
+        {
+            "from": "TRANSACTION",
+            "requisite": "normal operation",
+            "to": "TRANSACTION",
+            "actions": [
+                "STAT",
+                "LIST",
+                "RETR",
+                "DELE",
+                "NOOP",
+                "RSET"
+            ],
+            "response": "+OK or -ERR depending on command validity"
+        },
+        {
+            "from": "TRANSACTION",
+            "requisite": "QUIT command issued",
+            "to": "UPDATE",
+            "actions": [
+                "QUIT"
+            ],
+            "response": "+OK messages deleted and session closed"
+        },
+        {
+            "from": "UPDATE",
+            "requisite": "end of QUIT command",
+            "to": "CLOSED",
+            "actions": [
+                "Server deletes messages marked as deleted",
+                "Releases maildrop lock",
+                "Closes TCP connection"
+            ],
+            "response": "+OK or -ERR (depending on success of deletion)"
+        }
+    ]
+}
