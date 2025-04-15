@@ -1,0 +1,63 @@
+{
+    "states": [
+        "Connection_Established",
+        "Not_Authenticated",
+        "Authenticated",
+        "Selected",
+        "Logout"
+    ],
+    "initial_state": "Connection_Established",
+    "final_states": [
+        "Logout"
+    ],
+    "transitions": [
+        {
+            "from": "Connection_Established",
+            "to": "Not_Authenticated",
+            "action": "OK greeting",
+            "event": "connection without pre-authentication"
+        },
+        {
+            "from": "Connection_Established",
+            "to": "Authenticated",
+            "action": "PREAUTH greeting",
+            "event": "pre-authenticated connection"
+        },
+        {
+            "from": "Connection_Established",
+            "to": "Logout",
+            "action": "BYE greeting",
+            "event": "rejected connection"
+        },
+        {
+            "from": "Not_Authenticated",
+            "to": "Authenticated",
+            "action": "successful LOGIN or AUTHENTICATE command"
+        },
+        {
+            "from": "Not_Authenticated",
+            "to": "Logout",
+            "action": "LOGOUT command, server shutdown, or connection closed"
+        },
+        {
+            "from": "Authenticated",
+            "to": "Selected",
+            "action": "successful SELECT or EXAMINE command"
+        },
+        {
+            "from": "Authenticated",
+            "to": "Logout",
+            "action": "LOGOUT command, server shutdown, or connection closed"
+        },
+        {
+            "from": "Selected",
+            "to": "Authenticated",
+            "action": "CLOSE or UNSELECT command, unsolicited CLOSED response code, or failed SELECT or EXAMINE command"
+        },
+        {
+            "from": "Selected",
+            "to": "Logout",
+            "action": "LOGOUT command, server shutdown, or connection closed"
+        }
+    ]
+}
