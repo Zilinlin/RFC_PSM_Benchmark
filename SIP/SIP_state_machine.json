@@ -1,0 +1,195 @@
+{
+    "states": [
+      "INIT State",
+      "Register state",
+      "Unauthorized state",
+      "Ready state",
+      "Invite state",
+      "Trying state",
+      "Ringing state",
+      "Ack state",
+      "RTP/RTCP State",
+      "Bye state",
+      "OK state"
+    ],
+    "initial_state": "INIT State",
+    "final_states": ["Bye state"],
+    "transitions": [
+      {
+        "from": "INIT State",
+        "requisite": "Connection (check address)",
+        "to": "Register state",
+        "actions": ["200 OK"],
+        "response": ""
+      },
+      {
+        "from": "Register state",
+        "requisite": "",
+        "to": "Unauthorized state",
+        "actions": ["Update flow record", "Unauthorized count +1","401"],
+        "response": ""
+      },
+      {
+        "from": "Register state",
+        "requisite": "Register attempt",
+        "to": "Ready state",
+        "actions": ["Update flow record", "Register count +1"],
+        "response": ""
+      },
+      {
+        "from": "Register state",
+        "requisite": "",
+        "to": "OK state",
+        "actions": ["Update flow record", "Register OK count +1","200"],
+        "response": ""
+      },
+      {
+        "from": "Register state",
+        "requisite": "",
+        "to": "INIT state",
+        "actions": [],
+        "response": ""
+      },
+      {
+        "from": "Ready state",
+        "requisite": "",
+        "to": "Invite state",
+        "actions": ["Update flow record", "Invite count +1"],
+        "response": ""
+      },
+      {
+        "from": "Ready state",
+        "requisite": "",
+        "to": "Register state",
+        "actions": [],
+        "response": ""
+      },
+      {
+        "from": "Invite state",
+        "requisite": "",
+        "to": "Trying state",
+        "actions": ["Update flow record", "Trying count +1", "100"],
+        "response": ""
+      },
+      {
+        "from": "Invite state",
+        "requisite": "",
+        "to": "Ringing state",
+        "actions": ["Update flow record", "Ringing count +1", "180"],
+        "response": ""
+      },
+      {
+        "from": "Invite state",
+        "requisite": "",
+        "to": "OK state",
+        "actions": ["Update flow record", "Invite OK count +1", "200"],
+        "response": ""
+      },
+      {
+        "from": "Invite state",
+        "requisite": "",
+        "to": "READY state",
+        "actions": ["407"],
+        "response": ""
+      },
+      {
+        "from": "Invite state",
+        "requisite": "",
+        "to": "ACK state",
+        "actions": [],
+        "response": ""
+      },
+      {
+        "from": "OK state",
+        "requisite": "",
+        "to": "Register state",
+        "actions": ["Register OK count +1", "Update flow record", "200"],
+        "response": ""
+      },
+      {
+        "from": "OK state",
+        "requisite": "",
+        "to": "Invite state",
+        "actions": ["Invite OK count +1", "Update flow record", "200"],
+        "response": ""
+      },
+      {
+        "from": "OK state",
+        "requisite": "",
+        "to": "Ready state",
+        "actions": ["200 OK"],
+        "response": ""
+      },
+      {
+        "from": "OK state",
+        "requisite": "",
+        "to": "Bye state",
+        "actions": ["Bye OK count +1", "Update flow record", "200"],
+        "response": ""
+      },
+      {
+        "from": "Ack state",
+        "requisite": "",
+        "to": "RTP/RTCP State",
+        "actions": ["Update flow record"],
+        "response": ""
+      },
+      {
+        "from": "Ack state",
+        "requisite": "",
+        "to": "Invite State",
+        "actions": ["Update flow record", "Ack count +1"],
+        "response": ""
+      },
+      {
+        "from": "RTP/RTCP State",
+        "requisite": "",
+        "to": "Bye state",
+        "actions": ["Bye count +1", "Update flow record"],
+        "response": ""
+      },
+      {
+        "from": "RTP/RTCP State",
+        "requisite": "",
+        "to": "Ack state",
+        "actions": ["Update flow record"],
+        "response": ""
+      },
+      {
+        "from": "Bye state",
+        "requisite": "",
+        "to": "OK state",
+        "actions": ["Update flow record", "Bye OK count +1"],
+        "response": ""
+      },
+      {
+        "from": "Bye state",
+        "requisite": "",
+        "to": "RTP/RTCP State",
+        "actions": ["Update flow record", "Bye count +1"],
+        "response": ""
+      },
+      {
+        "from": "Unauthorized state",
+        "requisite": "",
+        "to": "Register state",
+        "actions": ["Update flow record", "Unauthorized count +1", "401"],
+        "response": ""
+      },
+      {
+        "from": "Trying state",
+        "requisite": "",
+        "to": "Invite state",
+        "actions": ["Update flow record", "Trying count +1", "100"],
+        "response": ""
+      },
+      {
+        "from": "Ringing state",
+        "requisite": "",
+        "to": "Invite state",
+        "actions": ["Update flow record", "Ringing count +1", "180"],
+        "response": ""
+      }
+    ]
+  }
+  
