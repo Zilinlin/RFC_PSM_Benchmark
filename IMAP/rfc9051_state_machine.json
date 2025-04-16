@@ -50,9 +50,19 @@
             "action": "LOGOUT command, server shutdown, or connection closed"
         },
         {
+            "from": "Authenticated",
+            "to": "Authenticated",
+            "action": "List mailbox."
+        },
+        {
             "from": "Selected",
             "to": "Authenticated",
             "action": "CLOSE or UNSELECT command, unsolicited CLOSED response code, or failed SELECT or EXAMINE command"
+        },
+        {
+            "from": "Selected",
+            "to": "Selected",
+            "action": "read, write, and manage messages"
         },
         {
             "from": "Selected",
