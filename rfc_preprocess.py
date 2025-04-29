@@ -59,82 +59,80 @@ def clean_rfc_headers(text: str) -> str:
     return cleaned_text
 
 
+
 def extract_section_from_toc_line(line: str):
     """
-    Extracts the section number and section name from a TOC line.
+    Extracts (section_number, section_title) from a TOC line in either style:
     
-    This function supports several formats:
-      - Numeric entries: "22. IANA Considerations ..........................................217"
-      - Appendix entries with prefix: "Appendix A. Examples .............................................248"
-      - Appendix level-two: "A.1. Media on Demand (Unicast) ................................248"
-      
-    The regex works as follows:
-      - Optionally match "Appendix" followed by whitespace (captured in group 1).
-      - Capture a section number that starts with either a letter or digits, 
-        optionally followed by a dot and digits, and ends with a dot (group 2).
-      - After some whitespace, capture the section title (group 3) up to the leader dots.
-      - Leader dots (at least two) and a trailing page number are then matched.
-      
-    Returns a tuple (section_number, section_name) where:
-      - If the "Appendix" prefix was present, the section number is returned as "Appendix <number>".
-      - Otherwise, just the captured section number.
-      
-    If the line does not match the pattern, returns None.
+      1.  Introduction . . . . . . . . . . . . . . . . . . . . . . .  5
+      2.1. Requirements Language
+      Appendix A. Other Implementation Notes . . . . . . . . . . . . 85
+
+    Returns (sec_num, sec_title) or None if no match.
     """
-    pattern = re.compile(r'''
+    pattern = re.compile(r"""
         ^\s*
-        (?:(Appendix)\s+)?               # Optional "Appendix" prefix in group 1
-        ((?:[A-Z]|\d+)(?:\.[0-9]+)?\.)    # Section number in group 2, e.g. "22." or "A.1."
+        (?:(Appendix)\s+)?                        # optional 'Appendix'
+        ([A-Za-z0-9]+(?:\.[A-Za-z0-9]+)*\.)       # section number with trailing dot
         \s+
-        (.+?)                           # Section title in group 3 (non-greedy)
-        \s+\.{2,}\s*\d+\s*$             # Leader dots and trailing page number
-    ''', re.IGNORECASE | re.VERBOSE)
-    
-    match = pattern.search(line)
-    if match:
-        prefix = match.group(1)
-        section_number = match.group(2)
-        section_title = match.group(3).strip()
-        # If there's an Appendix prefix, prepend it to the section number.
-        if prefix:
-            section_number = f"Appendix {section_number}"
-        return section_number, section_title
-    else:
+        (.+?)                                     # section title (non-greedy)
+        (?:
+            \s+(?:(?:\.\s*){2,}|\.{2,})\s*\d+\s*  # optional leader+dots+page#
+          | \s*$                                  # or end-of-line
+        )
+    """, re.VERBOSE)
+
+    m = pattern.match(line)
+    if not m:
         return None
-    
+    appendix, num, title = m.groups()
+    title = title.strip()
+    if appendix:
+        num = f"{appendix} {num}"
+    return num, title
+
 
 def process_toc_file(input_file: str, output_file: str):
     """
-    Processes the file line by line to extract TOC entries (level-two only) and
-    removes those lines from the file content.
-    
-    Writes the updated content to 'output_file' and returns a list of tuples:
-        [(section_number, section_name), ...]
-    
-    For example, if a line is:
-       "17.1. Informational 1xx .......................................113"
-    then the tuple ("17.1.", "Informational 1xx") is returned and that line is removed.
+    Reads `input_file`, finds the 'Table of Contents' section, extracts
+    TOC lines into a list of (sec_num, sec_title), removes them from the
+    output, and writes the rest to `output_file`.
     """
-    extracted_sections = []
-    updated_lines = []
-    
-    with open(input_file, "r", encoding="utf-8") as infile:
-        lines = infile.readlines()
-    
-    for line in lines:
-        result = extract_section_from_toc_line(line)
-        if result is not None:
-            # We found a TOC line; record its section number and name.
-            extracted_sections.append(result)
-        else:
-            # Not a TOC line; keep it in the updated content.
-            updated_lines.append(line)
-    
-    # Write the updated content (without TOC lines) to the output file.
-    with open(output_file, "w", encoding="utf-8") as outfile:
-        outfile.writelines(updated_lines)
-    
-    return extracted_sections
+    extracted = []
+    kept = []
+    toc_mode = False
+    toc_ended = False
+
+    with open(input_file, "r", encoding="utf-8") as f:
+        for line in f:
+            if not toc_mode:
+                # look for the start of the TOC
+                if line.strip().lower().startswith("table of contents"):
+                    toc_mode = True
+                    continue  # drop the “Table of Contents” line itself
+                else:
+                    kept.append(line)
+            else:
+                # we are in TOC mode: try to extract
+                pair = extract_section_from_toc_line(line)
+                if pair:
+                    extracted.append(pair)
+                elif line.strip() == "":
+                    # blank lines we just drop
+                    continue
+                else:
+                    # first non-blank non-TOC line => TOC is done
+                    toc_mode = False
+                    toc_ended = True
+                    kept.append(line)
+            # once TOC has ended, we just keep the rest
+        # Note: if toc_mode stays True until EOF, that's fine too.
+
+    # write out the non-TOC content
+    with open(output_file, "w", encoding="utf-8") as f:
+        f.writelines(kept)
+
+    return extracted
 
 
 
@@ -307,7 +305,7 @@ if __name__ == "__main__":
     #         print(f"{prot}/{raw_fn} → {prot}/{cleaned_fn}")
     
     '''---------------extract the sections------------------------------'''
-    dirs = ["DCCP"]
+    dirs = ["IMAP"]
     for prot in dirs:
         # check directory exists
         if not os.path.isdir(prot):
@@ -346,6 +344,22 @@ if __name__ == "__main__":
             for seg in segments:
                 print(seg["tag"], "→", count_tokens(seg["content"]), "tokens\n","the first 20 chars content:", seg["content"][:20])
             
+            # then save the segments to a JSON file
+            normalized = []
+            for seg in segments:
+                sec_num, sec_name = seg["section"]
+                normalized.append({
+                    "section_number": sec_num,
+                    "section_name":   sec_name,
+                    "tag":            seg["tag"],
+                    "content":        seg["content"]
+                })
+            
+            segment_json_file = output_file.replace("_no_toc.txt", "_segments.json")
+            with open(segment_json_file, "w", encoding="utf-8") as json_file:
+                json.dump(normalized, json_file, indent=2)
+            print(f"\nThe segments have been saved to '{segment_json_file}'.")
+                        
             
             
     
