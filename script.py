@@ -5,6 +5,9 @@ This file is to run the experiments for the RFC PSM Benchmark.
 import re
 import json
 from typing import Optional, Any, Union, List
+import glob
+import os
+import requests
 
 
 
@@ -14,24 +17,24 @@ def build_fsm_extraction_prompt(protocol_name: str,
     """
     Returns a complete prompt for extracting FSM components from one section.
     """
-    template = """You will be given the section "{section_title}" of an RFC document for protocol "{protocol_name}".  
-Please respond _only_ with JSON (or the word None) wrapped in <json>...</json>.
+    template = """
+You will be given the section "{section_title}" of an RFC document for protocol "{protocol_name}".
+
+**RESPONSE FORMAT (MANDATORY)**
+- Your reply must consist **exclusively** of the JSON object representing the state machine.
+- That JSON must be wrapped in <json> and </json> tags.
+- Do **not** include any extra text, explanation, code fences, or formatting.
 
 <section>
 {section_text}
 </section>
 
-First, check whether this section contains any information related to a protocol state machine, such as:
-- State definitions
-- State transitions
-- Diagrams or tables describing state flows
+Steps:
+1. Determine if this section has any FSM information (states, transitions, diagrams).
+2. If **none**, reply exactly:
+   <json>None</json>
+3. Otherwise, extract the partial FSM and format it **exactly** as:
 
-If no relevant information is found, simply return:
-None
-
-If the section contains partial information about the protocol state machine, extract and organize it using this JSON format:
-
-<template>
 {{
   "states": ["state1", "state2", "state3"],
   "transitions": [
@@ -51,9 +54,10 @@ If the section contains partial information about the protocol state machine, ex
     }}
   ]
 }}
-</template>
 
-If some fields like "requisite", "actions", or "response" are not mentioned, set them to an empty string (`""`) or empty list (`[]`) as appropriate.
+and then wrap that in <json>…</json> with nothing else.
+
+Remember: **ONLY** the <json>…</json> block should appear in your final output.
 """
     return template.format(
         protocol_name=protocol_name,
@@ -94,7 +98,7 @@ def parse_json_from_response(response: str) -> Union[Any, None]:
     try:
         return json.loads(json_text)
     except json.JSONDecodeError as e:
-        raise ValueError(f"Invalid JSON extracted: {e}")
+        return json_text  # Return the raw text if JSON parsing fails
 
 
 def build_fsm_combination_prompt(partial_fsms: List[Union[str, dict]]) -> str:
@@ -153,26 +157,135 @@ Please output **only** the final merged JSON in the `<json>…</json>` block.
     return prompt
 
 
+
+def call_ollama(model, prompt, temperature=0.0, max_tokens=10000):
+    """
+    Calls the local Ollama HTTP API and returns the generated text.
+    """
+    url = "http://localhost:11434/v1/completions"
+    payload = {
+        "model": model,
+        "prompt": prompt,
+        "temperature": temperature,
+        "max_tokens": max_tokens
+    }
+    resp = requests.post(url, json=payload)
+    resp.raise_for_status()  # will raise an HTTPError if the call failed
+    data = resp.json()
+    # Ollama uses the OpenAI-compatible response format:
+    # { "choices": [ { "text": "..." } ], ... }
+    return data["choices"][0]["text"]
+
+
+# ── Workflow ──────────────────────────────────────────────────────────────────
+
+def process_protocol(protocol_dir, model, verbose=True):
+    name = os.path.basename(protocol_dir.rstrip("/"))
+    seg_files = glob.glob(os.path.join(protocol_dir, "*_segments.json"))
+    if not seg_files:
+        raise FileNotFoundError(f"No segments file in {protocol_dir}")
+    segments = json.load(open(seg_files[0]))
+
+    partials = []
+    sections = []
+
+    # make sure output directory exists
+    os.makedirs("output", exist_ok=True)
+
+    for idx, seg in enumerate(segments, start=1):
+        tag, content = seg["tag"], seg["content"]
+        prompt = build_fsm_extraction_prompt(
+            protocol_name=name,
+            section_title=tag,
+            section_text=content
+        )
+
+        if verbose:
+            print(f"\n--- Section {idx}/{len(segments)}: {tag} ---")
+            #print("PROMPT:\n")
+
+        resp = call_ollama(model, prompt, temperature=0.0, max_tokens=10000)
+
+        #if verbose:
+            #print("RAW RESPONSE:\n", resp)
+
+        fsm = parse_json_from_response(resp)
+
+        if verbose:
+            print("PARSED FSM:\n", json.dumps(fsm, indent=2))
+
+        # store per‐section details
+        sections.append({
+            "tag": tag,
+            "prompt": prompt,
+            "response": resp,
+            "partial_fsm": fsm
+        })
+        partials.append(fsm)
+
+        # # optional: write each partial to its own file
+        # partial_file = f"output/{name}_{model}_partial_{idx}.json"
+        # with open(partial_file, "w") as pf:
+        #     json.dump(fsm, pf, indent=2)
+        # if verbose:
+        #     print(f"→ saved partial FSM to {partial_file}")
+
+    # combine step
+    combine_prompt = build_fsm_combination_prompt(partial_fsms=partials)
+
+    final_resp = call_ollama(model, combine_prompt, temperature=0.0, max_tokens=10000)
+    if verbose:
+        print("COMBINED RAW RESPONSE:\n", final_resp)
+
+    final_fsm = parse_json_from_response(final_resp)
+    if verbose:
+        print("FINAL MERGED FSM:\n", json.dumps(final_fsm, indent=2))
+
+    # write full output
+    out = {
+        "protocol": name,
+        "model": model,
+        "sections": sections,
+        "final_response": final_resp,
+        "final_fsm": final_fsm
+    }
+    outfile = f"output/{name}_{model}_output.json"
+    with open(outfile, "w") as f:
+        json.dump(out, f, indent=2)
+    if verbose:
+        print(f"\n► saved full output to {outfile}")
+
+    return outfile
+
+
 if __name__ == "__main__":
     
     
-    examples = [
-        "No JSON here.",
-        "<json>None</json>",
-        "<json>{\"states\":[]}</json>"
-    ]
-    for resp in examples:
-        print("Response:", repr(resp))
-        print("extract_json_content →", extract_json_content(resp))
-        print("parse_json_from_response →", parse_json_from_response(resp))
-        print("---")
+    # examples = [
+    #     "No JSON here.",
+    #     "<json>None</json>",
+    #     "<json>{\"states\":[]}</json>"
+    # ]
+    # for resp in examples:
+    #     print("Response:", repr(resp))
+    #     print("extract_json_content →", extract_json_content(resp))
+    #     print("parse_json_from_response →", parse_json_from_response(resp))
+    #     print("---")
         
-    # → then send `prompt` to your LLM client
-    partials = [
-        {"states": ["Idle"], "transitions": [{"from":"Idle","requisite":"","to":"Init","actions":[],"response":""}]},
-        {"states": ["Init","Connected"], "transitions":[{"from":"Init","requisite":"","to":"Connected","actions":["open"],"response":""}]}
-    ]
+    # # → then send `prompt` to your LLM client
+    # partials = [
+    #     {"states": ["Idle"], "transitions": [{"from":"Idle","requisite":"","to":"Init","actions":[],"response":""}]},
+    #     {"states": ["Init","Connected"], "transitions":[{"from":"Init","requisite":"","to":"Connected","actions":["open"],"response":""}]}
+    # ]
 
-    prompt = build_fsm_combination_prompt(partials)
-    print(prompt)
+    # prompt = build_fsm_combination_prompt(partials)
+    # print(prompt)
+    
+    protocols = ["DHCP", "FTP", "IMAP", 
+                 "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP"]
+    
+    model = "deepseek-r1:14b"
+    for d in protocols:
+        process_protocol(d, model, verbose=True)
+    
         
