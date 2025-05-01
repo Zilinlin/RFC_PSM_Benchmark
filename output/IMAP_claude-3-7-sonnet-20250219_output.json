@@ -254,6 +254,138 @@
       "partial_fsm": null
     }
   ],
-  "final_response": "\n\nStates like stars in night,\nTransitions flow like streams,\nProtocol's dance of light,\nIn JSON patterns gleams.\n\n<json>\n{\n  \"states\": [\n    \"Not Authenticated\",\n    \"Authenticated\",\n    \"Selected\",\n    \"Logout\",\n    \"Connection Established\",\n    \"Connection Closed\"\n  ],\n  \"initial_state\": \"Connection Established\",\n  \"final_states\": [\"Connection Closed\"],\n  \"transitions\": [\n    {\n      \"from\": \"Connection Established\",\n      \"requisite\": \"OK greeting\",\n      \"to\": \"Not Authenticated\",\n      \"actions\": [\"server greeting\"],\n      \"response\": \"connection without pre-authentication\"\n    },\n    {\n      \"from\": \"Connection Established\",\n      \"requisite\": \"PREAUTH greeting\",\n      \"to\": \"Authenticated\",\n      \"actions\": [\"server greeting\"],\n      \"response\": \"pre-authenticated connection\"\n    },\n    {\n      \"from\": \"Connection Established\",\n      \"requisite\": \"BYE greeting\",\n      \"to\": \"Logout\",\n      \"actions\": [\"server greeting\"],\n      \"response\": \"rejected connection\"\n    },\n    {\n      \"from\": \"Not Authenticated\",\n      \"requisite\": \"successful LOGIN or AUTHENTICATE command\",\n      \"to\": \"Authenticated\",\n      \"actions\": [\"establish authentication\"],\n      \"response\": \"OK - authenticate/login completed\"\n    },\n    {\n      \"from\": \"Not Authenticated\",\n      \"requisite\": \"STARTTLS command\",\n      \"to\": \"Not Authenticated\",\n      \"actions\": [\"begin TLS negotiation\"],\n      \"response\": \"OK - starttls completed\"\n    },\n    {\n      \"from\": \"Authenticated\",\n      \"requisite\": \"successful SELECT or EXAMINE command\",\n      \"to\": \"Selected\",\n      \"actions\": [\"select mailbox\"],\n      \"response\": \"OK - select/examine completed\"\n    },\n    {\n      \"from\": \"Selected\",\n      \"requisite\": \"CLOSE command\",\n      \"to\": \"Authenticated\",\n      \"actions\": [\"remove messages with \\\\Deleted flag\"],\n      \"response\": \"OK - close completed\"\n    },\n    {\n      \"from\": \"Selected\",\n      \"requisite\": \"UNSELECT command\",\n      \"to\": \"Authenticated\",\n      \"actions\": [\"free resources associated with selected mailbox\"],\n      \"response\": \"OK - unselect completed\"\n    },\n    {\n      \"from\": \"Selected\",\n      \"requisite\": \"unsolicited CLOSED response code, or failed SELECT or EXAMINE command\",\n      \"to\": \"Authenticated\",\n      \"actions\": [],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"Selected\",\n      \"requisite\": \"SELECT or EXAMINE command\",\n      \"to\": \"Selected\",\n      \"actions\": [\"deselect current mailbox, select new mailbox\"],\n      \"response\": \"OK - select/examine completed\"\n    },\n    {\n      \"from\": \"Not Authenticated\",\n      \"requisite\": \"LOGOUT command\",\n      \"to\": \"Logout\",\n      \"actions\": [\"close connection\"],\n      \"response\": \"BYE followed by OK\"\n    },\n    {\n      \"from\": \"Authenticated\",\n      \"requisite\": \"LOGOUT command\",\n      \"to\": \"Logout\",\n      \"actions\": [\"close connection\"],\n      \"response\": \"BYE followed by OK\"\n    },\n    {\n      \"from\": \"Selected\",\n      \"requisite\": \"LOGOUT command\",\n      \"to\": \"Logout\",\n      \"actions\": [\"close connection\"],\n      \"response\": \"BYE followed by OK\"\n    },\n    {\n      \"from\": \"Not Authenticated\",\n      \"requisite\": \"server shutdown, or connection closed\",\n      \"to\": \"Logout\",\n      \"actions\": [],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"Authenticated\",\n      \"requisite\": \"server shutdown, or connection closed\",\n      \"to\": \"Logout\",\n      \"actions\": [],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"Selected\",\n      \"requis",
-  "final_fsm": null
+  "final_response": "Connections merge like rivers,\nStates flow from start to end,\nProtocol paths converge,\nIn JSON, patterns blend.\n\n<json>\n{\n  \"states\": [\"Not Authenticated\", \"Authenticated\", \"Selected\", \"Logout\", \"Connection Established\", \"Connection Closed\"],\n  \"initial_state\": \"Connection Established\",\n  \"final_states\": [\"Connection Closed\"],\n  \"transitions\": [\n    {\n      \"from\": \"Connection Established\",\n      \"requisite\": \"OK greeting\",\n      \"to\": \"Not Authenticated\",\n      \"actions\": [\"server greeting\"],\n      \"response\": \"connection without pre-authentication\"\n    },\n    {\n      \"from\": \"Connection Established\",\n      \"requisite\": \"PREAUTH greeting\",\n      \"to\": \"Authenticated\",\n      \"actions\": [\"server greeting\"],\n      \"response\": \"pre-authenticated connection\"\n    },\n    {\n      \"from\": \"Connection Established\",\n      \"requisite\": \"BYE greeting\",\n      \"to\": \"Logout\",\n      \"actions\": [\"server greeting\"],\n      \"response\": \"rejected connection\"\n    },\n    {\n      \"from\": \"Not Authenticated\",\n      \"requisite\": \"successful LOGIN or AUTHENTICATE command\",\n      \"to\": \"Authenticated\",\n      \"actions\": [\"establish authentication\"],\n      \"response\": \"OK - authenticate/login completed\"\n    },\n    {\n      \"from\": \"Not Authenticated\",\n      \"requisite\": \"STARTTLS command\",\n      \"to\": \"Not Authenticated\",\n      \"actions\": [\"begin TLS negotiation\"],\n      \"response\": \"OK - starttls completed\"\n    },\n    {\n      \"from\": \"Authenticated\",\n      \"requisite\": \"successful SELECT or EXAMINE command\",\n      \"to\": \"Selected\",\n      \"actions\": [\"select mailbox\"],\n      \"response\": \"OK - select/examine completed\"\n    },\n    {\n      \"from\": \"Selected\",\n      \"requisite\": \"CLOSE command\",\n      \"to\": \"Authenticated\",\n      \"actions\": [\"remove messages with \\\\Deleted flag\"],\n      \"response\": \"OK - close completed\"\n    },\n    {\n      \"from\": \"Selected\",\n      \"requisite\": \"UNSELECT command\",\n      \"to\": \"Authenticated\",\n      \"actions\": [\"free resources associated with selected mailbox\"],\n      \"response\": \"OK - unselect completed\"\n    },\n    {\n      \"from\": \"Selected\",\n      \"requisite\": \"SELECT or EXAMINE command\",\n      \"to\": \"Selected\",\n      \"actions\": [\"deselect current mailbox, select new mailbox\"],\n      \"response\": \"OK - select/examine completed\"\n    },\n    {\n      \"from\": \"Not Authenticated\",\n      \"requisite\": \"LOGOUT command, server shutdown, or connection closed\",\n      \"to\": \"Logout\",\n      \"actions\": [\"close connection\"],\n      \"response\": \"BYE followed by OK\"\n    },\n    {\n      \"from\": \"Authenticated\",\n      \"requisite\": \"LOGOUT command, server shutdown, or connection closed\",\n      \"to\": \"Logout\",\n      \"actions\": [\"close connection\"],\n      \"response\": \"BYE followed by OK\"\n    },\n    {\n      \"from\": \"Selected\",\n      \"requisite\": \"LOGOUT command, server shutdown, or connection closed\",\n      \"to\": \"Logout\",\n      \"actions\": [\"close connection\"],\n      \"response\": \"BYE followed by OK\"\n    },\n    {\n      \"from\": \"Logout\",\n      \"requisite\": \"\",\n      \"to\": \"Connection Closed\",\n      \"actions\": [\"both sides close the connection\"],\n      \"response\": \"\"\n    }\n  ]\n}\n</json>",
+  "final_fsm": {
+    "states": [
+      "Not Authenticated",
+      "Authenticated",
+      "Selected",
+      "Logout",
+      "Connection Established",
+      "Connection Closed"
+    ],
+    "initial_state": "Connection Established",
+    "final_states": [
+      "Connection Closed"
+    ],
+    "transitions": [
+      {
+        "from": "Connection Established",
+        "requisite": "OK greeting",
+        "to": "Not Authenticated",
+        "actions": [
+          "server greeting"
+        ],
+        "response": "connection without pre-authentication"
+      },
+      {
+        "from": "Connection Established",
+        "requisite": "PREAUTH greeting",
+        "to": "Authenticated",
+        "actions": [
+          "server greeting"
+        ],
+        "response": "pre-authenticated connection"
+      },
+      {
+        "from": "Connection Established",
+        "requisite": "BYE greeting",
+        "to": "Logout",
+        "actions": [
+          "server greeting"
+        ],
+        "response": "rejected connection"
+      },
+      {
+        "from": "Not Authenticated",
+        "requisite": "successful LOGIN or AUTHENTICATE command",
+        "to": "Authenticated",
+        "actions": [
+          "establish authentication"
+        ],
+        "response": "OK - authenticate/login completed"
+      },
+      {
+        "from": "Not Authenticated",
+        "requisite": "STARTTLS command",
+        "to": "Not Authenticated",
+        "actions": [
+          "begin TLS negotiation"
+        ],
+        "response": "OK - starttls completed"
+      },
+      {
+        "from": "Authenticated",
+        "requisite": "successful SELECT or EXAMINE command",
+        "to": "Selected",
+        "actions": [
+          "select mailbox"
+        ],
+        "response": "OK - select/examine completed"
+      },
+      {
+        "from": "Selected",
+        "requisite": "CLOSE command",
+        "to": "Authenticated",
+        "actions": [
+          "remove messages with \\Deleted flag"
+        ],
+        "response": "OK - close completed"
+      },
+      {
+        "from": "Selected",
+        "requisite": "UNSELECT command",
+        "to": "Authenticated",
+        "actions": [
+          "free resources associated with selected mailbox"
+        ],
+        "response": "OK - unselect completed"
+      },
+      {
+        "from": "Selected",
+        "requisite": "SELECT or EXAMINE command",
+        "to": "Selected",
+        "actions": [
+          "deselect current mailbox, select new mailbox"
+        ],
+        "response": "OK - select/examine completed"
+      },
+      {
+        "from": "Not Authenticated",
+        "requisite": "LOGOUT command, server shutdown, or connection closed",
+        "to": "Logout",
+        "actions": [
+          "close connection"
+        ],
+        "response": "BYE followed by OK"
+      },
+      {
+        "from": "Authenticated",
+        "requisite": "LOGOUT command, server shutdown, or connection closed",
+        "to": "Logout",
+        "actions": [
+          "close connection"
+        ],
+        "response": "BYE followed by OK"
+      },
+      {
+        "from": "Selected",
+        "requisite": "LOGOUT command, server shutdown, or connection closed",
+        "to": "Logout",
+        "actions": [
+          "close connection"
+        ],
+        "response": "BYE followed by OK"
+      },
+      {
+        "from": "Logout",
+        "requisite": "",
+        "to": "Connection Closed",
+        "actions": [
+          "both sides close the connection"
+        ],
+        "response": ""
+      }
+    ]
+  }
 }

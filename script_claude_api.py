@@ -187,7 +187,7 @@ def call_api(model, prompt, temperature=0.0, max_tokens=8192):
     """
     message = client.messages.create(
         model=model,
-        max_tokens=1000,
+        max_tokens=max_tokens,
         temperature=temperature,
         system="You are a world-class poet. Respond only with short poems.",
         messages=[
@@ -312,9 +312,9 @@ if __name__ == "__main__":
 
     # prompt = build_fsm_combination_prompt(partials)
     # print(prompt)
-    # "DCCP","DHCP", "FTP","IMAP"
-    # , "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP"
-    protocols = [ "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP"]
+    # "DCCP","DHCP", "FTP","IMAP",
+    #             "NNTP", "POP3",
+    protocols = [  "RTSP", "SIP", "SMTP", "TCP"]
     
     # model = "deepseek-r1:14b"
     # models = ["deepseek-r1:32b","qwen3:32b","gemma3:27b"]

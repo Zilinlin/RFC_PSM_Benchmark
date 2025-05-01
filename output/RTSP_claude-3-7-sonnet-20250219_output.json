@@ -222,7 +222,7 @@
     {
       "tag": "Section 23. References",
       "prompt": "\nYou will be given the section \"Section 23. References\" of an RFC document for protocol \"RTSP\".\n\n**RESPONSE FORMAT (MANDATORY)**\n- Your reply must consist **exclusively** of the JSON object representing the state machine.\n- That JSON must be wrapped in <json> and </json> tags.\n- Do **not** include any extra text, explanation, code fences, or formatting.\n\n<section>\n23.1.  Normative References\n   [FIPS180-4]\n              National Institute of Standards and Technology (NIST),\n              \"Federal Information Processing Standards Publication:\n              Secure Hash Standard (SHS)\", DOI 10.6028/NIST.FIPS.180-4,\n              August 2015, <http://nvlpubs.nist.gov/nistpubs/FIPS/\n              NIST.FIPS.180-4.pdf>.\n   [RFC768]   Postel, J., \"User Datagram Protocol\", STD 6, RFC 768,\n              <http://www.rfc-editor.org/info/rfc768>.\n   [RFC793]   Postel, J., \"Transmission Control Protocol\", STD 7,\n              <http://www.rfc-editor.org/info/rfc793>.\n   [RFC2119]  Bradner, S., \"Key words for use in RFCs to Indicate\n              Requirement Levels\", BCP 14, RFC 2119,\n              <http://www.rfc-editor.org/info/rfc2119>.\n   [RFC2460]  Deering, S. and R. Hinden, \"Internet Protocol, Version 6\n              (IPv6) Specification\", RFC 2460, DOI 10.17487/RFC2460,\n   [RFC2616]  Fielding, R., Gettys, J., Mogul, J., Frystyk, H.,\n              Masinter, L., Leach, P., and T. Berners-Lee, \"Hypertext\n              Transfer Protocol -- HTTP/1.1\", RFC 2616,\n              <http://www.rfc-editor.org/info/rfc2616>.\n   [RFC2617]  Franks, J., Hallam-Baker, P., Hostetler, J., Lawrence, S.,\n              Leach, P., Luotonen, A., and L. Stewart, \"HTTP\n              Authentication: Basic and Digest Access Authentication\",\n              <http://www.rfc-editor.org/info/rfc2617>.\n   [RFC2818]  Rescorla, E., \"HTTP Over TLS\", RFC 2818,\n              <http://www.rfc-editor.org/info/rfc2818>.\n   [RFC3550]  Schulzrinne, H., Casner, S., Frederick, R., and V.\n              Jacobson, \"RTP: A Transport Protocol for Real-Time\n              Applications\", STD 64, RFC 3550, DOI 10.17487/RFC3550,\n   [RFC3551]  Schulzrinne, H. and S. Casner, \"RTP Profile for Audio and\n              Video Conferences with Minimal Control\", STD 65, RFC 3551,\n              <http://www.rfc-editor.org/info/rfc3551>.\n   [RFC3629]  Yergeau, F., \"UTF-8, a transformation format of ISO\n              10646\", STD 63, RFC 3629, DOI 10.17487/RFC3629, November\n              2003, <http://www.rfc-editor.org/info/rfc3629>.\n   [RFC3711]  Baugher, M., McGrew, D., Naslund, M., Carrara, E., and K.\n              Norrman, \"The Secure Real-time Transport Protocol (SRTP)\",\n              <http://www.rfc-editor.org/info/rfc3711>.\n   [RFC3830]  Arkko, J., Carrara, E., Lindholm, F., Naslund, M., and K.\n              Norrman, \"MIKEY: Multimedia Internet KEYing\", RFC 3830,\n              <http://www.rfc-editor.org/info/rfc3830>.\n   [RFC3986]  Berners-Lee, T., Fielding, R., and L. Masinter, \"Uniform\n              Resource Identifier (URI): Generic Syntax\", STD 66,\n              <http://www.rfc-editor.org/info/rfc3986>.\n   [RFC3987]  Duerst, M. and M. Suignard, \"Internationalized Resource\n              Identifiers (IRIs)\", RFC 3987, DOI 10.17487/RFC3987,\n   [RFC4086]  Eastlake 3rd, D., Schiller, J., and S. Crocker,\n              \"Randomness Requirements for Security\", BCP 106, RFC 4086,\n              <http://www.rfc-editor.org/info/rfc4086>.\n   [RFC4291]  Hinden, R. and S. Deering, \"IP Version 6 Addressing\n              Architecture\", RFC 4291, DOI 10.17487/RFC4291, February\n              2006, <http://www.rfc-editor.org/info/rfc4291>.\n   [RFC7595]  Thaler, D., Ed., Hansen, T., and T. Hardie, \"Guidelines\n              and Registration Procedures for URI Schemes\", BCP 35, RFC\n              editor.org/info/rfc7595>.\n   [RFC4566]  Handley, M., Jacobson, V., and C. Perkins, \"SDP: Session\n              Description Protocol\", RFC 4566, DOI 10.17487/RFC4566,\n   [RFC4571]  Lazzaro, J., \"Framing Real-time Transport Protocol (RTP)\n              and RTP Control Protocol (RTCP) Packets over Connection-\n              Oriented Transport\", RFC 4571, DOI 10.17487/RFC4571, July\n              2006, <http://www.rfc-editor.org/info/rfc4571>.\n   [RFC4585]  Ott, J., Wenger, S., Sato, N., Burmeister, C., and J. Rey,\n              \"Extended RTP Profile for Real-time Transport Control\n              Protocol (RTCP)-Based Feedback (RTP/AVPF)\", RFC 4585,\n              <http://www.rfc-editor.org/info/rfc4585>.\n   [RFC4648]  Josefsson, S., \"The Base16, Base32, and Base64 Data\n              <http://www.rfc-editor.org/info/rfc4648>.\n   [RFC4738]  Ignjatic, D., Dondeti, L., Audet, F., and P. Lin, \"MIKEY-\n              RSA-R: An Additional Mode of Key Distribution in\n              Multimedia Internet KEYing (MIKEY)\", RFC 4738,\n              <http://www.rfc-editor.org/info/rfc4738>.\n   [RFC5124]  Ott, J. and E. Carrara, \"Extended Secure RTP Profile for\n              Real-time Transport Control Protocol (RTCP)-Based Feedback\n              (RTP/SAVPF)\", RFC 5124, DOI 10.17487/RFC5124, February\n              2008, <http://www.rfc-editor.org/info/rfc5124>.\n   [RFC5226]  Narten, T. and H. Alvestrand, \"Guidelines for Writing an\n              IANA Considerations Section in RFCs\", BCP 26, RFC 5226,\n              <http://www.rfc-editor.org/info/rfc5226>.\n   [RFC5234]  Crocker, D., Ed. and P. Overell, \"Augmented BNF for Syntax\n              Specifications: ABNF\", STD 68, RFC 5234,\n              <http://www.rfc-editor.org/info/rfc5234>.\n   [RFC5246]  Dierks, T. and E. Rescorla, \"The Transport Layer Security\n              (TLS) Protocol Version 1.2\", RFC 5246,\n              <http://www.rfc-editor.org/info/rfc5246>.\n   [RFC5280]  Cooper, D., Santesson, S., Farrell, S., Boeyen, S.,\n              Housley, R., and W. Polk, \"Internet X.509 Public Key\n              Infrastructure Certificate and Certificate Revocation List\n              <http://www.rfc-editor.org/info/rfc5280>.\n   [RFC5322]  Resnick, P., Ed., \"Internet Message Format\", RFC 5322,\n              <http://www.rfc-editor.org/info/rfc5322>.\n   [RFC5646]  Phillips, A., Ed. and M. Davis, Ed., \"Tags for Identifying\n              Languages\", BCP 47, RFC 5646, DOI 10.17487/RFC5646,\n   [RFC5751]  Ramsdell, B. and S. Turner, \"Secure/Multipurpose Internet\n              Mail Extensions (S/MIME) Version 3.2 Message\n              Specification\", RFC 5751, DOI 10.17487/RFC5751, January\n              2010, <http://www.rfc-editor.org/info/rfc5751>.\n   [RFC5761]  Perkins, C. and M. Westerlund, \"Multiplexing RTP Data and\n              Control Packets on a Single Port\", RFC 5761,\n              <http://www.rfc-editor.org/info/rfc5761>.\n   [RFC5888]  Camarillo, G. and H. Schulzrinne, \"The Session Description\n              Protocol (SDP) Grouping Framework\", RFC 5888,\n              <http://www.rfc-editor.org/info/rfc5888>.\n   [RFC6838]  Freed, N., Klensin, J., and T. Hansen, \"Media Type\n              Specifications and Registration Procedures\", BCP 13,\n              <http://www.rfc-editor.org/info/rfc6838>.\n   [RFC7230]  Fielding, R., Ed. and J. Reschke, Ed., \"Hypertext Transfer\n              Protocol (HTTP/1.1): Message Syntax and Routing\",\n              <http://www.rfc-editor.org/info/rfc7230>.\n   [RFC7231]  Fielding, R., Ed. and J. Reschke, Ed., \"Hypertext Transfer\n              Protocol (HTTP/1.1): Semantics and Content\", RFC 7231,\n              <http://www.rfc-editor.org/info/rfc7231>.\n   [RFC7232]  Fielding, R., Ed. and J. Reschke, Ed., \"Hypertext Transfer\n              Protocol (HTTP/1.1): Conditional Requests\", RFC 7232,\n              <http://www.rfc-editor.org/info/rfc7232>.\n   [RFC7233]  Fielding, R., Ed., Lafon, Y., Ed., and J. Reschke, Ed.,\n              \"Hypertext Transfer Protocol (HTTP/1.1): Range Requests\",\n              <http://www.rfc-editor.org/info/rfc7233>.\n   [RFC7234]  Fielding, R., Ed., Nottingham, M., Ed., and J. Reschke,\n              Ed., \"Hypertext Transfer Protocol (HTTP/1.1): Caching\",\n              <http://www.rfc-editor.org/info/rfc7234>.\n   [RFC7235]  Fielding, R., Ed. and J. Reschke, Ed., \"Hypertext Transfer\n              Protocol (HTTP/1.1): Authentication\", RFC 7235,\n              <http://www.rfc-editor.org/info/rfc7235>.\n   [RFC7615]  Reschke, J., \"HTTP Authentication-Info and Proxy-\n              Authentication-Info Response Header Fields\", RFC 7615,\n              <http://www.rfc-editor.org/info/rfc7615>.\n   [RFC7616]  Shekh-Yusef, R., Ed., Ahrens, D., and S. Bremer, \"HTTP\n              Digest Access Authentication\", RFC 7616,\n              <http://www.rfc-editor.org/info/rfc7616>.\n   [RFC7617]  Reschke, J., \"The 'Basic' HTTP Authentication Scheme\",\n              <http://www.rfc-editor.org/info/rfc7617>.\n   [RFC7825]  Goldberg, J., Westerlund, M., and T. Zeng, \"A Network\n              Address Translator (NAT) Traversal Mechanism for Media\n              Controlled by Real-Time Streaming Protocol (RTSP)\",\n              <http://www.rfc-editor.org/info/rfc7825>.\n   [RTP-CIRCUIT-BREAKERS]\n              Perkins, C. and V. Singh, \"Multimedia Congestion Control:\n              Circuit Breakers for Unicast RTP Sessions\", Work in\n              Progress, draft-ietf-avtcore-rtp-circuit-breakers-13,\n              February 2016.\n   [SMPTE-TC] Society of Motion Picture and Television Engineers, \"ST\n              12-1:2008 For Television -- Time and Control Code\",\n              DOI 10.5594/SMPTE.ST12-1.2008, February 2008,\n              <http://ieeexplore.ieee.org/servlet/\n              opac?punumber=7289818>.\n   [TS-26234] 3rd Generation Partnership Project (3GPP), \"Transparent\n              end-to-end Packet-switched Streaming Service (PSS);\n              Protocols and codecs\", Technical Specification 26.234,\n              Release 13, September 2015,\n              <http://www.3gpp.org/DynaReport/26234.htm>.\n23.2.  Informative References\n   [ISO.13818-6.1995]\n              International Organization for Standardization,\n              \"Information technology -- Generic coding of moving\n              pictures and associated audio information - part 6:\n              Extension for DSM-CC\", ISO Draft Standard 13818-6:1998,\n              October 1998,\n              <http://www.iso.org/iso/home/store/catalogue_tc/\n              catalogue_detail.htm?csnumber=25039>.\n   [ISO.8601.2000]\n              International Organization for Standardization, \"Data\n              elements and interchange formats - Information interchange\n              - Representation of dates and times\", ISO/IEC Standard\n              8601, December 2000.\n   [RFC791]   Postel, J., \"Internet Protocol\", STD 5, RFC 791,\n              <http://www.rfc-editor.org/info/rfc791>.\n   [RFC1123]  Braden, R., Ed., \"Requirements for Internet Hosts -\n              Application and Support\", STD 3, RFC 1123,\n              <http://www.rfc-editor.org/info/rfc1123>.\n   [RFC2068]  Fielding, R., Gettys, J., Mogul, J., Frystyk, H., and T.\n              Berners-Lee, \"Hypertext Transfer Protocol -- HTTP/1.1\",\n              <http://www.rfc-editor.org/info/rfc2068>.\n   [RFC2326]  Schulzrinne, H., Rao, A., and R. Lanphier, \"Real Time\n              Streaming Protocol (RTSP)\", RFC 2326,\n              <http://www.rfc-editor.org/info/rfc2326>.\n   [RFC2663]  Srisuresh, P. and M. Holdrege, \"IP Network Address\n              Translator (NAT) Terminology and Considerations\",\n              <http://www.rfc-editor.org/info/rfc2663>.\n   [RFC2974]  Handley, M., Perkins, C., and E. Whelan, \"Session\n              Announcement Protocol\", RFC 2974, DOI 10.17487/RFC2974,\n   [RFC3261]  Rosenberg, J., Schulzrinne, H., Camarillo, G., Johnston,\n              A., Peterson, J., Sparks, R., Handley, M., and E.\n              Schooler, \"SIP: Session Initiation Protocol\", RFC 3261,\n              <http://www.rfc-editor.org/info/rfc3261>.\n   [RFC3264]  Rosenberg, J. and H. Schulzrinne, \"An Offer/Answer Model\n              with Session Description Protocol (SDP)\", RFC 3264,\n              <http://www.rfc-editor.org/info/rfc3264>.\n   [RFC3339]  Klyne, G. and C. Newman, \"Date and Time on the Internet:\n              <http://www.rfc-editor.org/info/rfc3339>.\n   [RFC4145]  Yon, D. and G. Camarillo, \"TCP-Based Media Transport in\n              the Session Description Protocol (SDP)\", RFC 4145,\n              <http://www.rfc-editor.org/info/rfc4145>.\n   [RFC4567]  Arkko, J., Lindholm, F., Naslund, M., Norrman, K., and E.\n              Carrara, \"Key Management Extensions for Session\n              Description Protocol (SDP) and Real Time Streaming\n              Protocol (RTSP)\", RFC 4567, DOI 10.17487/RFC4567, July\n              2006, <http://www.rfc-editor.org/info/rfc4567>.\n   [RFC4588]  Rey, J., Leon, D., Miyazaki, A., Varsa, V., and R.\n              Hakenberg, \"RTP Retransmission Payload Format\", RFC 4588,\n              <http://www.rfc-editor.org/info/rfc4588>.\n   [RFC4855]  Casner, S., \"Media Type Registration of RTP Payload\n              <http://www.rfc-editor.org/info/rfc4855>.\n   [RFC4856]  Casner, S., \"Media Type Registration of Payload Formats in\n              the RTP Profile for Audio and Video Conferences\",\n              <http://www.rfc-editor.org/info/rfc4856>.\n   [RFC5104]  Wenger, S., Chandra, U., Westerlund, M., and B. Burman,\n              \"Codec Control Messages in the RTP Audio-Visual Profile\n              with Feedback (AVPF)\", RFC 5104, DOI 10.17487/RFC5104,\n   [RFC5245]  Rosenberg, J., \"Interactive Connectivity Establishment\n              (ICE): A Protocol for Network Address Translator (NAT)\n              Traversal for Offer/Answer Protocols\", RFC 5245,\n              <http://www.rfc-editor.org/info/rfc5245>.\n   [RFC5389]  Rosenberg, J., Mahy, R., Matthews, P., and D. Wing,\n              \"Session Traversal Utilities for NAT (STUN)\", RFC 5389,\n              <http://www.rfc-editor.org/info/rfc5389>.\n   [RFC5583]  Schierl, T. and S. Wenger, \"Signaling Media Decoding\n              Dependency in the Session Description Protocol (SDP)\",\n              <http://www.rfc-editor.org/info/rfc5583>.\n   [RFC5905]  Mills, D., Martin, J., Ed., Burbank, J., and W. Kasch,\n              \"Network Time Protocol Version 4: Protocol and Algorithms\n              <http://www.rfc-editor.org/info/rfc5905>.\n   [RFC6298]  Paxson, V., Allman, M., Chu, J., and M. Sargent,\n              \"Computing TCP's Retransmission Timer\", RFC 6298,\n              <http://www.rfc-editor.org/info/rfc6298>.\n   [Stevens98]\n              Stevens, W., Fenner, B., and A. Rudoff, \"Unix Networking\n              Programming, Volume 1: The Sockets Networking API (3rd\n              Edition)\", 1998.\n</section>\n\nSteps:\n1. Determine if this section has any FSM information (states, transitions, diagrams).\n2. If **none**, reply exactly:\n   <json>None</json>\n3. Otherwise, extract the partial FSM and format it **exactly** as:\n\n{\n  \"states\": [\"state1\", \"state2\", \"state3\"],\n  \"transitions\": [\n    {\n      \"from\": \"state1\",\n      \"requisite\": \"conditionX\",\n      \"to\": \"state2\",\n      \"actions\": [\"action1\"],\n      \"response\": \"response1\"\n    },\n    {\n      \"from\": \"state2\",\n      \"requisite\": \"conditionY\",\n      \"to\": \"state3\",\n      \"actions\": [\"action2\"],\n      \"response\": \"response2\"\n    }\n  ]\n}\n\nand then wrap that in <json>\u2026</json> with nothing else.\n\nRemember: **ONLY** the <json>\u2026</json> block should appear in your final output.\n",
-      "response": "\nReferences like stars in the night,\nA bibliography of technical light.\nNo state machine here to be found,\nJust citations where knowledge is bound.\n\n<json>None</json>",
+      "response": "\nReferences like stars in the night,\nA catalog of wisdom, shining bright.\nNo state machine lurks within these lines,\nJust standards and protocols, technical signs.\n\n<json>None</json>",
       "partial_fsm": null
     },
     {
@@ -234,8 +234,313 @@
     {
       "tag": "Section Appendix B. RTSP Protocol State Machine",
       "prompt": "\nYou will be given the section \"Section Appendix B. RTSP Protocol State Machine\" of an RFC document for protocol \"RTSP\".\n\n**RESPONSE FORMAT (MANDATORY)**\n- Your reply must consist **exclusively** of the JSON object representing the state machine.\n- That JSON must be wrapped in <json> and </json> tags.\n- Do **not** include any extra text, explanation, code fences, or formatting.\n\n<section>\nThe RTSP session state machine describes the behavior of the protocol\n   from RTSP session initialization through RTSP session termination.\n   It is probably easiest to think of this as the server's state and\n   then view the client as needing to track what it believes the\n   server's state will be based on sent or received RTSP messages.\n   Thus, in most cases, the state tables below can be read as: if the\n   client does X, and assuming it fulfills any prerequisite(s), the\n   (server) state will move to the new state and the indicated response\n   will returned.  However, there are also server-to-client\n   notifications or requests, where the action describes what\n   notification or request will occur, its requisites, what new state\n   will result after the server has received the response, as well as\n   describing the client's response to the action.\n   The State machine is defined on a per-session basis, which is\n   uniquely identified by the RTSP session identifier.  The session may\n   contain one or more media streams depending on state.  If a single\n   media stream is part of the session, it is in non-aggregated control.\n   If two or more are part of the session, it is in aggregated control.\n   The below state machine is an informative description of the\n   protocol's behavior.  In case of ambiguity with the earlier parts of\n   this specification, the description in the earlier parts take\n   precedence.\nB.1.  States\n   The state machine contains three states, described below.  For each\n   state, there exists a table that shows which requests and events are\n   allowed and whether they will result in a state change.\n   Init: Initial state, no session exists.\n   Ready:  Session is ready to start playing.\n   Play: Session is playing, i.e., sending media-stream data in the\n         direction S->C.\nB.2.  State Variables\n   This representation of the state machine needs more than its state to\n   work.  A small number of variables are also needed, and they are\n   explained below.\n   NRM:  The number of media streams that are part of this session.\n   RP:   Resume point, the point in the presentation time line at which\n         a request to continue playing will resume from.  A time format\n         for the variable is not mandated.\nB.3.  Abbreviations\n   To make the state tables more compact, a number of abbreviations are\n   used, which are explained below.\n   IFI:  IF Implemented.\n   md:   Media\n   PP:   Pause Point, the point in the presentation timeline at which\n         the presentation was paused.\n   Prs:  Presentation, the complete multimedia presentation.\n   RedP: Redirect Point, the point in the presentation timeline at which\n         a REDIRECT was specified to occur.\n   SES:  Session.\nB.4.  State Tables\n   This section contains a table for each state.  The table contains all\n   the requests and events on which this state is allowed to act.  The\n   events that are method names are, unless noted, requests with the\n   given method in the direction client to server (C->S).  In some\n   cases, there exists one or more requisites.  The response column\n   tells what type of response actions should be performed.  Possible\n   actions that are requested for an event include: response codes,\n   e.g., 200, headers that need to be included in the response, setting\n   of state variables, or settings of other session-related parameters.\n   The new state column tells which state the state machine changes to.\n   The response to a valid request meeting the requisites is normally a\n   2xx (SUCCESS) unless otherwise noted in the response column.  The\n   exceptions need to be given a response according to the response\n   column.  If the request does not meet the requisite, is erroneous, or\n   some other type of error occurs, the appropriate response code is to\n   be sent.  If the response code is a 4xx, the session state is\n   unchanged.  A response code of 3rr will result in that the session\n   being ended and its state changed to Init.  A response code of 304\n   results in no state change.  However, there are restrictions to when\n   a 3rr response may be used.  A 5xx response does not result in any\n   change of the session state, except if the error is not possible to\n   recover from.  An unrecoverable error results in the ending of the\n   session.  In the general case, if it can't be determined whether or\n   not it was an unrecoverable error, the client will be required to\n   test.  In the case that the next request after a 5xx is responded to\n   with a 454 (Session Not Found), the client knows that the session has\n   ended.  For any request message that cannot be responded to within\n   the time defined in Section 10.4, a 100 response must be sent.\n   The server will time out the session after the period of time\n   specified in the SETUP response, if no activity from the client is\n   detected.  Therefore, there exists a timeout event for all states\n   except Init.\n   In the case that NRM = 1, the presentation URI is equal to the media\n   URI or a specified presentation URI.  For NRM > 1, the presentation\n   URI needs to be other than any of the media that are part of the\n   session.  This applies to all states.\n   +---------------+-----------------+---------------------------------+\n   | Event         | Prerequisite    | Response                        |\n   +---------------+-----------------+---------------------------------+\n   | DESCRIBE      | Needs REDIRECT  | 3rr, Redirect                   |\n   |               |                 |                                 |\n   | DESCRIBE      |                 | 200, Session description        |\n   |               |                 |                                 |\n   | OPTIONS       | Session ID      | 200, Reset session timeout      |\n   |               |                 | timer                           |\n   |               |                 |                                 |\n   | OPTIONS       |                 | 200                             |\n   |               |                 |                                 |\n   | SET_PARAMETER | Valid parameter | 200, change value of parameter  |\n   |               |                 |                                 |\n   | GET_PARAMETER | Valid parameter | 200, return value of parameter  |\n   +---------------+-----------------+---------------------------------+\n                Table 9: Non-State-Machine Changing Events\n   The methods in Table 9 do not have any effect on the state machine or\n   the state variables.  However, some methods do change other session-\n   related parameters, for example, SET_PARAMETER, which will set the\n   parameter(s) specified in its body.  Also, all of these methods that\n   allow the Session header will also update the keep-alive timer for\n   the session.\n   +------------------+----------------+-----------+-------------------+\n   | Action           | Requisite      | New State | Response          |\n   +------------------+----------------+-----------+-------------------+\n   | SETUP            |                | Ready     | NRM=1, RP=0.0     |\n   |                  |                |           |                   |\n   | SETUP            | Needs Redirect | Init      | 3rr Redirect      |\n   |                  |                |           |                   |\n   | S -> C: REDIRECT | No Session hdr | Init      | Terminate all SES |\n   +------------------+----------------+-----------+-------------------+\n                           Table 10: State: Init\n   The initial state of the state machine (Table 10) can only be left by\n   processing a correct SETUP request.  As seen in the table, the two\n   state variables are also set by a correct request.  This table also\n   shows that a correct SETUP can in some cases be redirected to another\n   URI or server by a 3rr response.\n   +-------------+------------------------+---------+------------------+\n   | Action      | Requisite              | New     | Response         |\n   |             |                        | State   |                  |\n   +-------------+------------------------+---------+------------------+\n   | SETUP       | New URI                | Ready   | NRM +=1          |\n   |             |                        |         |                  |\n   | SETUP       | URI Setup prior        | Ready   | Change transport |\n   |             |                        |         | param            |\n   |             |                        |         |                  |\n   | TEARDOWN    | Prs URI,               | Init    | No session hdr,  |\n   |             |                        |         | NRM = 0          |\n   |             |                        |         |                  |\n   | TEARDOWN    | md URI,NRM=1           | Init    | No Session hdr,  |\n   |             |                        |         | NRM = 0          |\n   |             |                        |         |                  |\n   | TEARDOWN    | md URI,NRM>1           | Ready   | Session hdr, NRM |\n   |             |                        |         | -= 1             |\n   |             |                        |         |                  |\n   | PLAY        | Prs URI, No range      | Play    | Play from RP     |\n   |             |                        |         |                  |\n   | PLAY        | Prs URI, Range         | Play    | According to     |\n   |             |                        |         | range            |\n   |             |                        |         |                  |\n   | PLAY        | md URI, NRM=1, Range   | Play    | According to     |\n   |             |                        |         | range            |\n   |             |                        |         |                  |\n   | PLAY        | md URI, NRM=1          | Play    | Play from RP     |\n   |             |                        |         |                  |\n   | PAUSE       | Prs URI                | Ready   | Return PP        |\n   |             |                        |         |                  |\n   | SC:REDIRECT | Terminate-Reason       | Ready   | Set RedP         |\n   |             |                        |         |                  |\n   | SC:REDIRECT | No Terminate-Reason    | Init    | Session is       |\n   |             | time parameter         |         | removed          |\n   |             |                        |         |                  |\n   | Timeout     |                        | Init    |                  |\n   |             |                        |         |                  |\n   | RedP        |                        | Init    | TEARDOWN of      |\n   | reached     |                        |         | session          |\n   +-------------+------------------------+---------+------------------+\n                          Table 11: State: Ready\n   In the Ready state (Table 11), some of the actions depend on the\n   number of media streams (NRM) in the session, i.e., aggregated or\n   non-aggregated control.  A SETUP request in the Ready state can\n   either add one more media stream to the session or, if the media\n   stream (same URI) already is part of the session, change the\n   transport parameters.  TEARDOWN depends on both the Request-URI and\n   the number of media streams within the session.  If the Request-URI\n   is the presentation URI, the whole session is torn down.  If a media\n   URI is used in the TEARDOWN request and more than one media exists in\n   the session, the session will remain and a session header is returned\n   in the response.  If only a single media stream remains in the\n   session when performing a TEARDOWN with a media URI, the session is\n   removed.  The number of media streams remaining after tearing down a\n   media stream determines the new state.\n   +----------------+-----------------------+--------+-----------------+\n   | Action         | Requisite             | New    | Response        |\n   |                |                       | State  |                 |\n   +----------------+-----------------------+--------+-----------------+\n   | PAUSE          | Prs URI               | Ready  | Set RP to       |\n   |                |                       |        | present point   |\n   |                |                       |        |                 |\n   | End of media   | All media             | Play   | Set RP = End of |\n   |                |                       |        | media           |\n   |                |                       |        |                 |\n   | End of range   |                       | Play   | Set RP = End of |\n   |                |                       |        | range           |\n   |                |                       |        |                 |\n   | PLAY           | Prs URI, No range     | Play   | Play from       |\n   |                |                       |        | present point   |\n   |                |                       |        |                 |\n   | PLAY           | Prs URI, Range        | Play   | According to    |\n   |                |                       |        | range           |\n   |                |                       |        |                 |\n   | SC:PLAY_NOTIFY |                       | Play   | 200             |\n   |                |                       |        |                 |\n   | SETUP          | New URI               | Play   | 455             |\n   |                |                       |        |                 |\n   | SETUP          | md URI                | Play   | 455             |\n   |                |                       |        |                 |\n   | SETUP          | md URI, IFI           | Play   | Change          |\n   |                |                       |        | transport param.|\n   |                |                       |        |                 |\n   | TEARDOWN       | Prs URI               | Init   | No session hdr  |\n   |                |                       |        |                 |\n   | TEARDOWN       | md URI,NRM=1          | Init   | No Session hdr, |\n   |                |                       |        | NRM=0           |\n   |                |                       |        |                 |\n   | TEARDOWN       | md URI                | Play   | 455             |\n   |                |                       |        |                 |\n   | SC:REDIRECT    | Terminate Reason with | Play   | Set RedP        |\n   |                | Time parameter        |        |                 |\n   |                |                       |        |                 |\n   | SC:REDIRECT    |                       | Init   | Session is      |\n   |                |                       |        | removed         |\n   |                |                       |        |                 |\n   | RedP reached   |                       | Init   | TEARDOWN of     |\n   |                |                       |        | session         |\n   |                |                       |        |                 |\n   | Timeout        |                       | Init   | Stop Media      |\n   |                |                       |        | playout         |\n   +----------------+-----------------------+--------+-----------------+\n                           Table 12: State: Play\n   The Play state table (Table 12) contains a number of requests that\n   need a presentation URI (labeled as Prs URI) to work on (i.e., the\n   presentation URI has to be used as the Request-URI).  This is due to\n   the exclusion of non-aggregated stream control in sessions with more\n   than one media stream.\n   To avoid inconsistencies between the client and server, automatic\n   state transitions are avoided.  This can be seen at, for example, an\n   \"End of media\" event when all media has finished playing but the\n   session still remains in Play state.  An explicit PAUSE request needs\n   to be sent to change the state to Ready.  It may appear that there\n   exist automatic transitions in \"RedP reached\" and \"PP reached\".\n   However, they are requested and acknowledged before they take place.\n   The time at which the transition will happen is known by looking at\n   the Terminate-Reason header's time parameter and Range header,\n   respectively.  If the client sends a request close in time to these\n   transitions, it needs to be prepared for receiving error messages, as\n   the state may or may not have changed.\n</section>\n\nSteps:\n1. Determine if this section has any FSM information (states, transitions, diagrams).\n2. If **none**, reply exactly:\n   <json>None</json>\n3. Otherwise, extract the partial FSM and format it **exactly** as:\n\n{\n  \"states\": [\"state1\", \"state2\", \"state3\"],\n  \"transitions\": [\n    {\n      \"from\": \"state1\",\n      \"requisite\": \"conditionX\",\n      \"to\": \"state2\",\n      \"actions\": [\"action1\"],\n      \"response\": \"response1\"\n    },\n    {\n      \"from\": \"state2\",\n      \"requisite\": \"conditionY\",\n      \"to\": \"state3\",\n      \"actions\": [\"action2\"],\n      \"response\": \"response2\"\n    }\n  ]\n}\n\nand then wrap that in <json>\u2026</json> with nothing else.\n\nRemember: **ONLY** the <json>\u2026</json> block should appear in your final output.\n",
-      "response": "<json>\n{\n  \"states\": [\"Init\", \"Ready\", \"Play\"],\n  \"transitions\": [\n    {\n      \"from\": \"Init\",\n      \"requisite\": \"\",\n      \"to\": \"Ready\",\n      \"actions\": [\"SETUP\"],\n      \"response\": \"NRM=1, RP=0.0\"\n    },\n    {\n      \"from\": \"Init\",\n      \"requisite\": \"Needs Redirect\",\n      \"to\": \"Init\",\n      \"actions\": [\"SETUP\"],\n      \"response\": \"3rr Redirect\"\n    },\n    {\n      \"from\": \"Init\",\n      \"requisite\": \"No Session hdr\",\n      \"to\": \"Init\",\n      \"actions\": [\"S -> C: REDIRECT\"],\n      \"response\": \"Terminate all SES\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"New URI\",\n      \"to\": \"Ready\",\n      \"actions\": [\"SETUP\"],\n      \"response\": \"NRM +=1\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"URI Setup prior\",\n      \"to\": \"Ready\",\n      \"actions\": [\"SETUP\"],\n      \"response\": \"Change transport param\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"Prs URI\",\n      \"to\": \"Init\",\n      \"actions\": [\"TEARDOWN\"],\n      \"response\": \"No session hdr, NRM = 0\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"md URI,NRM=1\",\n      \"to\": \"Init\",\n      \"actions\": [\"TEARDOWN\"],\n      \"response\": \"No Session hdr, NRM = 0\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"md URI,NRM>1\",\n      \"to\": \"Ready\",\n      \"actions\": [\"TEARDOWN\"],\n      \"response\": \"Session hdr, NRM -= 1\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"Prs URI, No range\",\n      \"to\": \"Play\",\n      \"actions\": [\"PLAY\"],\n      \"response\": \"Play from RP\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"Prs URI, Range\",\n      \"to\": \"Play\",\n      \"actions\": [\"PLAY\"],\n      \"response\": \"According to range\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"md URI, NRM=1, Range\",\n      \"to\": \"Play\",\n      \"actions\": [\"PLAY\"],\n      \"response\": \"According to range\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"md URI, NRM=1\",\n      \"to\": \"Play\",\n      \"actions\": [\"PLAY\"],\n      \"response\": \"Play from RP\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"Prs URI\",\n      \"to\": \"Ready\",\n      \"actions\": [\"PAUSE\"],\n      \"response\": \"Return PP\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"Terminate-Reason\",\n      \"to\": \"Ready\",\n      \"actions\": [\"SC:REDIRECT\"],\n      \"response\": \"Set RedP\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"No Terminate-Reason time parameter\",\n      \"to\": \"Init\",\n      \"actions\": [\"SC:REDIRECT\"],\n      \"response\": \"Session is removed\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"\",\n      \"to\": \"Init\",\n      \"actions\": [\"Timeout\"],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"\",\n      \"to\": \"Init\",\n      \"actions\": [\"RedP reached\"],\n      \"response\": \"TEARDOWN of session\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"Prs URI\",",
-      "partial_fsm": null
+      "response": "<json>\n{\n  \"states\": [\"Init\", \"Ready\", \"Play\"],\n  \"transitions\": [\n    {\n      \"from\": \"Init\",\n      \"requisite\": \"\",\n      \"to\": \"Ready\",\n      \"actions\": [\"SETUP\"],\n      \"response\": \"NRM=1, RP=0.0\"\n    },\n    {\n      \"from\": \"Init\",\n      \"requisite\": \"Needs Redirect\",\n      \"to\": \"Init\",\n      \"actions\": [\"SETUP\"],\n      \"response\": \"3rr Redirect\"\n    },\n    {\n      \"from\": \"Init\",\n      \"requisite\": \"No Session hdr\",\n      \"to\": \"Init\",\n      \"actions\": [\"S -> C: REDIRECT\"],\n      \"response\": \"Terminate all SES\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"New URI\",\n      \"to\": \"Ready\",\n      \"actions\": [\"SETUP\"],\n      \"response\": \"NRM +=1\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"URI Setup prior\",\n      \"to\": \"Ready\",\n      \"actions\": [\"SETUP\"],\n      \"response\": \"Change transport param\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"Prs URI\",\n      \"to\": \"Init\",\n      \"actions\": [\"TEARDOWN\"],\n      \"response\": \"No session hdr, NRM = 0\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"md URI,NRM=1\",\n      \"to\": \"Init\",\n      \"actions\": [\"TEARDOWN\"],\n      \"response\": \"No Session hdr, NRM = 0\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"md URI,NRM>1\",\n      \"to\": \"Ready\",\n      \"actions\": [\"TEARDOWN\"],\n      \"response\": \"Session hdr, NRM -= 1\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"Prs URI, No range\",\n      \"to\": \"Play\",\n      \"actions\": [\"PLAY\"],\n      \"response\": \"Play from RP\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"Prs URI, Range\",\n      \"to\": \"Play\",\n      \"actions\": [\"PLAY\"],\n      \"response\": \"According to range\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"md URI, NRM=1, Range\",\n      \"to\": \"Play\",\n      \"actions\": [\"PLAY\"],\n      \"response\": \"According to range\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"md URI, NRM=1\",\n      \"to\": \"Play\",\n      \"actions\": [\"PLAY\"],\n      \"response\": \"Play from RP\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"Prs URI\",\n      \"to\": \"Ready\",\n      \"actions\": [\"PAUSE\"],\n      \"response\": \"Return PP\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"Terminate-Reason\",\n      \"to\": \"Ready\",\n      \"actions\": [\"SC:REDIRECT\"],\n      \"response\": \"Set RedP\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"No Terminate-Reason time parameter\",\n      \"to\": \"Init\",\n      \"actions\": [\"SC:REDIRECT\"],\n      \"response\": \"Session is removed\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"\",\n      \"to\": \"Init\",\n      \"actions\": [\"Timeout\"],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"\",\n      \"to\": \"Init\",\n      \"actions\": [\"RedP reached\"],\n      \"response\": \"TEARDOWN of session\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"Prs URI\",\n      \"to\": \"Ready\",\n      \"actions\": [\"PAUSE\"],\n      \"response\": \"Set RP to present point\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"All media\",\n      \"to\": \"Play\",\n      \"actions\": [\"End of media\"],\n      \"response\": \"Set RP = End of media\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"\",\n      \"to\": \"Play\",\n      \"actions\": [\"End of range\"],\n      \"response\": \"Set RP = End of range\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"Prs URI, No range\",\n      \"to\": \"Play\",\n      \"actions\": [\"PLAY\"],\n      \"response\": \"Play from present point\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"Prs URI, Range\",\n      \"to\": \"Play\",\n      \"actions\": [\"PLAY\"],\n      \"response\": \"According to range\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"\",\n      \"to\": \"Play\",\n      \"actions\": [\"SC:PLAY_NOTIFY\"],\n      \"response\": \"200\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"New URI\",\n      \"to\": \"Play\",\n      \"actions\": [\"SETUP\"],\n      \"response\": \"455\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"md URI\",\n      \"to\": \"Play\",\n      \"actions\": [\"SETUP\"],\n      \"response\": \"455\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"md URI, IFI\",\n      \"to\": \"Play\",\n      \"actions\": [\"SETUP\"],\n      \"response\": \"Change transport param.\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"Prs URI\",\n      \"to\": \"Init\",\n      \"actions\": [\"TEARDOWN\"],\n      \"response\": \"No session hdr\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"md URI,NRM=1\",\n      \"to\": \"Init\",\n      \"actions\": [\"TEARDOWN\"],\n      \"response\": \"No Session hdr, NRM=0\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"md URI\",\n      \"to\": \"Play\",\n      \"actions\": [\"TEARDOWN\"],\n      \"response\": \"455\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"Terminate Reason with Time parameter\",\n      \"to\": \"Play\",\n      \"actions\": [\"SC:REDIRECT\"],\n      \"response\": \"Set RedP\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"\",\n      \"to\": \"Init\",\n      \"actions\": [\"SC:REDIRECT\"],\n      \"response\": \"Session is removed\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"\",\n      \"to\": \"Init\",\n      \"actions\": [\"RedP reached\"],\n      \"response\": \"TEARDOWN of session\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"\",\n      \"to\": \"Init\",\n      \"actions\": [\"Timeout\"],\n      \"response\": \"Stop Media playout\"\n    }\n  ]\n}\n</json>",
+      "partial_fsm": {
+        "states": [
+          "Init",
+          "Ready",
+          "Play"
+        ],
+        "transitions": [
+          {
+            "from": "Init",
+            "requisite": "",
+            "to": "Ready",
+            "actions": [
+              "SETUP"
+            ],
+            "response": "NRM=1, RP=0.0"
+          },
+          {
+            "from": "Init",
+            "requisite": "Needs Redirect",
+            "to": "Init",
+            "actions": [
+              "SETUP"
+            ],
+            "response": "3rr Redirect"
+          },
+          {
+            "from": "Init",
+            "requisite": "No Session hdr",
+            "to": "Init",
+            "actions": [
+              "S -> C: REDIRECT"
+            ],
+            "response": "Terminate all SES"
+          },
+          {
+            "from": "Ready",
+            "requisite": "New URI",
+            "to": "Ready",
+            "actions": [
+              "SETUP"
+            ],
+            "response": "NRM +=1"
+          },
+          {
+            "from": "Ready",
+            "requisite": "URI Setup prior",
+            "to": "Ready",
+            "actions": [
+              "SETUP"
+            ],
+            "response": "Change transport param"
+          },
+          {
+            "from": "Ready",
+            "requisite": "Prs URI",
+            "to": "Init",
+            "actions": [
+              "TEARDOWN"
+            ],
+            "response": "No session hdr, NRM = 0"
+          },
+          {
+            "from": "Ready",
+            "requisite": "md URI,NRM=1",
+            "to": "Init",
+            "actions": [
+              "TEARDOWN"
+            ],
+            "response": "No Session hdr, NRM = 0"
+          },
+          {
+            "from": "Ready",
+            "requisite": "md URI,NRM>1",
+            "to": "Ready",
+            "actions": [
+              "TEARDOWN"
+            ],
+            "response": "Session hdr, NRM -= 1"
+          },
+          {
+            "from": "Ready",
+            "requisite": "Prs URI, No range",
+            "to": "Play",
+            "actions": [
+              "PLAY"
+            ],
+            "response": "Play from RP"
+          },
+          {
+            "from": "Ready",
+            "requisite": "Prs URI, Range",
+            "to": "Play",
+            "actions": [
+              "PLAY"
+            ],
+            "response": "According to range"
+          },
+          {
+            "from": "Ready",
+            "requisite": "md URI, NRM=1, Range",
+            "to": "Play",
+            "actions": [
+              "PLAY"
+            ],
+            "response": "According to range"
+          },
+          {
+            "from": "Ready",
+            "requisite": "md URI, NRM=1",
+            "to": "Play",
+            "actions": [
+              "PLAY"
+            ],
+            "response": "Play from RP"
+          },
+          {
+            "from": "Ready",
+            "requisite": "Prs URI",
+            "to": "Ready",
+            "actions": [
+              "PAUSE"
+            ],
+            "response": "Return PP"
+          },
+          {
+            "from": "Ready",
+            "requisite": "Terminate-Reason",
+            "to": "Ready",
+            "actions": [
+              "SC:REDIRECT"
+            ],
+            "response": "Set RedP"
+          },
+          {
+            "from": "Ready",
+            "requisite": "No Terminate-Reason time parameter",
+            "to": "Init",
+            "actions": [
+              "SC:REDIRECT"
+            ],
+            "response": "Session is removed"
+          },
+          {
+            "from": "Ready",
+            "requisite": "",
+            "to": "Init",
+            "actions": [
+              "Timeout"
+            ],
+            "response": ""
+          },
+          {
+            "from": "Ready",
+            "requisite": "",
+            "to": "Init",
+            "actions": [
+              "RedP reached"
+            ],
+            "response": "TEARDOWN of session"
+          },
+          {
+            "from": "Play",
+            "requisite": "Prs URI",
+            "to": "Ready",
+            "actions": [
+              "PAUSE"
+            ],
+            "response": "Set RP to present point"
+          },
+          {
+            "from": "Play",
+            "requisite": "All media",
+            "to": "Play",
+            "actions": [
+              "End of media"
+            ],
+            "response": "Set RP = End of media"
+          },
+          {
+            "from": "Play",
+            "requisite": "",
+            "to": "Play",
+            "actions": [
+              "End of range"
+            ],
+            "response": "Set RP = End of range"
+          },
+          {
+            "from": "Play",
+            "requisite": "Prs URI, No range",
+            "to": "Play",
+            "actions": [
+              "PLAY"
+            ],
+            "response": "Play from present point"
+          },
+          {
+            "from": "Play",
+            "requisite": "Prs URI, Range",
+            "to": "Play",
+            "actions": [
+              "PLAY"
+            ],
+            "response": "According to range"
+          },
+          {
+            "from": "Play",
+            "requisite": "",
+            "to": "Play",
+            "actions": [
+              "SC:PLAY_NOTIFY"
+            ],
+            "response": "200"
+          },
+          {
+            "from": "Play",
+            "requisite": "New URI",
+            "to": "Play",
+            "actions": [
+              "SETUP"
+            ],
+            "response": "455"
+          },
+          {
+            "from": "Play",
+            "requisite": "md URI",
+            "to": "Play",
+            "actions": [
+              "SETUP"
+            ],
+            "response": "455"
+          },
+          {
+            "from": "Play",
+            "requisite": "md URI, IFI",
+            "to": "Play",
+            "actions": [
+              "SETUP"
+            ],
+            "response": "Change transport param."
+          },
+          {
+            "from": "Play",
+            "requisite": "Prs URI",
+            "to": "Init",
+            "actions": [
+              "TEARDOWN"
+            ],
+            "response": "No session hdr"
+          },
+          {
+            "from": "Play",
+            "requisite": "md URI,NRM=1",
+            "to": "Init",
+            "actions": [
+              "TEARDOWN"
+            ],
+            "response": "No Session hdr, NRM=0"
+          },
+          {
+            "from": "Play",
+            "requisite": "md URI",
+            "to": "Play",
+            "actions": [
+              "TEARDOWN"
+            ],
+            "response": "455"
+          },
+          {
+            "from": "Play",
+            "requisite": "Terminate Reason with Time parameter",
+            "to": "Play",
+            "actions": [
+              "SC:REDIRECT"
+            ],
+            "response": "Set RedP"
+          },
+          {
+            "from": "Play",
+            "requisite": "",
+            "to": "Init",
+            "actions": [
+              "SC:REDIRECT"
+            ],
+            "response": "Session is removed"
+          },
+          {
+            "from": "Play",
+            "requisite": "",
+            "to": "Init",
+            "actions": [
+              "RedP reached"
+            ],
+            "response": "TEARDOWN of session"
+          },
+          {
+            "from": "Play",
+            "requisite": "",
+            "to": "Init",
+            "actions": [
+              "Timeout"
+            ],
+            "response": "Stop Media playout"
+          }
+        ]
+      }
     },
     {
       "tag": "Section Appendix C. Media-Transport Alternatives",
@@ -280,7 +585,7 @@
       "partial_fsm": null
     }
   ],
-  "final_response": "Streams of code and logic flow,\nStates and transitions in a row.\nHere's your machine, merged and clean,\nA protocol's dance, now clearly seen:\n\n<json>\n{\n  \"states\": [\"Init\", \"Ready\", \"Play\"],\n  \"initial_state\": \"Init\",\n  \"final_states\": [],\n  \"transitions\": [\n    {\n      \"from\": \"Init\",\n      \"requisite\": \"SETUP request\",\n      \"to\": \"Ready\",\n      \"actions\": [\n        \"Create session\",\n        \"Set up transport parameters\"\n      ],\n      \"response\": \"200 OK with Session header\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"SETUP request\",\n      \"to\": \"Ready\",\n      \"actions\": [\n        \"Change transport parameters\"\n      ],\n      \"response\": \"200 OK\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"PLAY request\",\n      \"to\": \"Play\",\n      \"actions\": [\n        \"Start media delivery\"\n      ],\n      \"response\": \"200 OK with Range and RTP-Info headers\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"PAUSE request\",\n      \"to\": \"Ready\",\n      \"actions\": [\n        \"Stop media delivery\",\n        \"Set pause point\"\n      ],\n      \"response\": \"200 OK with Range header\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"PLAY request\",\n      \"to\": \"Play\",\n      \"actions\": [\n        \"Update playback parameters\"\n      ],\n      \"response\": \"200 OK with updated parameters\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"SETUP request\",\n      \"to\": \"Play\",\n      \"actions\": [\n        \"Change transport parameters\"\n      ],\n      \"response\": \"200 OK with Range and RTP-Info headers\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"TEARDOWN request\",\n      \"to\": \"Init\",\n      \"actions\": [\n        \"Free resources\",\n        \"Destroy session\"\n      ],\n      \"response\": \"200 OK without Session header\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"TEARDOWN request\",\n      \"to\": \"Init\",\n      \"actions\": [\n        \"Stop media delivery\",\n        \"Free resources\",\n        \"Destroy session\"\n      ],\n      \"response\": \"200 OK without Session header\"\n    }\n  ]\n}\n</json>",
+  "final_response": "<json>\n{\n  \"states\": [\"Init\", \"Ready\", \"Play\"],\n  \"initial_state\": \"Init\",\n  \"final_states\": [],\n  \"transitions\": [\n    {\n      \"from\": \"Init\",\n      \"requisite\": \"SETUP request\",\n      \"to\": \"Ready\",\n      \"actions\": [\"Create session\", \"Set up transport parameters\"],\n      \"response\": \"200 OK with Session header\"\n    },\n    {\n      \"from\": \"Init\",\n      \"requisite\": \"Needs Redirect\",\n      \"to\": \"Init\",\n      \"actions\": [\"SETUP\"],\n      \"response\": \"3rr Redirect\"\n    },\n    {\n      \"from\": \"Init\",\n      \"requisite\": \"No Session hdr\",\n      \"to\": \"Init\",\n      \"actions\": [\"S -> C: REDIRECT\"],\n      \"response\": \"Terminate all SES\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"SETUP request\",\n      \"to\": \"Ready\",\n      \"actions\": [\"Change transport parameters\"],\n      \"response\": \"200 OK\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"New URI\",\n      \"to\": \"Ready\",\n      \"actions\": [\"SETUP\"],\n      \"response\": \"NRM +=1\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"URI Setup prior\",\n      \"to\": \"Ready\",\n      \"actions\": [\"SETUP\"],\n      \"response\": \"Change transport param\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"PLAY request\",\n      \"to\": \"Play\",\n      \"actions\": [\"Start media delivery\"],\n      \"response\": \"200 OK with Range and RTP-Info headers\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"Prs URI, No range\",\n      \"to\": \"Play\",\n      \"actions\": [\"PLAY\"],\n      \"response\": \"Play from RP\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"Prs URI, Range\",\n      \"to\": \"Play\",\n      \"actions\": [\"PLAY\"],\n      \"response\": \"According to range\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"md URI, NRM=1, Range\",\n      \"to\": \"Play\",\n      \"actions\": [\"PLAY\"],\n      \"response\": \"According to range\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"md URI, NRM=1\",\n      \"to\": \"Play\",\n      \"actions\": [\"PLAY\"],\n      \"response\": \"Play from RP\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"Prs URI\",\n      \"to\": \"Ready\",\n      \"actions\": [\"PAUSE\"],\n      \"response\": \"Return PP\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"TEARDOWN request\",\n      \"to\": \"Init\",\n      \"actions\": [\"Free resources\", \"Destroy session\"],\n      \"response\": \"200 OK without Session header\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"Prs URI\",\n      \"to\": \"Init\",\n      \"actions\": [\"TEARDOWN\"],\n      \"response\": \"No session hdr, NRM = 0\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"md URI,NRM=1\",\n      \"to\": \"Init\",\n      \"actions\": [\"TEARDOWN\"],\n      \"response\": \"No Session hdr, NRM = 0\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"md URI,NRM>1\",\n      \"to\": \"Ready\",\n      \"actions\": [\"TEARDOWN\"],\n      \"response\": \"Session hdr, NRM -= 1\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"Terminate-Reason\",\n      \"to\": \"Ready\",\n      \"actions\": [\"SC:REDIRECT\"],\n      \"response\": \"Set RedP\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"No Terminate-Reason time parameter\",\n      \"to\": \"Init\",\n      \"actions\": [\"SC:REDIRECT\"],\n      \"response\": \"Session is removed\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"\",\n      \"to\": \"Init\",\n      \"actions\": [\"Timeout\"],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"requisite\": \"\",\n      \"to\": \"Init\",\n      \"actions\": [\"RedP reached\"],\n      \"response\": \"TEARDOWN of session\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"PAUSE request\",\n      \"to\": \"Ready\",\n      \"actions\": [\"Stop media delivery\", \"Set pause point\"],\n      \"response\": \"200 OK with Range header\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"Prs URI\",\n      \"to\": \"Ready\",\n      \"actions\": [\"PAUSE\"],\n      \"response\": \"Set RP to present point\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"PLAY request\",\n      \"to\": \"Play\",\n      \"actions\": [\"Update playback parameters\"],\n      \"response\": \"200 OK with updated parameters\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"Prs URI, No range\",\n      \"to\": \"Play\",\n      \"actions\": [\"PLAY\"],\n      \"response\": \"Play from present point\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"Prs URI, Range\",\n      \"to\": \"Play\",\n      \"actions\": [\"PLAY\"],\n      \"response\": \"According to range\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"SETUP request\",\n      \"to\": \"Play\",\n      \"actions\": [\"Change transport parameters\"],\n      \"response\": \"200 OK with Range and RTP-Info headers\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"New URI\",\n      \"to\": \"Play\",\n      \"actions\": [\"SETUP\"],\n      \"response\": \"455\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"md URI\",\n      \"to\": \"Play\",\n      \"actions\": [\"SETUP\"],\n      \"response\": \"455\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"md URI, IFI\",\n      \"to\": \"Play\",\n      \"actions\": [\"SETUP\"],\n      \"response\": \"Change transport param.\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"TEARDOWN request\",\n      \"to\": \"Init\",\n      \"actions\": [\"Stop media delivery\", \"Free resources\", \"Destroy session\"],\n      \"response\": \"200 OK without Session header\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"Prs URI\",\n      \"to\": \"Init\",\n      \"actions\": [\"TEARDOWN\"],\n      \"response\": \"No session hdr\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"md URI,NRM=1\",\n      \"to\": \"Init\",\n      \"actions\": [\"TEARDOWN\"],\n      \"response\": \"No Session hdr, NRM=0\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"md URI\",\n      \"to\": \"Play\",\n      \"actions\": [\"TEARDOWN\"],\n      \"response\": \"455\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"All media\",\n      \"to\": \"Play\",\n      \"actions\": [\"End of media\"],\n      \"response\": \"Set RP = End of media\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"\",\n      \"to\": \"Play\",\n      \"actions\": [\"End of range\"],\n      \"response\": \"Set RP = End of range\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"\",\n      \"to\": \"Play\",\n      \"actions\": [\"SC:PLAY_NOTIFY\"],\n      \"response\": \"200\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"Terminate Reason with Time parameter\",\n      \"to\": \"Play\",\n      \"actions\": [\"SC:REDIRECT\"],\n      \"response\": \"Set RedP\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"\",\n      \"to\": \"Init\",\n      \"actions\": [\"SC:REDIRECT\"],\n      \"response\": \"Session is removed\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"\",\n      \"to\": \"Init\",\n      \"actions\": [\"RedP reached\"],\n      \"response\": \"TEARDOWN of session\"\n    },\n    {\n      \"from\": \"Play\",\n      \"requisite\": \"\",\n      \"to\": \"Init\",\n      \"actions\": [\"Timeout\"],\n      \"response\": \"Stop Media playout\"\n    }\n  ]\n}\n</json>",
   "final_fsm": {
     "states": [
       "Init",
@@ -301,6 +606,24 @@
         "response": "200 OK with Session header"
       },
       {
+        "from": "Init",
+        "requisite": "Needs Redirect",
+        "to": "Init",
+        "actions": [
+          "SETUP"
+        ],
+        "response": "3rr Redirect"
+      },
+      {
+        "from": "Init",
+        "requisite": "No Session hdr",
+        "to": "Init",
+        "actions": [
+          "S -> C: REDIRECT"
+        ],
+        "response": "Terminate all SES"
+      },
+      {
         "from": "Ready",
         "requisite": "SETUP request",
         "to": "Ready",
@@ -311,12 +634,148 @@
       },
       {
         "from": "Ready",
+        "requisite": "New URI",
+        "to": "Ready",
+        "actions": [
+          "SETUP"
+        ],
+        "response": "NRM +=1"
+      },
+      {
+        "from": "Ready",
+        "requisite": "URI Setup prior",
+        "to": "Ready",
+        "actions": [
+          "SETUP"
+        ],
+        "response": "Change transport param"
+      },
+      {
+        "from": "Ready",
         "requisite": "PLAY request",
         "to": "Play",
         "actions": [
           "Start media delivery"
         ],
         "response": "200 OK with Range and RTP-Info headers"
+      },
+      {
+        "from": "Ready",
+        "requisite": "Prs URI, No range",
+        "to": "Play",
+        "actions": [
+          "PLAY"
+        ],
+        "response": "Play from RP"
+      },
+      {
+        "from": "Ready",
+        "requisite": "Prs URI, Range",
+        "to": "Play",
+        "actions": [
+          "PLAY"
+        ],
+        "response": "According to range"
+      },
+      {
+        "from": "Ready",
+        "requisite": "md URI, NRM=1, Range",
+        "to": "Play",
+        "actions": [
+          "PLAY"
+        ],
+        "response": "According to range"
+      },
+      {
+        "from": "Ready",
+        "requisite": "md URI, NRM=1",
+        "to": "Play",
+        "actions": [
+          "PLAY"
+        ],
+        "response": "Play from RP"
+      },
+      {
+        "from": "Ready",
+        "requisite": "Prs URI",
+        "to": "Ready",
+        "actions": [
+          "PAUSE"
+        ],
+        "response": "Return PP"
+      },
+      {
+        "from": "Ready",
+        "requisite": "TEARDOWN request",
+        "to": "Init",
+        "actions": [
+          "Free resources",
+          "Destroy session"
+        ],
+        "response": "200 OK without Session header"
+      },
+      {
+        "from": "Ready",
+        "requisite": "Prs URI",
+        "to": "Init",
+        "actions": [
+          "TEARDOWN"
+        ],
+        "response": "No session hdr, NRM = 0"
+      },
+      {
+        "from": "Ready",
+        "requisite": "md URI,NRM=1",
+        "to": "Init",
+        "actions": [
+          "TEARDOWN"
+        ],
+        "response": "No Session hdr, NRM = 0"
+      },
+      {
+        "from": "Ready",
+        "requisite": "md URI,NRM>1",
+        "to": "Ready",
+        "actions": [
+          "TEARDOWN"
+        ],
+        "response": "Session hdr, NRM -= 1"
+      },
+      {
+        "from": "Ready",
+        "requisite": "Terminate-Reason",
+        "to": "Ready",
+        "actions": [
+          "SC:REDIRECT"
+        ],
+        "response": "Set RedP"
+      },
+      {
+        "from": "Ready",
+        "requisite": "No Terminate-Reason time parameter",
+        "to": "Init",
+        "actions": [
+          "SC:REDIRECT"
+        ],
+        "response": "Session is removed"
+      },
+      {
+        "from": "Ready",
+        "requisite": "",
+        "to": "Init",
+        "actions": [
+          "Timeout"
+        ],
+        "response": ""
+      },
+      {
+        "from": "Ready",
+        "requisite": "",
+        "to": "Init",
+        "actions": [
+          "RedP reached"
+        ],
+        "response": "TEARDOWN of session"
       },
       {
         "from": "Play",
@@ -330,12 +789,39 @@
       },
       {
         "from": "Play",
+        "requisite": "Prs URI",
+        "to": "Ready",
+        "actions": [
+          "PAUSE"
+        ],
+        "response": "Set RP to present point"
+      },
+      {
+        "from": "Play",
         "requisite": "PLAY request",
         "to": "Play",
         "actions": [
           "Update playback parameters"
         ],
         "response": "200 OK with updated parameters"
+      },
+      {
+        "from": "Play",
+        "requisite": "Prs URI, No range",
+        "to": "Play",
+        "actions": [
+          "PLAY"
+        ],
+        "response": "Play from present point"
+      },
+      {
+        "from": "Play",
+        "requisite": "Prs URI, Range",
+        "to": "Play",
+        "actions": [
+          "PLAY"
+        ],
+        "response": "According to range"
       },
       {
         "from": "Play",
@@ -347,14 +833,31 @@
         "response": "200 OK with Range and RTP-Info headers"
       },
       {
-        "from": "Ready",
-        "requisite": "TEARDOWN request",
-        "to": "Init",
+        "from": "Play",
+        "requisite": "New URI",
+        "to": "Play",
         "actions": [
-          "Free resources",
-          "Destroy session"
+          "SETUP"
         ],
-        "response": "200 OK without Session header"
+        "response": "455"
+      },
+      {
+        "from": "Play",
+        "requisite": "md URI",
+        "to": "Play",
+        "actions": [
+          "SETUP"
+        ],
+        "response": "455"
+      },
+      {
+        "from": "Play",
+        "requisite": "md URI, IFI",
+        "to": "Play",
+        "actions": [
+          "SETUP"
+        ],
+        "response": "Change transport param."
       },
       {
         "from": "Play",
@@ -366,6 +869,96 @@
           "Destroy session"
         ],
         "response": "200 OK without Session header"
+      },
+      {
+        "from": "Play",
+        "requisite": "Prs URI",
+        "to": "Init",
+        "actions": [
+          "TEARDOWN"
+        ],
+        "response": "No session hdr"
+      },
+      {
+        "from": "Play",
+        "requisite": "md URI,NRM=1",
+        "to": "Init",
+        "actions": [
+          "TEARDOWN"
+        ],
+        "response": "No Session hdr, NRM=0"
+      },
+      {
+        "from": "Play",
+        "requisite": "md URI",
+        "to": "Play",
+        "actions": [
+          "TEARDOWN"
+        ],
+        "response": "455"
+      },
+      {
+        "from": "Play",
+        "requisite": "All media",
+        "to": "Play",
+        "actions": [
+          "End of media"
+        ],
+        "response": "Set RP = End of media"
+      },
+      {
+        "from": "Play",
+        "requisite": "",
+        "to": "Play",
+        "actions": [
+          "End of range"
+        ],
+        "response": "Set RP = End of range"
+      },
+      {
+        "from": "Play",
+        "requisite": "",
+        "to": "Play",
+        "actions": [
+          "SC:PLAY_NOTIFY"
+        ],
+        "response": "200"
+      },
+      {
+        "from": "Play",
+        "requisite": "Terminate Reason with Time parameter",
+        "to": "Play",
+        "actions": [
+          "SC:REDIRECT"
+        ],
+        "response": "Set RedP"
+      },
+      {
+        "from": "Play",
+        "requisite": "",
+        "to": "Init",
+        "actions": [
+          "SC:REDIRECT"
+        ],
+        "response": "Session is removed"
+      },
+      {
+        "from": "Play",
+        "requisite": "",
+        "to": "Init",
+        "actions": [
+          "RedP reached"
+        ],
+        "response": "TEARDOWN of session"
+      },
+      {
+        "from": "Play",
+        "requisite": "",
+        "to": "Init",
+        "actions": [
+          "Timeout"
+        ],
+        "response": "Stop Media playout"
       }
     ]
   }

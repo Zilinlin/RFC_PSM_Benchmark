@@ -76,7 +76,7 @@
     {
       "tag": "Section 4. The AUTHORIZATION State",
       "prompt": "\nYou will be given the section \"Section 4. The AUTHORIZATION State\" of an RFC document for protocol \"POP3\".\n\n**RESPONSE FORMAT (MANDATORY)**\n- Your reply must consist **exclusively** of the JSON object representing the state machine.\n- That JSON must be wrapped in <json> and </json> tags.\n- Do **not** include any extra text, explanation, code fences, or formatting.\n\n<section>\nOnce the TCP connection has been opened by a POP3 client, the POP3\n   server issues a one line greeting.  This can be any positive\n   response.  An example might be:\n      S:  +OK POP3 server ready\n   The POP3 session is now in the AUTHORIZATION state.  The client must\n   now identify and authenticate itself to the POP3 server.  Two\n   possible mechanisms for doing this are described in this document,\n   the USER and PASS command combination and the APOP command.  Both\n   mechanisms are described later in this document.  Additional\n   authentication mechanisms are described in [RFC1734].  While there is\n   no single authentication mechanism that is required of all POP3\n   servers, a POP3 server must of course support at least one\n   authentication mechanism.\n   Once the POP3 server has determined through the use of any\n   authentication command that the client should be given access to the\n   appropriate maildrop, the POP3 server then acquires an exclusive-\n   access lock on the maildrop, as necessary to prevent messages from\n   being modified or removed before the session enters the UPDATE state.\n   If the lock is successfully acquired, the POP3 server responds with a\n   positive status indicator.  The POP3 session now enters the\n   TRANSACTION state, with no messages marked as deleted.  If the\n   maildrop cannot be opened for some reason (for example, a lock can\n   not be acquired, the client is denied access to the appropriate\n   maildrop, or the maildrop cannot be parsed), the POP3 server responds\n   with a negative status indicator.  (If a lock was acquired but the\n   POP3 server intends to respond with a negative status indicator, the\n   POP3 server must release the lock prior to rejecting the command.)\n   After returning a negative status indicator, the server may close the\n   connection.  If the server does not close the connection, the client\n   may either issue a new authentication command and start again, or the\n   client may issue the QUIT command.\n   After the POP3 server has opened the maildrop, it assigns a message-\n   number to each message, and notes the size of each message in octets.\n   The first message in the maildrop is assigned a message-number of\n   \"1\", the second is assigned \"2\", and so on, so that the nth message\n   in a maildrop is assigned a message-number of \"n\".  In POP3 commands\n   and responses, all message-numbers and message sizes are expressed in\n   base-10 (i.e., decimal).\n   Here is the summary for the QUIT command when used in the\n   AUTHORIZATION state:\n      QUIT\n         Arguments: none\n         Restrictions: none\n         Possible Responses:\n             +OK\n         Examples:\n             C: QUIT\n             S: +OK dewey POP3 server signing off\n</section>\n\nSteps:\n1. Determine if this section has any FSM information (states, transitions, diagrams).\n2. If **none**, reply exactly:\n   <json>None</json>\n3. Otherwise, extract the partial FSM and format it **exactly** as:\n\n{\n  \"states\": [\"state1\", \"state2\", \"state3\"],\n  \"transitions\": [\n    {\n      \"from\": \"state1\",\n      \"requisite\": \"conditionX\",\n      \"to\": \"state2\",\n      \"actions\": [\"action1\"],\n      \"response\": \"response1\"\n    },\n    {\n      \"from\": \"state2\",\n      \"requisite\": \"conditionY\",\n      \"to\": \"state3\",\n      \"actions\": [\"action2\"],\n      \"response\": \"response2\"\n    }\n  ]\n}\n\nand then wrap that in <json>\u2026</json> with nothing else.\n\nRemember: **ONLY** the <json>\u2026</json> block should appear in your final output.\n",
-      "response": "<json>\n{\n  \"states\": [\"AUTHORIZATION\", \"TRANSACTION\", \"UPDATE\"],\n  \"transitions\": [\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"successful authentication (USER/PASS or APOP)\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"acquire exclusive-access lock on maildrop\", \"assign message numbers\", \"note message sizes\"],\n      \"response\": \"positive status indicator\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"authentication failure\",\n      \"to\": \"AUTHORIZATION\",\n      \"actions\": [\"optionally close connection\"],\n      \"response\": \"negative status indicator\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"QUIT command\",\n      \"to\": null,\n      \"actions\": [\"terminate session\"],\n      \"response\": \"+OK\"\n    }\n  ]\n}\n</json>",
+      "response": "<json>\n{\n  \"states\": [\"AUTHORIZATION\", \"TRANSACTION\", \"UPDATE\"],\n  \"transitions\": [\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"successful authentication (USER/PASS or APOP)\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"acquire exclusive-access lock on maildrop\", \"assign message numbers\", \"note message sizes\"],\n      \"response\": \"positive status indicator\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"authentication failure or maildrop cannot be opened\",\n      \"to\": \"AUTHORIZATION\",\n      \"actions\": [\"release lock if acquired\"],\n      \"response\": \"negative status indicator\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"QUIT command\",\n      \"to\": null,\n      \"actions\": [\"terminate session\"],\n      \"response\": \"+OK\"\n    }\n  ]\n}\n</json>",
       "partial_fsm": {
         "states": [
           "AUTHORIZATION",
@@ -97,10 +97,10 @@
           },
           {
             "from": "AUTHORIZATION",
-            "requisite": "authentication failure",
+            "requisite": "authentication failure or maildrop cannot be opened",
             "to": "AUTHORIZATION",
             "actions": [
-              "optionally close connection"
+              "release lock if acquired"
             ],
             "response": "negative status indicator"
           },
@@ -385,7 +385,7 @@
     {
       "tag": "Section 9. POP3 Command Summary",
       "prompt": "\nYou will be given the section \"Section 9. POP3 Command Summary\" of an RFC document for protocol \"POP3\".\n\n**RESPONSE FORMAT (MANDATORY)**\n- Your reply must consist **exclusively** of the JSON object representing the state machine.\n- That JSON must be wrapped in <json> and </json> tags.\n- Do **not** include any extra text, explanation, code fences, or formatting.\n\n<section>\nMinimal POP3 Commands:\n         USER name               valid in the AUTHORIZATION state\n         PASS string\n         QUIT\n         STAT                    valid in the TRANSACTION state\n         LIST [msg]\n         RETR msg\n         DELE msg\n         NOOP\n         RSET\n         QUIT\n      Optional POP3 Commands:\n         APOP name digest        valid in the AUTHORIZATION state\n         TOP msg n               valid in the TRANSACTION state\n         UIDL [msg]\n      POP3 Replies:\n         +OK\n         -ERR\n      Note that with the exception of the STAT, LIST, and UIDL commands,\n      the reply given by the POP3 server to any command is significant\n      only to \"+OK\" and \"-ERR\".  Any text occurring after this reply\n      may be ignored by the client.\n</section>\n\nSteps:\n1. Determine if this section has any FSM information (states, transitions, diagrams).\n2. If **none**, reply exactly:\n   <json>None</json>\n3. Otherwise, extract the partial FSM and format it **exactly** as:\n\n{\n  \"states\": [\"state1\", \"state2\", \"state3\"],\n  \"transitions\": [\n    {\n      \"from\": \"state1\",\n      \"requisite\": \"conditionX\",\n      \"to\": \"state2\",\n      \"actions\": [\"action1\"],\n      \"response\": \"response1\"\n    },\n    {\n      \"from\": \"state2\",\n      \"requisite\": \"conditionY\",\n      \"to\": \"state3\",\n      \"actions\": [\"action2\"],\n      \"response\": \"response2\"\n    }\n  ]\n}\n\nand then wrap that in <json>\u2026</json> with nothing else.\n\nRemember: **ONLY** the <json>\u2026</json> block should appear in your final output.\n",
-      "response": "<json>\n{\n  \"states\": [\"AUTHORIZATION\", \"TRANSACTION\"],\n  \"transitions\": [\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"USER command\",\n      \"to\": \"AUTHORIZATION\",\n      \"actions\": [\"Provide username\"],\n      \"response\": \"+OK or -ERR\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"PASS command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Provide password\"],\n      \"response\": \"+OK or -ERR\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"QUIT command\",\n      \"to\": null,\n      \"actions\": [\"End session\"],\n      \"response\": \"+OK or -ERR\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"APOP command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Provide name and digest\"],\n      \"response\": \"+OK or -ERR\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"STAT command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Get mailbox status\"],\n      \"response\": \"+OK or -ERR\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"LIST command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"List messages\"],\n      \"response\": \"+OK or -ERR\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"RETR command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Retrieve message\"],\n      \"response\": \"+OK or -ERR\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"DELE command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Delete message\"],\n      \"response\": \"+OK or -ERR\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"NOOP command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"No operation\"],\n      \"response\": \"+OK or -ERR\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"RSET command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Reset session state\"],\n      \"response\": \"+OK or -ERR\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"TOP command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Retrieve message headers and top n lines\"],\n      \"response\": \"+OK or -ERR\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"UIDL command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Get unique ID listing\"],\n      \"response\": \"+OK or -ERR\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"QUIT command\",\n      \"to\": null,\n      \"actions\": [\"End session\"],\n      \"response\": \"+OK or -ERR\"\n    }\n  ]\n}\n</json>",
+      "response": "<json>\n{\n  \"states\": [\"AUTHORIZATION\", \"TRANSACTION\"],\n  \"transitions\": [\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"USER command\",\n      \"to\": \"AUTHORIZATION\",\n      \"actions\": [\"Provide username\"],\n      \"response\": \"+OK or -ERR\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"PASS command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Provide password\"],\n      \"response\": \"+OK or -ERR\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"APOP command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Provide name and digest\"],\n      \"response\": \"+OK or -ERR\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"QUIT command\",\n      \"to\": null,\n      \"actions\": [\"End session\"],\n      \"response\": \"+OK or -ERR\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"STAT command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Get mailbox status\"],\n      \"response\": \"+OK or -ERR\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"LIST command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"List messages\"],\n      \"response\": \"+OK or -ERR\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"RETR command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Retrieve message\"],\n      \"response\": \"+OK or -ERR\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"DELE command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Delete message\"],\n      \"response\": \"+OK or -ERR\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"NOOP command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"No operation\"],\n      \"response\": \"+OK or -ERR\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"RSET command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Reset session state\"],\n      \"response\": \"+OK or -ERR\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"TOP command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Retrieve message headers and top lines\"],\n      \"response\": \"+OK or -ERR\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"UIDL command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Get unique ID listing\"],\n      \"response\": \"+OK or -ERR\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"QUIT command\",\n      \"to\": null,\n      \"actions\": [\"End session\"],\n      \"response\": \"+OK or -ERR\"\n    }\n  ]\n}\n</json>",
       "partial_fsm": {
         "states": [
           "AUTHORIZATION",
@@ -412,19 +412,19 @@
           },
           {
             "from": "AUTHORIZATION",
-            "requisite": "QUIT command",
-            "to": null,
+            "requisite": "APOP command",
+            "to": "TRANSACTION",
             "actions": [
-              "End session"
+              "Provide name and digest"
             ],
             "response": "+OK or -ERR"
           },
           {
             "from": "AUTHORIZATION",
-            "requisite": "APOP command",
-            "to": "TRANSACTION",
+            "requisite": "QUIT command",
+            "to": null,
             "actions": [
-              "Provide name and digest"
+              "End session"
             ],
             "response": "+OK or -ERR"
           },
@@ -487,7 +487,7 @@
             "requisite": "TOP command",
             "to": "TRANSACTION",
             "actions": [
-              "Retrieve message headers and top n lines"
+              "Retrieve message headers and top lines"
             ],
             "response": "+OK or -ERR"
           },
@@ -515,40 +515,40 @@
     {
       "tag": "Section 10. Example POP3 Session",
       "prompt": "\nYou will be given the section \"Section 10. Example POP3 Session\" of an RFC document for protocol \"POP3\".\n\n**RESPONSE FORMAT (MANDATORY)**\n- Your reply must consist **exclusively** of the JSON object representing the state machine.\n- That JSON must be wrapped in <json> and </json> tags.\n- Do **not** include any extra text, explanation, code fences, or formatting.\n\n<section>\nS: <wait for connection on TCP port 110>\n      C: <open connection>\n      S:    +OK POP3 server ready <1896.697170952@dbc.mtview.ca.us>\n      C:    APOP mrose c4c9334bac560ecc979e58001b3e22fb\n      S:    +OK mrose's maildrop has 2 messages (320 octets)\n      C:    STAT\n      S:    +OK 2 320\n      C:    LIST\n      S:    +OK 2 messages (320 octets)\n      S:    1 120\n      S:    2 200\n      S:    .\n      C:    RETR 1\n      S:    +OK 120 octets\n      S:    <the POP3 server sends message 1>\n      S:    .\n      C:    DELE 1\n      S:    +OK message 1 deleted\n      C:    RETR 2\n      S:    +OK 200 octets\n      S:    <the POP3 server sends message 2>\n      S:    .\n      C:    DELE 2\n      S:    +OK message 2 deleted\n      C:    QUIT\n      S:    +OK dewey POP3 server signing off (maildrop empty)\n      C:  <close connection>\n      S:  <wait for next connection>\n</section>\n\nSteps:\n1. Determine if this section has any FSM information (states, transitions, diagrams).\n2. If **none**, reply exactly:\n   <json>None</json>\n3. Otherwise, extract the partial FSM and format it **exactly** as:\n\n{\n  \"states\": [\"state1\", \"state2\", \"state3\"],\n  \"transitions\": [\n    {\n      \"from\": \"state1\",\n      \"requisite\": \"conditionX\",\n      \"to\": \"state2\",\n      \"actions\": [\"action1\"],\n      \"response\": \"response1\"\n    },\n    {\n      \"from\": \"state2\",\n      \"requisite\": \"conditionY\",\n      \"to\": \"state3\",\n      \"actions\": [\"action2\"],\n      \"response\": \"response2\"\n    }\n  ]\n}\n\nand then wrap that in <json>\u2026</json> with nothing else.\n\nRemember: **ONLY** the <json>\u2026</json> block should appear in your final output.\n",
-      "response": "<json>\n{\n  \"states\": [\"WAITING\", \"AUTHORIZATION\", \"TRANSACTION\", \"UPDATE\", \"CLOSED\"],\n  \"transitions\": [\n    {\n      \"from\": \"WAITING\",\n      \"requisite\": \"Client opens connection\",\n      \"to\": \"AUTHORIZATION\",\n      \"actions\": [\"Server sends greeting\"],\n      \"response\": \"+OK POP3 server ready <1896.697170952@dbc.mtview.ca.us>\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"APOP command with username and digest\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Server authenticates user\"],\n      \"response\": \"+OK mrose's maildrop has 2 messages (320 octets)\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"STAT command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Server provides mailbox statistics\"],\n      \"response\": \"+OK 2 320\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"LIST command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Server lists message information\"],\n      \"response\": \"+OK 2 messages (320 octets)\\n1 120\\n2 200\\n.\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"RETR command with message number\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Server retrieves specified message\"],\n      \"response\": \"+OK [size] octets\\n<message content>\\n.\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"DELE command with message number\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Server marks message for deletion\"],\n      \"response\": \"+OK message [number] deleted\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"QUIT command\",\n      \"to\": \"UPDATE\",\n      \"actions\": [\"Server removes deleted messages\"],\n      \"response\": \"+OK dewey POP3 server signing off (maildrop empty)\"\n    },\n    {\n      \"from\": \"UPDATE\",\n      \"requisite\": \"Client closes connection\",\n      \"to\": \"CLOSED\",\n      \"actions\": [\"Connection terminated\"],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"CLOSED\",\n      \"requisite\": \"\",\n      \"to\": \"WAITING\",\n      \"actions\": [\"Server waits for next connection\"],\n      \"response\": \"\"\n    }\n  ]\n}\n</json>",
+      "response": "<json>\n{\n  \"states\": [\"WAITING\", \"CONNECTED\", \"AUTHENTICATED\", \"TRANSACTION\", \"UPDATE\"],\n  \"transitions\": [\n    {\n      \"from\": \"WAITING\",\n      \"requisite\": \"Client opens connection\",\n      \"to\": \"CONNECTED\",\n      \"actions\": [\"Accept connection\"],\n      \"response\": \"+OK POP3 server ready <1896.697170952@dbc.mtview.ca.us>\"\n    },\n    {\n      \"from\": \"CONNECTED\",\n      \"requisite\": \"APOP command with username and digest\",\n      \"to\": \"AUTHENTICATED\",\n      \"actions\": [\"Authenticate user\"],\n      \"response\": \"+OK mrose's maildrop has 2 messages (320 octets)\"\n    },\n    {\n      \"from\": \"AUTHENTICATED\",\n      \"requisite\": \"STAT command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Count messages and size\"],\n      \"response\": \"+OK 2 320\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"LIST command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"List messages\"],\n      \"response\": \"+OK 2 messages (320 octets)\\n1 120\\n2 200\\n.\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"RETR command with message number\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Retrieve message content\"],\n      \"response\": \"+OK 120 octets\\n<the POP3 server sends message 1>\\n.\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"DELE command with message number\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Mark message for deletion\"],\n      \"response\": \"+OK message 1 deleted\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"QUIT command\",\n      \"to\": \"UPDATE\",\n      \"actions\": [\"Remove deleted messages\", \"Close session\"],\n      \"response\": \"+OK dewey POP3 server signing off (maildrop empty)\"\n    },\n    {\n      \"from\": \"UPDATE\",\n      \"requisite\": \"Client closes connection\",\n      \"to\": \"WAITING\",\n      \"actions\": [\"Wait for next connection\"],\n      \"response\": \"\"\n    }\n  ]\n}\n</json>",
       "partial_fsm": {
         "states": [
           "WAITING",
-          "AUTHORIZATION",
+          "CONNECTED",
+          "AUTHENTICATED",
           "TRANSACTION",
-          "UPDATE",
-          "CLOSED"
+          "UPDATE"
         ],
         "transitions": [
           {
             "from": "WAITING",
             "requisite": "Client opens connection",
-            "to": "AUTHORIZATION",
+            "to": "CONNECTED",
             "actions": [
-              "Server sends greeting"
+              "Accept connection"
             ],
             "response": "+OK POP3 server ready <1896.697170952@dbc.mtview.ca.us>"
           },
           {
-            "from": "AUTHORIZATION",
+            "from": "CONNECTED",
             "requisite": "APOP command with username and digest",
-            "to": "TRANSACTION",
+            "to": "AUTHENTICATED",
             "actions": [
-              "Server authenticates user"
+              "Authenticate user"
             ],
             "response": "+OK mrose's maildrop has 2 messages (320 octets)"
           },
           {
-            "from": "TRANSACTION",
+            "from": "AUTHENTICATED",
             "requisite": "STAT command",
             "to": "TRANSACTION",
             "actions": [
-              "Server provides mailbox statistics"
+              "Count messages and size"
             ],
             "response": "+OK 2 320"
           },
@@ -557,7 +557,7 @@
             "requisite": "LIST command",
             "to": "TRANSACTION",
             "actions": [
-              "Server lists message information"
+              "List messages"
             ],
             "response": "+OK 2 messages (320 octets)\n1 120\n2 200\n."
           },
@@ -566,43 +566,35 @@
             "requisite": "RETR command with message number",
             "to": "TRANSACTION",
             "actions": [
-              "Server retrieves specified message"
+              "Retrieve message content"
             ],
-            "response": "+OK [size] octets\n<message content>\n."
+            "response": "+OK 120 octets\n<the POP3 server sends message 1>\n."
           },
           {
             "from": "TRANSACTION",
             "requisite": "DELE command with message number",
             "to": "TRANSACTION",
             "actions": [
-              "Server marks message for deletion"
+              "Mark message for deletion"
             ],
-            "response": "+OK message [number] deleted"
+            "response": "+OK message 1 deleted"
           },
           {
             "from": "TRANSACTION",
             "requisite": "QUIT command",
             "to": "UPDATE",
             "actions": [
-              "Server removes deleted messages"
+              "Remove deleted messages",
+              "Close session"
             ],
             "response": "+OK dewey POP3 server signing off (maildrop empty)"
           },
           {
             "from": "UPDATE",
             "requisite": "Client closes connection",
-            "to": "CLOSED",
-            "actions": [
-              "Connection terminated"
-            ],
-            "response": ""
-          },
-          {
-            "from": "CLOSED",
-            "requisite": "",
             "to": "WAITING",
             "actions": [
-              "Server waits for next connection"
+              "Wait for next connection"
             ],
             "response": ""
           }
@@ -652,6 +644,6 @@
       "partial_fsm": null
     }
   ],
-  "final_response": "{\n  \"states\": [\"WAITING\", \"AUTHORIZATION\", \"TRANSACTION\", \"UPDATE\", \"TERMINATED\", \"CLOSED\"],\n  \"initial_state\": \"WAITING\",\n  \"final_states\": [\"TERMINATED\", \"CLOSED\"],\n  \"transitions\": [\n    {\n      \"from\": \"WAITING\",\n      \"requisite\": \"Client opens connection\",\n      \"to\": \"AUTHORIZATION\",\n      \"actions\": [\"Server sends greeting\"],\n      \"response\": \"+OK POP3 server ready <1896.697170952@dbc.mtview.ca.us>\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"USER command with valid mailbox name\",\n      \"to\": \"AUTHORIZATION\",\n      \"actions\": [\"Record username for authentication\"],\n      \"response\": \"+OK name is a valid mailbox\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"USER command with invalid mailbox name\",\n      \"to\": \"AUTHORIZATION\",\n      \"actions\": [],\n      \"response\": \"-ERR never heard of mailbox name\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"PASS command after successful USER command with valid password\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Authenticate user\", \"Lock maildrop\"],\n      \"response\": \"+OK maildrop locked and ready\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"PASS command after successful USER command with invalid password\",\n      \"to\": \"AUTHORIZATION\",\n      \"actions\": [],\n      \"response\": \"-ERR invalid password\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"PASS command after successful USER command but maildrop already locked\",\n      \"to\": \"AUTHORIZATION\",\n      \"actions\": [],\n      \"response\": \"-ERR unable to lock maildrop\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"APOP command with valid digest\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Authenticate user\", \"Lock maildrop\"],\n      \"response\": \"+OK maildrop locked and ready\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"APOP command with invalid digest\",\n      \"to\": \"AUTHORIZATION\",\n      \"actions\": [],\n      \"response\": \"-ERR permission denied\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"QUIT command\",\n      \"to\": \"TERMINATED\",\n      \"actions\": [\"Close TCP connection\"],\n      \"response\": \"+OK\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"STAT command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Server counts non-deleted messages\", \"Server calculates maildrop size\"],\n      \"response\": \"+OK nn mm\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"LIST command (no argument)\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Server lists all non-deleted messages with sizes\"],\n      \"response\": \"+OK scan listing follows\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"LIST command (with valid message number)\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Server provides information for specified message\"],\n      \"response\": \"+OK n size\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"LIST command (with invalid message number)\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [],\n      \"response\": \"-ERR no such message\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"RETR command (with valid message number)\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Server sends the entire message\"],\n      \"response\": \"+OK message follows\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"RETR command (with invalid message number)\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [],\n      \"response\": \"-ER",
+  "final_response": "{\n  \"states\": [\"WAITING\", \"CONNECTED\", \"AUTHORIZATION\", \"TRANSACTION\", \"UPDATE\", \"TERMINATED\"],\n  \"initial_state\": \"WAITING\",\n  \"final_states\": [\"TERMINATED\"],\n  \"transitions\": [\n    {\n      \"from\": \"WAITING\",\n      \"requisite\": \"Client opens connection\",\n      \"to\": \"CONNECTED\",\n      \"actions\": [\"Accept connection\"],\n      \"response\": \"+OK POP3 server ready <1896.697170952@dbc.mtview.ca.us>\"\n    },\n    {\n      \"from\": \"CONNECTED\",\n      \"requisite\": \"Server sends greeting\",\n      \"to\": \"AUTHORIZATION\",\n      \"actions\": [\"Server sends greeting\"],\n      \"response\": \"Greeting message\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"USER command with valid mailbox name\",\n      \"to\": \"AUTHORIZATION\",\n      \"actions\": [\"Record username for authentication\"],\n      \"response\": \"+OK name is a valid mailbox\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"USER command with invalid mailbox name\",\n      \"to\": \"AUTHORIZATION\",\n      \"actions\": [],\n      \"response\": \"-ERR never heard of mailbox name\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"PASS command after successful USER command with valid password\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Authenticate user\", \"Lock maildrop\"],\n      \"response\": \"+OK maildrop locked and ready\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"PASS command after successful USER command with invalid password\",\n      \"to\": \"AUTHORIZATION\",\n      \"actions\": [],\n      \"response\": \"-ERR invalid password\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"PASS command after successful USER command but maildrop already locked\",\n      \"to\": \"AUTHORIZATION\",\n      \"actions\": [],\n      \"response\": \"-ERR unable to lock maildrop\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"APOP command with valid digest\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Authenticate user\", \"Lock maildrop\"],\n      \"response\": \"+OK maildrop locked and ready\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"APOP command with invalid digest\",\n      \"to\": \"AUTHORIZATION\",\n      \"actions\": [],\n      \"response\": \"-ERR permission denied\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"authentication failure or maildrop cannot be opened\",\n      \"to\": \"AUTHORIZATION\",\n      \"actions\": [\"release lock if acquired\"],\n      \"response\": \"negative status indicator\"\n    },\n    {\n      \"from\": \"AUTHORIZATION\",\n      \"requisite\": \"QUIT command\",\n      \"to\": \"TERMINATED\",\n      \"actions\": [\"Close TCP connection\"],\n      \"response\": \"+OK\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"STAT command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Server counts non-deleted messages\", \"Server calculates maildrop size\"],\n      \"response\": \"+OK nn mm\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"LIST command (no argument)\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Server lists all non-deleted messages with sizes\"],\n      \"response\": \"+OK scan listing follows\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"LIST command (with valid message number)\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Server provides information for specified message\"],\n      \"response\": \"+OK n size\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"LIST command (with invalid message number)\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [],\n      \"response\": \"-ERR no such message\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"RETR command (with valid message number)\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Server sends the entire message\"],\n      \"response\": \"+OK message follows\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"RETR command (with invalid message number)\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [],\n      \"response\": \"-ERR no such message\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"DELE command (with valid message number)\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Server marks message as deleted\"],\n      \"response\": \"+OK message deleted\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"DELE command (with invalid message number)\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [],\n      \"response\": \"-ERR no such message\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"NOOP command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Server does nothing\"],\n      \"response\": \"+OK\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"RSET command\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Server unmarks any messages marked as deleted\"],\n      \"response\": \"+OK\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"TOP command with valid message number and line count\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Send message headers and specified number of body lines\"],\n      \"response\": \"+OK top of message follows\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"TOP command with invalid message number\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [],\n      \"response\": \"-ERR no such message\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"UIDL command with valid message number\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Send unique-id listing for specified message\"],\n      \"response\": \"+OK [message-number] [unique-id]\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"UIDL command with no arguments\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [\"Send unique-id listing for all messages\"],\n      \"response\": \"+OK unique-id listing follows\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"UIDL command with invalid message number\",\n      \"to\": \"TRANSACTION\",\n      \"actions\": [],\n      \"response\": \"-ERR no such message\"\n    },\n    {\n      \"from\": \"TRANSACTION\",\n      \"requisite\": \"QUIT command\",\n      \"to\": \"UPDATE\",\n      \"actions\": [\"Server releases resources acquired during TRANSACTION state\"],\n      \"response\": \"+OK\"\n    },\n    {\n      \"from\": \"UPDATE\",\n      \"requisite\": \"Server completes resource release\",\n      \"to\": \"TERMINATED\",\n      \"actions\": [\"Remove messages marked as deleted\", \"Release exclusive-access lock on maildrop\", \"Close TCP connection\"],\n      \"response\": \"+OK or -ERR some deleted messages not removed\"\n    },\n    {\n      \"from\": \"Any state\",\n      \"requisite\": \"Inactivity autologout timer expires (if implemented)\",\n      \"to\": \"TERMINATED\",\n      \"actions\": [\"Server closes TCP connection without removing messages\"],\n      \"response\": \"None\"\n    },\n    {\n      \"from\": \"Any state\",\n      \"requisite\": \"Session terminates for reason other than client-issued QUIT\",\n      \"to\": \"TERMINATED\",\n      \"actions\": [\"Do not remove messages\", \"Close TCP connection\"],\n      \"response\": \"None specified\"\n    }\n  ]\n}",
   "final_fsm": null
 }
