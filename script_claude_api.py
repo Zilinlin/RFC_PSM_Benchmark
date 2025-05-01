@@ -9,7 +9,12 @@ import glob
 import os
 import requests
 
+import time
+import anthropic
 
+client = anthropic.Anthropic()
+
+# claude key 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
 
 def build_fsm_extraction_prompt(protocol_name: str,
                                 section_title: str,
@@ -158,23 +163,50 @@ Please output **only** the final merged JSON in the `<json>…</json>` block.
 
 
 
-def call_ollama(model, prompt, temperature=0.0, max_tokens=10000):
+# def call_ollama(model, prompt, temperature=0.0, max_tokens=10000):
+#     """
+#     Calls the local Ollama HTTP API and returns the generated text.
+#     """
+#     url = "http://localhost:11434/v1/completions"
+#     payload = {
+#         "model": model,
+#         "prompt": prompt,
+#         "temperature": temperature,
+#         "max_tokens": max_tokens
+#     }
+#     resp = requests.post(url, json=payload)
+#     resp.raise_for_status()  # will raise an HTTPError if the call failed
+#     data = resp.json()
+#     # Ollama uses the OpenAI-compatible response format:
+#     # { "choices": [ { "text": "..." } ], ... }
+#     return data["choices"][0]["text"]
+
+def call_api(model, prompt, temperature=0.0, max_tokens=8192):
     """
-    Calls the local Ollama HTTP API and returns the generated text.
+    Calls the chatgpt API and returns the generated text.
     """
-    url = "http://localhost:11434/v1/completions"
-    payload = {
-        "model": model,
-        "prompt": prompt,
-        "temperature": temperature,
-        "max_tokens": max_tokens
-    }
-    resp = requests.post(url, json=payload)
-    resp.raise_for_status()  # will raise an HTTPError if the call failed
-    data = resp.json()
-    # Ollama uses the OpenAI-compatible response format:
-    # { "choices": [ { "text": "..." } ], ... }
-    return data["choices"][0]["text"]
+    message = client.messages.create(
+        model=model,
+        max_tokens=1000,
+        temperature=temperature,
+        system="You are a world-class poet. Respond only with short poems.",
+        messages=[
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "text",
+                        "text": prompt
+                    }
+                ]
+            }
+        ]
+    )
+    
+    # message.content is a list of TextBlock objects
+    blocks = message.content  
+    poem = blocks[0].text
+    return poem
 
 
 # ── Workflow ──────────────────────────────────────────────────────────────────
@@ -204,8 +236,8 @@ def process_protocol(protocol_dir, model, verbose=True):
             print(f"\n--- Section {idx}/{len(segments)}: {tag} ---")
             #print("PROMPT:\n")
 
-        resp = call_ollama(model, prompt, temperature=0.0, max_tokens=10000)
-
+        resp = call_api(model, prompt, temperature=0.0, max_tokens=8192)
+        time.sleep(60) # to bypass the claude rate limit
         #if verbose:
             #print("RAW RESPONSE:\n", resp)
 
@@ -233,7 +265,7 @@ def process_protocol(protocol_dir, model, verbose=True):
     # combine step
     combine_prompt = build_fsm_combination_prompt(partial_fsms=partials)
 
-    final_resp = call_ollama(model, combine_prompt, temperature=0.0, max_tokens=10000)
+    final_resp = call_api(model, combine_prompt, temperature=0.0, max_tokens=8192)
     if verbose:
         print("COMBINED RAW RESPONSE:\n", final_resp)
 
@@ -280,14 +312,18 @@ if __name__ == "__main__":
 
     # prompt = build_fsm_combination_prompt(partials)
     # print(prompt)
-    
-    protocols = ["DCCP","DHCP", "FTP", "IMAP", 
-                 "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP"]
+    # "DCCP","DHCP", "FTP","IMAP"
+    # , "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP"
+    protocols = [ "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP"]
     
     # model = "deepseek-r1:14b"
     # models = ["deepseek-r1:32b","qwen3:32b","gemma3:27b"]
     # models = ["mistral-small3.1"] # this is 24b
-    models = ["qwq"] # 32b
+    # models = ["qwq"] # 32b
+    
+    # models = ["deepseek-reasoner"]
+    # models = ["gpt-4o-mini"]
+    models = ["claude-3-7-sonnet-20250219"]
     for m in models:
         for d in protocols:
             process_protocol(d, m, verbose=True)

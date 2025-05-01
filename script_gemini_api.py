@@ -9,7 +9,11 @@ import glob
 import os
 import requests
 
+from google import genai
+from google.genai import types
 
+
+client = genai.Client(api_key="AIzaSyAXmh7ydccAyTE5q80dudxp8lrHaxleOAA")
 
 def build_fsm_extraction_prompt(protocol_name: str,
                                 section_title: str,
@@ -158,23 +162,36 @@ Please output **only** the final merged JSON in the `<json>…</json>` block.
 
 
 
-def call_ollama(model, prompt, temperature=0.0, max_tokens=10000):
+# def call_ollama(model, prompt, temperature=0.0, max_tokens=10000):
+#     """
+#     Calls the local Ollama HTTP API and returns the generated text.
+#     """
+#     url = "http://localhost:11434/v1/completions"
+#     payload = {
+#         "model": model,
+#         "prompt": prompt,
+#         "temperature": temperature,
+#         "max_tokens": max_tokens
+#     }
+#     resp = requests.post(url, json=payload)
+#     resp.raise_for_status()  # will raise an HTTPError if the call failed
+#     data = resp.json()
+#     # Ollama uses the OpenAI-compatible response format:
+#     # { "choices": [ { "text": "..." } ], ... }
+#     return data["choices"][0]["text"]
+
+def call_api(model, prompt, temperature=0.0, max_tokens=8192):
     """
-    Calls the local Ollama HTTP API and returns the generated text.
+    Calls the chatgpt API and returns the generated text.
     """
-    url = "http://localhost:11434/v1/completions"
-    payload = {
-        "model": model,
-        "prompt": prompt,
-        "temperature": temperature,
-        "max_tokens": max_tokens
-    }
-    resp = requests.post(url, json=payload)
-    resp.raise_for_status()  # will raise an HTTPError if the call failed
-    data = resp.json()
-    # Ollama uses the OpenAI-compatible response format:
-    # { "choices": [ { "text": "..." } ], ... }
-    return data["choices"][0]["text"]
+    response = client.models.generate_content(
+        model=model, 
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            temperature=0.0
+        )
+    )
+    return response.text
 
 
 # ── Workflow ──────────────────────────────────────────────────────────────────
@@ -204,7 +221,7 @@ def process_protocol(protocol_dir, model, verbose=True):
             print(f"\n--- Section {idx}/{len(segments)}: {tag} ---")
             #print("PROMPT:\n")
 
-        resp = call_ollama(model, prompt, temperature=0.0, max_tokens=10000)
+        resp = call_api(model, prompt, temperature=0.0, max_tokens=8192)
 
         #if verbose:
             #print("RAW RESPONSE:\n", resp)
@@ -233,7 +250,7 @@ def process_protocol(protocol_dir, model, verbose=True):
     # combine step
     combine_prompt = build_fsm_combination_prompt(partial_fsms=partials)
 
-    final_resp = call_ollama(model, combine_prompt, temperature=0.0, max_tokens=10000)
+    final_resp = call_api(model, combine_prompt, temperature=0.0, max_tokens=8192)
     if verbose:
         print("COMBINED RAW RESPONSE:\n", final_resp)
 
@@ -287,7 +304,11 @@ if __name__ == "__main__":
     # model = "deepseek-r1:14b"
     # models = ["deepseek-r1:32b","qwen3:32b","gemma3:27b"]
     # models = ["mistral-small3.1"] # this is 24b
-    models = ["qwq"] # 32b
+    # models = ["qwq"] # 32b
+    
+    # models = ["deepseek-reasoner"]
+    # models = ["gpt-4o-mini"]
+    models = ["gemini-2.0-flash"]
     for m in models:
         for d in protocols:
             process_protocol(d, m, verbose=True)
