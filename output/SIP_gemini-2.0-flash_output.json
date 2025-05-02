@@ -502,5 +502,483 @@
     }
   ],
   "final_response": "```json\n{\n  \"states\": [\n    \"Initial\",\n    \"WaitingForProvisionalResponse\",\n    \"TransactionCancelled\",\n    \"FinalResponseReceived\",\n    \"UAC_Idle\",\n    \"UAC_Invite_Sent\",\n    \"UAS_Idle\",\n    \"UAS_Invite_Received\",\n    \"UAC_Session_Established\",\n    \"UAC_Session_Terminated\",\n    \"UAS_Session_Established\",\n    \"UAS_Session_Terminated\",\n    \"Calling\",\n    \"Proceeding\",\n    \"Completed\",\n    \"Terminated\"\n  ],\n  \"initial_state\": \"Initial\",\n  \"final_states\": [\n    \"FinalResponseReceived\",\n    \"UAC_Session_Terminated\",\n    \"UAS_Session_Terminated\",\n    \"Terminated\"\n  ],\n  \"transitions\": [\n    {\n      \"from\": \"Initial\",\n      \"requisite\": \"Request is not INVITE\",\n      \"to\": \"Initial\",\n      \"actions\": [],\n      \"response\": \"SHOULD NOT send CANCEL\"\n    },\n    {\n      \"from\": \"Initial\",\n      \"requisite\": \"Request is INVITE and no provisional response received\",\n      \"to\": \"WaitingForProvisionalResponse\",\n      \"actions\": [\n        \"Wait for provisional response\"\n      ],\n      \"response\": \"MUST NOT send CANCEL\"\n    },\n    {\n      \"from\": \"Initial\",\n      \"requisite\": \"Request is INVITE and final response received\",\n      \"to\": \"FinalResponseReceived\",\n      \"actions\": [],\n      \"response\": \"SHOULD NOT send CANCEL\"\n    },\n    {\n      \"from\": \"WaitingForProvisionalResponse\",\n      \"requisite\": \"Provisional response received\",\n      \"to\": \"TransactionCancelled\",\n      \"actions\": [\n        \"Create CANCEL transaction\",\n        \"Send CANCEL request\"\n      ],\n      \"response\": \"200 OK for CANCEL\"\n    },\n    {\n      \"from\": \"WaitingForProvisionalResponse\",\n      \"requisite\": \"Final response received\",\n      \"to\": \"FinalResponseReceived\",\n      \"actions\": [],\n      \"response\": \"SHOULD NOT send CANCEL\"\n    },\n    {\n      \"from\": \"TransactionCancelled\",\n      \"requisite\": \"No final response for original request in 64*T1 seconds\",\n      \"to\": \"FinalResponseReceived\",\n      \"actions\": [\n        \"Consider original transaction cancelled\",\n        \"Destroy client transaction handling original request\"\n      ],\n      \"response\": \"N/A\"\n    },\n    {\n      \"from\": \"UAC_Idle\",\n      \"requisite\": \"UAC wants to modify session\",\n      \"to\": \"UAC_Invite_Sent\",\n      \"actions\": [\n        \"Send re-INVITE\"\n      ],\n      \"response\": \"None\"\n    },\n    {\n      \"from\": \"UAC_Invite_Sent\",\n      \"requisite\": \"2xx response received\",\n      \"to\": \"UAC_Idle\",\n      \"actions\": [\n        \"Update session parameters\"\n      ],\n      \"response\": \"ACK\"\n    },\n    {\n      \"from\": \"UAC_Invite_Sent\",\n      \"requisite\": \"Non-2xx response received (not 481, 408, or timeout)\",\n      \"to\": \"UAC_Idle\",\n      \"actions\": [\n        \"Session parameters remain unchanged\"\n      ],\n      \"response\": \"None\"\n    },\n    {\n      \"from\": \"UAC_Invite_Sent\",\n      \"requisite\": \"481, 408, or timeout response received\",\n      \"to\": \"UAC_Idle\",\n      \"actions\": [\n        \"Terminate dialog\"\n      ],\n      \"response\": \"None\"\n    },\n    {\n      \"from\": \"UAC_Invite_Sent\",\n      \"requisite\": \"491 response received\",\n      \"to\": \"UAC_Invite_Sent\",\n      \"actions\": [\n        \"Start timer T\",\n        \"Re-attempt re-INVITE after timer expires (if still desired)\"\n      ],\n      \"response\": \"None\"\n    },\n    {\n      \"from\": \"UAS_Idle\",\n      \"requisite\": \"Re-INVITE received\",\n      \"to\": \"UAS_Invite_Received\",\n      \"actions\": [\n        \"Check session description for changes\"\n      ],\n      \"response\": \"None\"\n    },\n    {\n      \"from\": \"UAS_Invite_Received\",\n      \"requisite\": \"Session description acceptable\",\n      \"to\": \"UAS_Idle\",\n      \"actions\": [\n        \"Adjust session parameters accordingly\"\n      ],\n      \"response\": \"2xx\"\n    },\n    {\n      \"from\": \"UAS_Invite_Received\",\n      \"requisite\": \"Session description not acceptable\",\n      \"to\": \"UAS_Idle\",\n      \"actions\": [\n        \"None\"\n      ],\n      \"response\": \"488 (Not Acceptable Here)\"\n    },\n    {\n      \"from\": \"UAS_Invite_Received\",\n      \"requisite\": \"Second INVITE received before final response to first INVITE (lower CSeq)\",\n      \"to\": \"UAS_Idle\",\n      \"actions\": [\n        \"None\"\n      ],\n      \"response\": \"500 (Server Internal Error) with Retry-After\"\n    },\n    {\n      \"from\": \"UAS_Invite_Received\",\n      \"requisite\": \"INVITE sent by UAS is in progress\",\n      \"to\": \"UAS_Idle\",\n      \"actions\": [\n        \"None\"\n      ],\n      \"response\": \"491 (Request Pending)\"\n    },\n    {\n      \"from\": \"UAS_Invite_Received\",\n      \"requisite\": \"2xx response generated, ACK not received\",\n      \"to\": \"UAS_Idle\",\n      \"actions\": [\n        \"Generate BYE to terminate dialog\"\n      ],\n      \"response\": \"None\"\n    },\n    {\n      \"from\": \"UAC_Session_Established\",\n      \"requisite\": \"BYE request passed to client transaction\",\n      \"to\": \"UAC_Session_Terminated\",\n      \"actions\": [\n        \"Stop sending/listening for media\"\n      ],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"UAC_Session_Established\",\n      \"requisite\": \"Response for BYE is 481, 408, or timeout\",\n      \"to\": \"UAC_Session_Terminated\",\n      \"actions\": [\n        \"Consider session and dialog terminated\"\n      ],\n      \"response\": \"481/408/Timeout\"\n    },\n    {\n      \"from\": \"UAS_Session_Established\",\n      \"requisite\": \"BYE request matches existing dialog\",\n      \"to\": \"UAS_Session_Terminated\",\n      \"actions\": [\n        \"Terminate session (stop sending/listening for media, except multicast)\",\n        \"Generate 2xx response\",\n        \"Pass 2xx to server transaction\"\n      ],\n      \"response\": \"2xx\"\n    },\n    {\n      \"from\": \"UAS_Idle\",\n      \"requisite\": \"BYE request does not match existing dialog\",\n      \"to\": \"UAS_Idle\",\n      \"actions\": [\n        \"Generate 481 response\",\n        \"Pass 481 to server transaction\"\n      ],\n      \"response\": \"481\"\n    },\n    {\n      \"from\": \"Calling\",\n      \"requisite\": \"INVITE from TU\",\n      \"to\": \"Calling\",\n      \"actions\": [\n        \"INVITE sent\",\n        \"Reset A\",\n        \"INVITE sent\"\n      ],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"Calling\",\n      \"requisite\": \"Timer B fires or Transport Err.\",\n      \"to\": \"Terminated\",\n      \"actions\": [\n        \"inform TU\"\n      ],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"Calling\",\n      \"requisite\": \"1xx\",\n      \"to\": \"Proceeding\",\n      \"actions\": [\n        \"1xx to TU\"\n      ],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"Calling\",\n      \"requisite\": \"300-699\",\n      \"to\": \"Completed\",\n      \"actions\": [\n        \"ACK sent\",\n        \"resp. to TU\"\n      ],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"Proceeding\",\n      \"requisite\": \"1xx\",\n      \"to\": \"Proceeding\",\n      \"actions\": [\n        \"1xx to TU\"\n      ],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"Proceeding\",\n      \"requisite\": \"300-699\",\n      \"to\": \"Completed\",\n      \"actions\": [\n        \"ACK sent\",\n        \"resp. to TU\"\n      ],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"Proceeding\",\n      \"requisite\": \"2xx\",\n      \"to\": \"Terminated\",\n      \"actions\": [\n        \"2xx to TU\"\n      ],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"Completed\",\n      \"requisite\": \"Transport Err.\",\n      \"to\": \"Terminated\",\n      \"actions\": [\n        \"Inform TU\"\n      ],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"Completed\",\n      \"requisite\": \"Timer D fires\",\n      \"to\": \"Terminated\",\n      \"actions\": [\n        \"-\"\n      ],\n      \"response\": \"\"\n    }\n  ]\n}\n```",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "Initial",
+      "WaitingForProvisionalResponse",
+      "TransactionCancelled",
+      "FinalResponseReceived",
+      "Early",
+      "Confirmed",
+      "Terminated",
+      "UAC_Idle",
+      "UAC_Invite_Sent",
+      "UAS_Idle",
+      "UAS_Invite_Received",
+      "UAC_Session_Established",
+      "UAC_Session_Terminated",
+      "UAS_Session_Established",
+      "UAS_Session_Terminated",
+      "Request Received",
+      "Request Validated",
+      "Route Info Preprocessed",
+      "Target(s) Determined",
+      "Request Forwarded",
+      "Response Processing",
+      "Final Response Chosen",
+      "CANCEL Generated (Stateful)",
+      "Stateless Forwarding",
+      "Calling",
+      "Proceeding",
+      "Completed"
+    ],
+    "initial_state": "Initial",
+    "final_states": [
+      "TransactionCancelled",
+      "FinalResponseReceived",
+      "Terminated",
+      "UAC_Session_Terminated",
+      "UAS_Session_Terminated",
+      "Stateless Forwarding",
+      "Completed"
+    ],
+    "transitions": [
+      {
+        "from": "Initial",
+        "requisite": "Request is not INVITE",
+        "to": "Initial",
+        "actions": [],
+        "response": "SHOULD NOT send CANCEL"
+      },
+      {
+        "from": "Initial",
+        "requisite": "Request is INVITE and no provisional response received",
+        "to": "WaitingForProvisionalResponse",
+        "actions": [
+          "Wait for provisional response"
+        ],
+        "response": "MUST NOT send CANCEL"
+      },
+      {
+        "from": "Initial",
+        "requisite": "Request is INVITE and final response received",
+        "to": "FinalResponseReceived",
+        "actions": [],
+        "response": "SHOULD NOT send CANCEL"
+      },
+      {
+        "from": "WaitingForProvisionalResponse",
+        "requisite": "Provisional response received",
+        "to": "TransactionCancelled",
+        "actions": [
+          "Create CANCEL transaction",
+          "Send CANCEL request"
+        ],
+        "response": "200 OK for CANCEL"
+      },
+      {
+        "from": "WaitingForProvisionalResponse",
+        "requisite": "Final response received",
+        "to": "FinalResponseReceived",
+        "actions": [],
+        "response": "SHOULD NOT send CANCEL"
+      },
+      {
+        "from": "TransactionCancelled",
+        "requisite": "No final response for original request in 64*T1 seconds",
+        "to": "FinalResponseReceived",
+        "actions": [
+          "Consider original transaction cancelled",
+          "Destroy client transaction handling original request"
+        ],
+        "response": "N/A"
+      },
+      {
+        "from": "early",
+        "requisite": "2xx final response arrives",
+        "to": "confirmed",
+        "actions": [],
+        "response": null
+      },
+      {
+        "from": "early",
+        "requisite": "other responses, or if no response arrives at all",
+        "to": null,
+        "actions": [
+          "terminate early dialog"
+        ],
+        "response": null
+      },
+      {
+        "from": "Initial",
+        "requisite": "Receives 1xx with tag in To field and no matching dialog ID",
+        "to": "Early",
+        "actions": [
+          "Construct early dialog"
+        ],
+        "response": "1xx"
+      },
+      {
+        "from": "Early",
+        "requisite": "Receives non-2xx final response",
+        "to": "Terminated",
+        "actions": [
+          "Terminate early dialog"
+        ],
+        "response": "4xx, 5xx, or 6xx"
+      },
+      {
+        "from": "Initial",
+        "requisite": "Receives 2xx response with matching dialog ID",
+        "to": "Confirmed",
+        "actions": [
+          "Transition dialog to confirmed state",
+          "Recompute route set"
+        ],
+        "response": "2xx"
+      },
+      {
+        "from": "Initial",
+        "requisite": "Receives 2xx response with no matching dialog ID",
+        "to": "Confirmed",
+        "actions": [
+          "Construct new dialog in confirmed state"
+        ],
+        "response": "2xx"
+      },
+      {
+        "from": "Confirmed",
+        "requisite": "UAC does not want to continue with dialog",
+        "to": "Terminated",
+        "actions": [
+          "Send BYE request"
+        ],
+        "response": "None"
+      },
+      {
+        "from": "Confirmed",
+        "requisite": "Server retransmits 2xx for 64*T1 seconds without ACK",
+        "to": "Terminated",
+        "actions": [
+          "Send BYE request"
+        ],
+        "response": "None"
+      },
+      {
+        "from": "UAC_Idle",
+        "requisite": "UAC wants to modify session",
+        "to": "UAC_Invite_Sent",
+        "actions": [
+          "Send re-INVITE"
+        ],
+        "response": "None"
+      },
+      {
+        "from": "UAC_Invite_Sent",
+        "requisite": "2xx response received",
+        "to": "UAC_Idle",
+        "actions": [
+          "Update session parameters"
+        ],
+        "response": "ACK"
+      },
+      {
+        "from": "UAC_Invite_Sent",
+        "requisite": "Non-2xx response received (not 481, 408, or timeout)",
+        "to": "UAC_Idle",
+        "actions": [
+          "Session parameters remain unchanged"
+        ],
+        "response": "None"
+      },
+      {
+        "from": "UAC_Invite_Sent",
+        "requisite": "481, 408, or timeout response received",
+        "to": "UAC_Idle",
+        "actions": [
+          "Terminate dialog"
+        ],
+        "response": "None"
+      },
+      {
+        "from": "UAC_Invite_Sent",
+        "requisite": "491 response received",
+        "to": "UAC_Invite_Sent",
+        "actions": [
+          "Start timer T",
+          "Re-attempt re-INVITE after timer expires (if still desired)"
+        ],
+        "response": "None"
+      },
+      {
+        "from": "UAS_Idle",
+        "requisite": "Re-INVITE received",
+        "to": "UAS_Invite_Received",
+        "actions": [
+          "Check session description for changes"
+        ],
+        "response": "None"
+      },
+      {
+        "from": "UAS_Invite_Received",
+        "requisite": "Session description acceptable",
+        "to": "UAS_Idle",
+        "actions": [
+          "Adjust session parameters accordingly"
+        ],
+        "response": "2xx"
+      },
+      {
+        "from": "UAS_Invite_Received",
+        "requisite": "Session description not acceptable",
+        "to": "UAS_Idle",
+        "actions": [
+          "None"
+        ],
+        "response": "488 (Not Acceptable Here)"
+      },
+      {
+        "from": "UAS_Invite_Received",
+        "requisite": "Second INVITE received before final response to first INVITE (lower CSeq)",
+        "to": "UAS_Idle",
+        "actions": [
+          "None"
+        ],
+        "response": "500 (Server Internal Error) with Retry-After"
+      },
+      {
+        "from": "UAS_Invite_Received",
+        "requisite": "INVITE sent by UAS is in progress",
+        "to": "UAS_Idle",
+        "actions": [
+          "None"
+        ],
+        "response": "491 (Request Pending)"
+      },
+      {
+        "from": "UAS_Invite_Received",
+        "requisite": "2xx response generated, ACK not received",
+        "to": "UAS_Idle",
+        "actions": [
+          "Generate BYE to terminate dialog"
+        ],
+        "response": "None"
+      },
+      {
+        "from": "UAC_Session_Established",
+        "requisite": "BYE request passed to client transaction",
+        "to": "UAC_Session_Terminated",
+        "actions": [
+          "Stop sending/listening for media"
+        ],
+        "response": null
+      },
+      {
+        "from": "UAC_Session_Established",
+        "requisite": "Response for BYE is 481, 408, or timeout",
+        "to": "UAC_Session_Terminated",
+        "actions": [
+          "Consider session and dialog terminated"
+        ],
+        "response": "481/408/Timeout"
+      },
+      {
+        "from": "UAS_Session_Established",
+        "requisite": "BYE request matches existing dialog",
+        "to": "UAS_Session_Terminated",
+        "actions": [
+          "Terminate session (stop sending/listening for media, except multicast)",
+          "Generate 2xx response",
+          "Pass 2xx to server transaction"
+        ],
+        "response": "2xx"
+      },
+      {
+        "from": "UAS_Idle",
+        "requisite": "BYE request does not match existing dialog",
+        "to": "UAS_Idle",
+        "actions": [
+          "Generate 481 response",
+          "Pass 481 to server transaction"
+        ],
+        "response": "481"
+      },
+      {
+        "from": "Request Received",
+        "requisite": "Element intends to proxy the request",
+        "to": "Request Validated",
+        "actions": [
+          "Validate the request (Section 16.3)"
+        ],
+        "response": null
+      },
+      {
+        "from": "Request Validated",
+        "requisite": "Request is valid",
+        "to": "Route Info Preprocessed",
+        "actions": [
+          "Preprocess routing information (Section 16.4)"
+        ],
+        "response": null
+      },
+      {
+        "from": "Request Validated",
+        "requisite": "Request is invalid",
+        "to": "Request Received",
+        "actions": [
+          "Behave as a user agent server (Section 8.2)",
+          "Respond with an error code"
+        ],
+        "response": "Error Response"
+      },
+      {
+        "from": "Route Info Preprocessed",
+        "requisite": "None",
+        "to": "Target(s) Determined",
+        "actions": [
+          "Determine target(s) for the request (Section 16.5)"
+        ],
+        "response": null
+      },
+      {
+        "from": "Target(s) Determined",
+        "requisite": "Target set is non-empty",
+        "to": "Request Forwarded",
+        "actions": [
+          "Forward the request to each target (Section 16.6)"
+        ],
+        "response": null
+      },
+      {
+        "from": "Target(s) Determined",
+        "requisite": "Target set is empty",
+        "to": "Request Received",
+        "actions": [
+          "Return an error response (480 Temporarily Unavailable)"
+        ],
+        "response": "Error Response"
+      },
+      {
+        "from": "Request Forwarded",
+        "requisite": "Stateful Proxy",
+        "to": "Response Processing",
+        "actions": [
+          "Process all responses (Section 16.7)"
+        ],
+        "response": null
+      },
+      {
+        "from": "Request Forwarded",
+        "requisite": "Stateless Proxy",
+        "to": "Stateless Forwarding",
+        "actions": [
+          "Forward request statelessly (Section 16.11)"
+        ],
+        "response": null
+      },
+      {
+        "from": "Response Processing",
+        "requisite": "All client transactions associated with the response context have been terminated and no final response has been forwarded",
+        "to": "Final Response Chosen",
+        "actions": [
+          "Choose the best final response from the response context"
+        ],
+        "response": null
+      },
+      {
+        "from": "Response Processing",
+        "requisite": "A final response has been forwarded",
+        "to": "CANCEL Generated (Stateful)",
+        "actions": [
+          "Generate CANCEL requests for all pending client transactions associated with this response context"
+        ],
+        "response": null
+      },
+      {
+        "from": "Calling",
+        "requisite": "INVITE from TU",
+        "to": "Calling",
+        "actions": [
+          "INVITE sent",
+          "Reset A",
+          "INVITE sent"
+        ],
+        "response": null
+      },
+      {
+        "from": "Calling",
+        "requisite": "Timer B fires or Transport Err.",
+        "to": "Terminated",
+        "actions": [
+          "inform TU"
+        ],
+        "response": null
+      },
+      {
+        "from": "Calling",
+        "requisite": "1xx",
+        "to": "Proceeding",
+        "actions": [
+          "1xx to TU"
+        ],
+        "response": null
+      },
+      {
+        "from": "Calling",
+        "requisite": "300-699",
+        "to": "Completed",
+        "actions": [
+          "ACK sent",
+          "resp. to TU"
+        ],
+        "response": null
+      },
+      {
+        "from": "Proceeding",
+        "requisite": "1xx",
+        "to": "Proceeding",
+        "actions": [
+          "1xx to TU"
+        ],
+        "response": null
+      },
+      {
+        "from": "Proceeding",
+        "requisite": "300-699",
+        "to": "Completed",
+        "actions": [
+          "ACK sent",
+          "resp. to TU"
+        ],
+        "response": null
+      },
+      {
+        "from": "Proceeding",
+        "requisite": "2xx",
+        "to": "Terminated",
+        "actions": [
+          "2xx to TU"
+        ],
+        "response": null
+      },
+      {
+        "from": "Completed",
+        "requisite": "Transport Err.",
+        "to": "Terminated",
+        "actions": [
+          "Inform TU"
+        ],
+        "response": null
+      },
+      {
+        "from": "Completed",
+        "requisite": "Timer D fires",
+        "to": "Terminated",
+        "actions": [
+          "-"
+        ],
+        "response": null
+      }
+    ]
+  }
 }

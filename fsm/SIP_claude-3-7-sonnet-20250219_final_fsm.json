@@ -1,0 +1,853 @@
+{
+  "states": [
+    "Idle",
+    "Initial",
+    "Calling",
+    "Proceeding",
+    "Completed",
+    "Terminated",
+    "Trying",
+    "Confirmed",
+    "Early Dialog",
+    "Confirmed Dialog",
+    "Dialog Established",
+    "Re-INVITE in Progress",
+    "Session Modified",
+    "Session Unchanged",
+    "Dialog Terminated",
+    "Session Established",
+    "Session Terminating",
+    "Session Terminated",
+    "Request Validation",
+    "Route Information Preprocessing",
+    "Target Determination",
+    "Request Forwarding",
+    "Response Processing",
+    "Timer C Processing",
+    "Transport Error Handling",
+    "CANCEL Processing",
+    "WaitingForProvisionalResponse",
+    "CancelSent",
+    "Registering",
+    "Registered",
+    "Inviting",
+    "Ringing",
+    "Connected",
+    "Terminating"
+  ],
+  "initial_state": "Idle",
+  "final_states": [
+    "Dialog Terminated",
+    "Session Terminated"
+  ],
+  "transitions": [
+    {
+      "from": "Idle",
+      "requisite": "User initiates registration",
+      "to": "Registering",
+      "actions": [
+        "Send REGISTER request"
+      ],
+      "response": "REGISTER request sent"
+    },
+    {
+      "from": "Registering",
+      "requisite": "200 OK received",
+      "to": "Registered",
+      "actions": [
+        "Store registration information"
+      ],
+      "response": "Registration successful"
+    },
+    {
+      "from": "Registered",
+      "requisite": "User initiates call",
+      "to": "Inviting",
+      "actions": [
+        "Send INVITE request"
+      ],
+      "response": "INVITE request sent"
+    },
+    {
+      "from": "Inviting",
+      "requisite": "180 Ringing received",
+      "to": "Ringing",
+      "actions": [
+        "Notify user of ringing"
+      ],
+      "response": "Call is ringing"
+    },
+    {
+      "from": "Ringing",
+      "requisite": "200 OK received",
+      "to": "Connected",
+      "actions": [
+        "Send ACK",
+        "Establish media session"
+      ],
+      "response": "Call established"
+    },
+    {
+      "from": "Connected",
+      "requisite": "User ends call or BYE received",
+      "to": "Terminating",
+      "actions": [
+        "Send BYE request or 200 OK response"
+      ],
+      "response": "Call termination initiated"
+    },
+    {
+      "from": "Terminating",
+      "requisite": "200 OK received or BYE request processed",
+      "to": "Registered",
+      "actions": [
+        "Close media session"
+      ],
+      "response": "Call terminated"
+    },
+    {
+      "from": "Initial",
+      "requisite": "Decision to cancel request",
+      "to": "WaitingForProvisionalResponse",
+      "actions": [
+        "Construct CANCEL request with matching headers"
+      ],
+      "response": ""
+    },
+    {
+      "from": "WaitingForProvisionalResponse",
+      "requisite": "Provisional response received for original request",
+      "to": "CancelSent",
+      "actions": [
+        "Send CANCEL request",
+        "Create client transaction for CANCEL"
+      ],
+      "response": ""
+    },
+    {
+      "from": "WaitingForProvisionalResponse",
+      "requisite": "Final response received for original request",
+      "to": "Completed",
+      "actions": [
+        "Do not send CANCEL (it would be a no-op)"
+      ],
+      "response": ""
+    },
+    {
+      "from": "CancelSent",
+      "requisite": "Final response received for original request OR 64*T1 seconds elapsed",
+      "to": "Completed",
+      "actions": [
+        "Destroy client transaction for original request"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Initial",
+      "requisite": "101-199 response with To tag to INVITE",
+      "to": "Early Dialog",
+      "actions": [
+        "create dialog state",
+        "set route set",
+        "set remote target",
+        "set sequence numbers",
+        "set dialog ID",
+        "set URIs"
+      ],
+      "response": "provisional response"
+    },
+    {
+      "from": "Initial",
+      "requisite": "2xx response with To tag to INVITE",
+      "to": "Confirmed Dialog",
+      "actions": [
+        "create dialog state",
+        "set route set",
+        "set remote target",
+        "set sequence numbers",
+        "set dialog ID",
+        "set URIs"
+      ],
+      "response": "final response"
+    },
+    {
+      "from": "Early Dialog",
+      "requisite": "2xx response arrives",
+      "to": "Confirmed Dialog",
+      "actions": [
+        "update dialog state"
+      ],
+      "response": "final response"
+    },
+    {
+      "from": "Early Dialog",
+      "requisite": "non-2xx final response or no response",
+      "to": "Terminated",
+      "actions": [
+        "terminate early dialog"
+      ],
+      "response": "dialog termination"
+    },
+    {
+      "from": "Confirmed Dialog",
+      "requisite": "481 response or 408 response or request timeout",
+      "to": "Terminated",
+      "actions": [
+        "terminate dialog (e.g., send BYE for INVITE dialogs)"
+      ],
+      "response": "dialog termination"
+    },
+    {
+      "from": "Confirmed Dialog",
+      "requisite": "BYE request",
+      "to": "Terminated",
+      "actions": [
+        "terminate session and dialog"
+      ],
+      "response": "dialog termination"
+    },
+    {
+      "from": "Initial",
+      "requisite": "UAC sends INVITE",
+      "to": "Initial",
+      "actions": [
+        "UAS processes INVITE"
+      ],
+      "response": "1xx provisional response"
+    },
+    {
+      "from": "Initial",
+      "requisite": "UAS sends 1xx with tag in To field",
+      "to": "Early Dialog",
+      "actions": [
+        "Dialog is constructed"
+      ],
+      "response": "1xx response"
+    },
+    {
+      "from": "Initial",
+      "requisite": "UAS rejects invitation",
+      "to": "Terminated",
+      "actions": [
+        "UAS sends non-2xx final response"
+      ],
+      "response": "3xx, 4xx, 5xx, or 6xx response"
+    },
+    {
+      "from": "Initial",
+      "requisite": "UAS accepts invitation",
+      "to": "Confirmed Dialog",
+      "actions": [
+        "UAS sends 2xx response",
+        "UAC sends ACK"
+      ],
+      "response": "2xx response"
+    },
+    {
+      "from": "Early Dialog",
+      "requisite": "UAS accepts invitation",
+      "to": "Confirmed Dialog",
+      "actions": [
+        "UAS sends 2xx response",
+        "UAC sends ACK"
+      ],
+      "response": "2xx response"
+    },
+    {
+      "from": "Early Dialog",
+      "requisite": "UAS rejects invitation",
+      "to": "Terminated",
+      "actions": [
+        "UAS sends non-2xx final response"
+      ],
+      "response": "3xx, 4xx, 5xx, or 6xx response"
+    },
+    {
+      "from": "Early Dialog",
+      "requisite": "INVITE transaction timeout (64*T1 seconds after first 2xx)",
+      "to": "Terminated",
+      "actions": [
+        "UAC terminates early dialogs"
+      ],
+      "response": "None"
+    },
+    {
+      "from": "Confirmed Dialog",
+      "requisite": "UAC or UAS sends BYE",
+      "to": "Terminated",
+      "actions": [
+        "Dialog is terminated"
+      ],
+      "response": "200 OK for BYE"
+    },
+    {
+      "from": "Confirmed Dialog",
+      "requisite": "No ACK received for 64*T1 seconds",
+      "to": "Terminated",
+      "actions": [
+        "UAS sends BYE"
+      ],
+      "response": "None"
+    },
+    {
+      "from": "Dialog Established",
+      "requisite": "UAC wants to modify session",
+      "to": "Re-INVITE in Progress",
+      "actions": [
+        "Send re-INVITE request within dialog"
+      ],
+      "response": "None"
+    },
+    {
+      "from": "Re-INVITE in Progress",
+      "requisite": "UAS accepts session modification",
+      "to": "Session Modified",
+      "actions": [
+        "UAS sends 2xx response",
+        "UAC sends ACK"
+      ],
+      "response": "2xx"
+    },
+    {
+      "from": "Re-INVITE in Progress",
+      "requisite": "UAS rejects session modification",
+      "to": "Session Unchanged",
+      "actions": [
+        "UAS sends non-2xx final response (e.g., 488)"
+      ],
+      "response": "Non-2xx (e.g., 488)"
+    },
+    {
+      "from": "Re-INVITE in Progress",
+      "requisite": "Dialog no longer exists",
+      "to": "Dialog Terminated",
+      "actions": [
+        "UAS sends 481 or 408 response",
+        "or request times out"
+      ],
+      "response": "481, 408, or timeout"
+    },
+    {
+      "from": "Re-INVITE in Progress",
+      "requisite": "INVITE transaction in progress",
+      "to": "Re-INVITE in Progress",
+      "actions": [
+        "UAS sends 491 response",
+        "UAC waits and retries"
+      ],
+      "response": "491"
+    },
+    {
+      "from": "Re-INVITE in Progress",
+      "requisite": "Second INVITE received before response to first",
+      "to": "Re-INVITE in Progress",
+      "actions": [
+        "UAS sends 500 response with Retry-After header"
+      ],
+      "response": "500 with Retry-After"
+    },
+    {
+      "from": "Session Modified",
+      "requisite": "UAC or UAS wants to terminate dialog",
+      "to": "Dialog Terminated",
+      "actions": [
+        "Send BYE request"
+      ],
+      "response": "None"
+    },
+    {
+      "from": "Session Unchanged",
+      "requisite": "UAC or UAS wants to terminate dialog",
+      "to": "Dialog Terminated",
+      "actions": [
+        "Send BYE request"
+      ],
+      "response": "None"
+    },
+    {
+      "from": "Session Established",
+      "requisite": "UAC decides to terminate session",
+      "to": "Session Terminating",
+      "actions": [
+        "UAC constructs BYE request",
+        "UAC passes BYE to client transaction"
+      ],
+      "response": "UAC stops sending/listening for media"
+    },
+    {
+      "from": "Session Terminating",
+      "requisite": "UAS receives BYE for existing dialog",
+      "to": "Session Terminated",
+      "actions": [
+        "UAS processes BYE according to Section 12.2.2",
+        "UAS stops sending/listening for media"
+      ],
+      "response": "UAS generates 2xx response to BYE"
+    },
+    {
+      "from": "Session Terminating",
+      "requisite": "UAS receives BYE that doesn't match existing dialog",
+      "to": "Session Terminating",
+      "actions": [],
+      "response": "UAS generates 481 (Call/Transaction Does Not Exist)"
+    },
+    {
+      "from": "Session Terminating",
+      "requisite": "UAC receives 481 or 408 response or timeout for BYE",
+      "to": "Session Terminated",
+      "actions": [],
+      "response": "UAC considers session and dialog terminated"
+    },
+    {
+      "from": "Session Terminated",
+      "requisite": "No other application layer states associated with dialog",
+      "to": "Dialog Terminated",
+      "actions": [],
+      "response": ""
+    },
+    {
+      "from": "Initial",
+      "requisite": "New request received",
+      "to": "Request Validation",
+      "actions": [
+        "Create server transaction for new request",
+        "Send immediate provisional response (100 Trying) for INVITE"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Request Validation",
+      "requisite": "Request passes validation checks",
+      "to": "Route Information Preprocessing",
+      "actions": [
+        "Check syntax",
+        "Verify URI scheme",
+        "Check Max-Forwards",
+        "Optional loop detection",
+        "Check Proxy-Require",
+        "Check Proxy-Authorization"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Request Validation",
+      "requisite": "Request fails validation",
+      "to": "Initial",
+      "actions": [
+        "Behave as UAS",
+        "Generate appropriate error response"
+      ],
+      "response": "Error response (4xx, 5xx)"
+    },
+    {
+      "from": "Route Information Preprocessing",
+      "requisite": "Request-URI contains value previously placed in Record-Route",
+      "to": "Route Information Preprocessing",
+      "actions": [
+        "Replace Request-URI with last Route value",
+        "Remove that value from Route header"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Route Information Preprocessing",
+      "requisite": "Request-URI contains maddr parameter proxy is responsible for",
+      "to": "Route Information Preprocessing",
+      "actions": [
+        "Strip maddr and non-default port/transport parameters"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Route Information Preprocessing",
+      "requisite": "First Route value indicates this proxy",
+      "to": "Route Information Preprocessing",
+      "actions": [
+        "Remove that value from request"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Route Information Preprocessing",
+      "requisite": "Route preprocessing complete",
+      "to": "Target Determination",
+      "actions": [
+        "Calculate target(s) for request"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Target Determination",
+      "requisite": "Request-URI contains maddr parameter",
+      "to": "Request Forwarding",
+      "actions": [
+        "Place Request-URI into target set as only target"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Target Determination",
+      "requisite": "Request-URI domain not responsibility of proxy",
+      "to": "Request Forwarding",
+      "actions": [
+        "Place Request-URI into target set as only target"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Target Determination",
+      "requisite": "Request-URI does not provide sufficient information",
+      "to": "Initial",
+      "actions": [
+        "Generate 485 response with Contact header containing new addresses"
+      ],
+      "response": "485 Ambiguous"
+    },
+    {
+      "from": "Target Determination",
+      "requisite": "Target set remains empty after processing",
+      "to": "Initial",
+      "actions": [
+        "Generate error response"
+      ],
+      "response": "480 Temporarily Unavailable"
+    },
+    {
+      "from": "Target Determination",
+      "requisite": "Request-URI indicates non-existent resource at this proxy",
+      "to": "Initial",
+      "actions": [
+        "Generate 404 response"
+      ],
+      "response": "404 Not Found"
+    },
+    {
+      "from": "Target Determination",
+      "requisite": "Target set non-empty",
+      "to": "Request Forwarding",
+      "actions": [
+        "Begin forwarding request to targets"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Request Forwarding",
+      "requisite": "For each target in target set",
+      "to": "Request Forwarding",
+      "actions": [
+        "Copy request",
+        "Update Request-URI",
+        "Update Max-Forwards",
+        "Optionally add Record-Route",
+        "Optionally add additional headers",
+        "Postprocess routing information",
+        "Determine next-hop address/port/transport",
+        "Add Via header",
+        "Add Content-Length if necessary",
+        "Forward request",
+        "Set timer C for INVITE"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Request Forwarding",
+      "requisite": "All targets processed",
+      "to": "Response Processing",
+      "actions": [
+        "Wait for responses"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Response Processing",
+      "requisite": "Response received",
+      "to": "Response Processing",
+      "actions": [
+        "Find appropriate response context",
+        "Update timer C for provisional responses",
+        "Remove topmost Via",
+        "Add response to context",
+        "Check if response should be forwarded immediately",
+        "Choose best final response when necessary",
+        "Aggregate Authorization header values",
+        "Optionally rewrite Record-Route",
+        "Forward response",
+        "Generate CANCELs for pending transactions if final/6xx response"
+      ],
+      "response": "Forwarded response"
+    },
+    {
+      "from": "Timer C Processing",
+      "requisite": "Timer C fires",
+      "to": "Timer C Processing",
+      "actions": [
+        "Either reset timer or terminate client transaction",
+        "Generate CANCEL if provisional response received",
+        "Treat as 408 response if no provisional response"
+      ],
+      "response": "CANCEL or 408 Response"
+    },
+    {
+      "from": "Transport Error Handling",
+      "requisite": "Transport error when forwarding request",
+      "to": "Transport Error Handling",
+      "actions": [
+        "Behave as if request received 503 response"
+      ],
+      "response": "503 Service Unavailable"
+    },
+    {
+      "from": "Transport Error Handling",
+      "requisite": "Transport error when forwarding response",
+      "to": "Transport Error Handling",
+      "actions": [
+        "Drop the response",
+        "Do not cancel outstanding client transactions"
+      ],
+      "response": ""
+    },
+    {
+      "from": "CANCEL Processing",
+      "requisite": "CANCEL request received",
+      "to": "CANCEL Processing",
+      "actions": [
+        "Search for matching response context",
+        "Return 200 OK to CANCEL",
+        "Generate CANCELs for all pending client transactions in context"
+      ],
+      "response": "200 OK to CANCEL"
+    },
+    {
+      "from": "CANCEL Processing",
+      "requisite": "No matching response context found",
+      "to": "CANCEL Processing",
+      "actions": [
+        "Statelessly forward the CANCEL request"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Calling",
+      "requisite": "INVITE from TU",
+      "to": "Calling",
+      "actions": [
+        "INVITE sent",
+        "Start Timer A with value T1",
+        "Start Timer B with value 64*T1"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Calling",
+      "requisite": "Timer A fires",
+      "to": "Calling",
+      "actions": [
+        "Reset Timer A with value 2*T1",
+        "INVITE sent"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Calling",
+      "requisite": "Timer B fires or Transport Error",
+      "to": "Terminated",
+      "actions": [
+        "Inform TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Calling",
+      "requisite": "1xx response received",
+      "to": "Proceeding",
+      "actions": [
+        "Pass response to TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Calling",
+      "requisite": "300-699 response received",
+      "to": "Completed",
+      "actions": [
+        "Pass response to TU",
+        "Generate ACK",
+        "Send ACK",
+        "Start Timer D"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Calling",
+      "requisite": "2xx response received",
+      "to": "Terminated",
+      "actions": [
+        "Pass response to TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Proceeding",
+      "requisite": "1xx response received",
+      "to": "Proceeding",
+      "actions": [
+        "Pass response to TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Proceeding",
+      "requisite": "300-699 response received",
+      "to": "Completed",
+      "actions": [
+        "Pass response to TU",
+        "Generate ACK",
+        "Send ACK",
+        "Start Timer D"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Proceeding",
+      "requisite": "2xx response received",
+      "to": "Terminated",
+      "actions": [
+        "Pass response to TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Completed",
+      "requisite": "Retransmission of response received",
+      "to": "Completed",
+      "actions": [
+        "Retransmit ACK"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Completed",
+      "requisite": "Timer D fires",
+      "to": "Terminated",
+      "actions": [],
+      "response": ""
+    },
+    {
+      "from": "Completed",
+      "requisite": "Transport Error",
+      "to": "Terminated",
+      "actions": [
+        "Inform TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Trying",
+      "requisite": "Request from TU",
+      "to": "Trying",
+      "actions": [
+        "Send request",
+        "Start Timer E with value T1",
+        "Start Timer F with value 64*T1"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Trying",
+      "requisite": "Timer E fires",
+      "to": "Trying",
+      "actions": [
+        "Reset Timer E with value MIN(2*T1, T2)",
+        "Send request"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Trying",
+      "requisite": "Timer F fires or Transport Error",
+      "to": "Terminated",
+      "actions": [
+        "Inform TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Trying",
+      "requisite": "1xx response received",
+      "to": "Proceeding",
+      "actions": [
+        "Pass response to TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Trying",
+      "requisite": "200-699 response received",
+      "to": "Completed",
+      "actions": [
+        "Pass response to TU",
+        "Start Timer K"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Proceeding",
+      "requisite": "Timer E fires",
+      "to": "Proceeding",
+      "actions": [
+        "Reset Timer E with value T2",
+        "Send request"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Proceeding",
+      "requisite": "Timer F fires or Transport Error",
+      "to": "Terminated",
+      "actions": [
+        "Inform TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Proceeding",
+      "requisite": "1xx response received",
+      "to": "Proceeding",
+      "actions": [
+        "Pass response to TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Proceeding",
+      "requisite": "200-699 response received",
+      "to": "Completed",
+      "actions": [
+        "Pass response to TU",
+        "Start Timer K"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Completed",
+      "requisite": "Timer K fires",
+      "to": "Terminated",
+      "actions": [],
+      "response": ""
+    },
+    {
+      "from": "Completed",
+      "requisite": "ACK received",
+      "to": "Confirmed",
+      "actions": [],
+      "response": ""
+    },
+    {
+      "from": "Confirmed",
+      "requisite": "Timer I fires",
+      "to": "Terminated",
+      "actions": [],
+      "response": ""
+    }
+  ]
+}

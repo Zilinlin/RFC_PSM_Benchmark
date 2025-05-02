@@ -236,5 +236,182 @@
     }
   ],
   "final_response": "```json\n{\n  \"states\": [\n    \"CLOSED\",\n    \"LISTEN\",\n    \"SYN-SENT\",\n    \"SYN-RECEIVED\",\n    \"ESTABLISHED\",\n    \"FIN-WAIT-1\",\n    \"FIN-WAIT-2\",\n    \"CLOSE-WAIT\",\n    \"CLOSING\",\n    \"LAST-ACK\",\n    \"TIME-WAIT\"\n  ],\n  \"initial_state\": \"CLOSED\",\n  \"final_states\": [\n    \"CLOSED\"\n  ],\n  \"transitions\": [\n    {\n      \"from\": \"CLOSED\",\n      \"requisite\": \"active OPEN\",\n      \"to\": \"SYN-SENT\",\n      \"actions\": [\n        \"create TCB\",\n        \"snd SYN\"\n      ],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"CLOSED\",\n      \"requisite\": \"passive OPEN\",\n      \"to\": \"LISTEN\",\n      \"actions\": [\n        \"create TCB\"\n      ],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"LISTEN\",\n      \"requisite\": \"CLOSE\",\n      \"to\": \"CLOSED\",\n      \"actions\": [\n        \"delete TCB\"\n      ],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"LISTEN\",\n      \"requisite\": \"rcv RST (note 1)\",\n      \"to\": \"LISTEN\",\n      \"actions\": [],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"LISTEN\",\n      \"requisite\": \"rcv SYN\",\n      \"to\": \"SYN-RECEIVED\",\n      \"actions\": [\n        \"snd SYN,ACK\"\n      ],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"LISTEN\",\n      \"requisite\": \"SEND\",\n      \"to\": \"SYN-SENT\",\n      \"actions\": [\n        \"snd SYN\"\n      ],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"SYN-RECEIVED\",\n      \"requisite\": \"rcv ACK of SYN\",\n      \"to\": \"ESTABLISHED\",\n      \"actions\": [],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"SYN-SENT\",\n      \"requisite\": \"rcv SYN,ACK\",\n      \"to\": \"ESTABLISHED\",\n      \"actions\": [\n        \"snd ACK\"\n      ],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"SYN-SENT\",\n      \"requisite\": \"rcv SYN\",\n      \"to\": \"SYN-RECEIVED\",\n      \"actions\": [\n        \"snd SYN,ACK\"\n      ],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"ESTABLISHED\",\n      \"requisite\": \"CLOSE\",\n      \"to\": \"FIN-WAIT-1\",\n      \"actions\": [\n        \"snd FIN\"\n      ],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"ESTABLISHED\",\n      \"requisite\": \"rcv FIN\",\n      \"to\": \"CLOSE-WAIT\",\n      \"actions\": [\n        \"snd ACK\"\n      ],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"FIN-WAIT-1\",\n      \"requisite\": \"rcv ACK of FIN\",\n      \"to\": \"FIN-WAIT-2\",\n      \"actions\": [],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"FIN-WAIT-1\",\n      \"requisite\": \"rcv FIN\",\n      \"to\": \"CLOSING\",\n      \"actions\": [\n        \"snd ACK\"\n      ],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"FIN-WAIT-2\",\n      \"requisite\": \"rcv FIN\",\n      \"to\": \"TIME-WAIT\",\n      \"actions\": [\n        \"snd ACK\"\n      ],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"CLOSING\",\n      \"requisite\": \"rcv ACK of FIN\",\n      \"to\": \"TIME-WAIT\",\n      \"actions\": [],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"CLOSE-WAIT\",\n      \"requisite\": \"CLOSE\",\n      \"to\": \"LAST-ACK\",\n      \"actions\": [\n        \"snd FIN\"\n      ],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"LAST-ACK\",\n      \"requisite\": \"rcv ACK of FIN\",\n      \"to\": \"CLOSED\",\n      \"actions\": [\n        \"Timeout=2MSL\",\n        \"delete TCB\"\n      ],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"TIME-WAIT\",\n      \"requisite\": \"Timeout=2MSL\",\n      \"to\": \"CLOSED\",\n      \"actions\": [\n        \"delete TCB\"\n      ],\n      \"response\": \"\"\n    }\n  ]\n}\n```",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "CLOSED",
+      "LISTEN",
+      "SYN-SENT",
+      "SYN-RECEIVED",
+      "ESTABLISHED",
+      "FIN-WAIT-1",
+      "FIN-WAIT-2",
+      "CLOSE-WAIT",
+      "CLOSING",
+      "LAST-ACK",
+      "TIME-WAIT"
+    ],
+    "initial_state": "CLOSED",
+    "final_states": [
+      "CLOSED",
+      "TIME-WAIT"
+    ],
+    "transitions": [
+      {
+        "from": "CLOSED",
+        "requisite": "active OPEN",
+        "to": "SYN-SENT",
+        "actions": [
+          "create TCB",
+          "snd SYN"
+        ],
+        "response": ""
+      },
+      {
+        "from": "CLOSED",
+        "requisite": "passive OPEN",
+        "to": "LISTEN",
+        "actions": [
+          "create TCB"
+        ],
+        "response": ""
+      },
+      {
+        "from": "LISTEN",
+        "requisite": "CLOSE",
+        "to": "CLOSED",
+        "actions": [
+          "delete TCB"
+        ],
+        "response": ""
+      },
+      {
+        "from": "LISTEN",
+        "requisite": "rcv RST (note 1)",
+        "to": "LISTEN",
+        "actions": [],
+        "response": ""
+      },
+      {
+        "from": "LISTEN",
+        "requisite": "rcv SYN",
+        "to": "SYN-RECEIVED",
+        "actions": [
+          "snd SYN,ACK"
+        ],
+        "response": ""
+      },
+      {
+        "from": "LISTEN",
+        "requisite": "SEND",
+        "to": "SYN-SENT",
+        "actions": [
+          "snd SYN"
+        ],
+        "response": ""
+      },
+      {
+        "from": "SYN-RECEIVED",
+        "requisite": "rcv ACK of SYN",
+        "to": "ESTABLISHED",
+        "actions": [],
+        "response": ""
+      },
+      {
+        "from": "SYN-SENT",
+        "requisite": "rcv SYN,ACK",
+        "to": "ESTABLISHED",
+        "actions": [
+          "snd ACK"
+        ],
+        "response": ""
+      },
+      {
+        "from": "SYN-SENT",
+        "requisite": "rcv SYN",
+        "to": "SYN-RECEIVED",
+        "actions": [
+          "snd SYN,ACK"
+        ],
+        "response": ""
+      },
+      {
+        "from": "ESTABLISHED",
+        "requisite": "CLOSE",
+        "to": "FIN-WAIT-1",
+        "actions": [
+          "snd FIN"
+        ],
+        "response": ""
+      },
+      {
+        "from": "ESTABLISHED",
+        "requisite": "rcv FIN",
+        "to": "CLOSE-WAIT",
+        "actions": [
+          "snd ACK"
+        ],
+        "response": ""
+      },
+      {
+        "from": "FIN-WAIT-1",
+        "requisite": "rcv ACK of FIN",
+        "to": "FIN-WAIT-2",
+        "actions": [],
+        "response": ""
+      },
+      {
+        "from": "FIN-WAIT-1",
+        "requisite": "rcv FIN",
+        "to": "CLOSING",
+        "actions": [
+          "snd ACK"
+        ],
+        "response": ""
+      },
+      {
+        "from": "FIN-WAIT-2",
+        "requisite": "rcv FIN",
+        "to": "TIME-WAIT",
+        "actions": [
+          "snd ACK"
+        ],
+        "response": ""
+      },
+      {
+        "from": "CLOSING",
+        "requisite": "rcv ACK of FIN",
+        "to": "TIME-WAIT",
+        "actions": [],
+        "response": ""
+      },
+      {
+        "from": "CLOSE-WAIT",
+        "requisite": "CLOSE",
+        "to": "LAST-ACK",
+        "actions": [
+          "snd FIN"
+        ],
+        "response": ""
+      },
+      {
+        "from": "LAST-ACK",
+        "requisite": "rcv ACK of FIN",
+        "to": "CLOSED",
+        "actions": [
+          "Timeout=2MSL",
+          "delete TCB"
+        ],
+        "response": ""
+      },
+      {
+        "from": "TIME-WAIT",
+        "requisite": "Timeout=2MSL",
+        "to": "CLOSED",
+        "actions": [
+          "delete TCB"
+        ],
+        "response": ""
+      }
+    ]
+  }
 }

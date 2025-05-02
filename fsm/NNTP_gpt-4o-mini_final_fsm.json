@@ -1,0 +1,203 @@
+{
+  "states": [
+    "initial",
+    "connected",
+    "authenticated",
+    "reader_mode",
+    "transit_mode",
+    "initial_connection",
+    "capabilities",
+    "quit",
+    "invalid",
+    "valid_group_selected",
+    "empty_group_selected",
+    "article_retrieved",
+    "article_not_found"
+  ],
+  "initial_state": "initial",
+  "final_states": [
+    "quit",
+    "article_not_found"
+  ],
+  "transitions": [
+    {
+      "from": "initial",
+      "requisite": "client connects to server",
+      "to": "connected",
+      "actions": [
+        "send greeting"
+      ],
+      "response": "200 Server ready"
+    },
+    {
+      "from": "initial",
+      "requisite": "Client connects",
+      "to": "initial_connection",
+      "actions": [],
+      "response": "200 or 201 or 400 or 502"
+    },
+    {
+      "from": "initial_connection",
+      "requisite": "Client issues CAPABILITIES",
+      "to": "capabilities",
+      "actions": [],
+      "response": "101"
+    },
+    {
+      "from": "connected",
+      "requisite": "client sends MODE READER",
+      "to": "reader_mode",
+      "actions": [
+        "switch to reader mode"
+      ],
+      "response": "200 Reader mode, posting permitted"
+    },
+    {
+      "from": "capabilities",
+      "requisite": "Client issues MODE READER",
+      "to": "reader_mode",
+      "actions": [],
+      "response": "200 or 201 or 502"
+    },
+    {
+      "from": "connected",
+      "requisite": "client sends IHAVE",
+      "to": "transit_mode",
+      "actions": [
+        "switch to transit mode"
+      ],
+      "response": "200 Transit mode"
+    },
+    {
+      "from": "reader_mode",
+      "requisite": "client sends GROUP command",
+      "to": "reader_mode",
+      "actions": [
+        "process GROUP command"
+      ],
+      "response": "211 Group selected"
+    },
+    {
+      "from": "transit_mode",
+      "requisite": "client sends IHAVE command",
+      "to": "transit_mode",
+      "actions": [
+        "process IHAVE command"
+      ],
+      "response": "200 IHAVE accepted"
+    },
+    {
+      "from": "connected",
+      "requisite": "inactivity timer expires",
+      "to": "initial",
+      "actions": [
+        "close connection"
+      ],
+      "response": "400 Connection closed due to inactivity"
+    },
+    {
+      "from": "invalid",
+      "requisite": "GROUP command issued with valid group",
+      "to": "valid_group_selected",
+      "actions": [
+        "set currently selected newsgroup",
+        "set current article number to first article"
+      ],
+      "response": "211 number low high group"
+    },
+    {
+      "from": "invalid",
+      "requisite": "GROUP command issued with invalid group",
+      "to": "invalid",
+      "actions": [],
+      "response": "411 No such newsgroup"
+    },
+    {
+      "from": "valid_group_selected",
+      "requisite": "LAST command issued",
+      "to": "article_retrieved",
+      "actions": [
+        "set current article number to previous article"
+      ],
+      "response": "223 n message-id"
+    },
+    {
+      "from": "valid_group_selected",
+      "requisite": "NEXT command issued",
+      "to": "article_retrieved",
+      "actions": [
+        "set current article number to next article"
+      ],
+      "response": "223 n message-id"
+    },
+    {
+      "from": "valid_group_selected",
+      "requisite": "ARTICLE command issued with valid article number",
+      "to": "article_retrieved",
+      "actions": [
+        "retrieve article"
+      ],
+      "response": "220 n message-id"
+    },
+    {
+      "from": "valid_group_selected",
+      "requisite": "ARTICLE command issued with invalid article number",
+      "to": "article_not_found",
+      "actions": [],
+      "response": "423 No article with that number"
+    },
+    {
+      "from": "valid_group_selected",
+      "requisite": "HEAD command issued",
+      "to": "article_retrieved",
+      "actions": [
+        "retrieve article headers"
+      ],
+      "response": "221 n message-id"
+    },
+    {
+      "from": "valid_group_selected",
+      "requisite": "BODY command issued",
+      "to": "article_retrieved",
+      "actions": [
+        "retrieve article body"
+      ],
+      "response": "222 n message-id"
+    },
+    {
+      "from": "valid_group_selected",
+      "requisite": "STAT command issued",
+      "to": "article_retrieved",
+      "actions": [],
+      "response": "223 n message-id"
+    },
+    {
+      "from": "empty_group_selected",
+      "requisite": "LAST command issued",
+      "to": "article_not_found",
+      "actions": [],
+      "response": "420 Current article number is invalid"
+    },
+    {
+      "from": "empty_group_selected",
+      "requisite": "NEXT command issued",
+      "to": "article_not_found",
+      "actions": [],
+      "response": "420 Current article number is invalid"
+    },
+    {
+      "from": "empty_group_selected",
+      "requisite": "ARTICLE command issued",
+      "to": "article_not_found",
+      "actions": [],
+      "response": "420 No current article selected"
+    },
+    {
+      "from": "mode_reader",
+      "requisite": "Client issues QUIT",
+      "to": "quit",
+      "actions": [],
+      "response": "205"
+    }
+  ]
+}

@@ -1,0 +1,929 @@
+{
+  "states": [
+    "Idle",
+    "Calling",
+    "Ringing",
+    "In Call",
+    "Terminated",
+    "client transaction",
+    "server transaction",
+    "transaction user",
+    "UAC Behavior",
+    "Generating the Request",
+    "Sending the Request",
+    "Processing Responses",
+    "UAS Behavior",
+    "Method Inspection",
+    "Header Inspection",
+    "Generating the Response",
+    "CANCEL Sent",
+    "Final Response Received",
+    "Transaction Cancelled",
+    "Initial State",
+    "Registrar Processing",
+    "Binding Updated",
+    "Binding Removed",
+    "Error Response",
+    "OPTIONS Request",
+    "OPTIONS Response",
+    "early",
+    "confirmed",
+    "UAC Initial State",
+    "Waiting for INVITE Response",
+    "Early Dialog Established",
+    "Final Response Received",
+    "Dialog Confirmed",
+    "Dialog Terminated",
+    "UAC",
+    "UAS",
+    "Dialog Terminated",
+    "Initial",
+    "Request Validation",
+    "Route Information Preprocessing",
+    "Determining Request Targets",
+    "Request Forwarding",
+    "Response Processing",
+    "Timer C Processing",
+    "Handling Transport Errors",
+    "CANCEL Processing",
+    "Stateless Proxy",
+    "Proceeding",
+    "Completed",
+    "Trying",
+    "Client Transport",
+    "Server Transport",
+    "Request Sent",
+    "Response Received",
+    "Connection Established",
+    "Error Handling",
+    "Provisional 1xx",
+    "Successful 2xx",
+    "Redirection 3xx",
+    "Request Failure 4xx",
+    "Server Failure 5xx",
+    "Global Failures 6xx",
+    "Proxy",
+    "UAC sends request with S/MIME body",
+    "UAS receives request with S/MIME body",
+    "UAC receives response with S/MIME body",
+    "UAS sends response with S/MIME body",
+    "UAC validates certificate",
+    "UAS validates certificate",
+    "User notified of certificate status",
+    "User authorizes certificate",
+    "UAC adds certificate to keyring",
+    "UAS adds certificate to keyring",
+    "UAC rejects request with 493 response",
+    "UAC rejects request with 415 response",
+    "UAC notifies user of unsecured session",
+    "UAS notifies user of unsecured session",
+    "User aborts connection attempt",
+    "User confirms key change",
+    "Registered",
+    "Session Established",
+    "Session Terminated"
+  ],
+  "initial_state": "Idle",
+  "final_states": [
+    "Transaction Cancelled",
+    "Error Response",
+    "OPTIONS Response",
+    "Dialog Terminated",
+    "Stateless Proxy",
+    "Error Handling",
+    "Global Failures 6xx",
+    "Session Terminated"
+  ],
+  "transitions": [
+    {
+      "from": "Idle",
+      "requisite": "User initiates call",
+      "to": "Calling",
+      "actions": [
+        "Send INVITE"
+      ],
+      "response": "100 Trying"
+    },
+    {
+      "from": "Calling",
+      "requisite": "Call is answered",
+      "to": "In Call",
+      "actions": [
+        "Send 200 OK",
+        "Send ACK"
+      ],
+      "response": "Media Session Established"
+    },
+    {
+      "from": "In Call",
+      "requisite": "User hangs up",
+      "to": "Terminated",
+      "actions": [
+        "Send BYE"
+      ],
+      "response": "200 OK"
+    },
+    {
+      "from": "In Call",
+      "requisite": "User wants to change media",
+      "to": "In Call",
+      "actions": [
+        "Send re-INVITE"
+      ],
+      "response": "200 OK or 488 Not Acceptable Here"
+    },
+    {
+      "from": "transaction user",
+      "requisite": "wishes to send a request",
+      "to": "client transaction",
+      "actions": [
+        "create client transaction instance",
+        "pass request and destination"
+      ],
+      "response": "transaction initiated"
+    },
+    {
+      "from": "client transaction",
+      "requisite": "cancels transaction",
+      "to": "server transaction",
+      "actions": [
+        "request server to stop processing",
+        "revert to previous state"
+      ],
+      "response": "specific error response generated"
+    },
+    {
+      "from": "UAC Behavior",
+      "requisite": "Request generated",
+      "to": "Generating the Request",
+      "actions": [
+        "Construct SIP request"
+      ],
+      "response": "Request ready to send"
+    },
+    {
+      "from": "Generating the Request",
+      "requisite": "Request constructed",
+      "to": "Sending the Request",
+      "actions": [
+        "Determine destination"
+      ],
+      "response": "Request sent"
+    },
+    {
+      "from": "Sending the Request",
+      "requisite": "Response received",
+      "to": "Processing Responses",
+      "actions": [
+        "Process response"
+      ],
+      "response": "Response processed"
+    },
+    {
+      "from": "Processing Responses",
+      "requisite": "Response type identified",
+      "to": "UAS Behavior",
+      "actions": [
+        "Handle response"
+      ],
+      "response": "Response handled"
+    },
+    {
+      "from": "UAS Behavior",
+      "requisite": "Request received",
+      "to": "Method Inspection",
+      "actions": [
+        "Authenticate request"
+      ],
+      "response": "Request authenticated"
+    },
+    {
+      "from": "Method Inspection",
+      "requisite": "Method recognized",
+      "to": "Header Inspection",
+      "actions": [
+        "Inspect method"
+      ],
+      "response": "Method inspected"
+    },
+    {
+      "from": "Header Inspection",
+      "requisite": "Headers valid",
+      "to": "Generating the Response",
+      "actions": [
+        "Generate response"
+      ],
+      "response": "Response generated"
+    },
+    {
+      "from": "CANCEL Sent",
+      "requisite": "No Final Response for Original Request",
+      "to": "Final Response Received",
+      "actions": [
+        "Send CANCEL Request"
+      ],
+      "response": "200 OK"
+    },
+    {
+      "from": "Final Response Received",
+      "requisite": "Final Response for Original Request Exists",
+      "to": "Transaction Cancelled",
+      "actions": [
+        "Consider Original Transaction Cancelled"
+      ],
+      "response": "487 Request Terminated"
+    },
+    {
+      "from": "Initial State",
+      "requisite": "REGISTER request received",
+      "to": "Registrar Processing",
+      "actions": [
+        "Inspect Request-URI",
+        "Authenticate UAC"
+      ],
+      "response": "Proceed to process the request"
+    },
+    {
+      "from": "Registrar Processing",
+      "requisite": "Valid address-of-record",
+      "to": "Binding Updated",
+      "actions": [
+        "Extract address-of-record",
+        "Check Contact header"
+      ],
+      "response": "200 OK with current bindings"
+    },
+    {
+      "from": "Registrar Processing",
+      "requisite": "Contact header contains '*' and Expires=0",
+      "to": "Binding Removed",
+      "actions": [
+        "Remove all bindings"
+      ],
+      "response": "200 OK with current bindings"
+    },
+    {
+      "from": "Registrar Processing",
+      "requisite": "Invalid request",
+      "to": "Error Response",
+      "actions": [
+        "Return 400 Invalid Request"
+      ],
+      "response": "400 Invalid Request"
+    },
+    {
+      "from": "Registrar Processing",
+      "requisite": "Expiration interval too brief",
+      "to": "Error Response",
+      "actions": [
+        "Return 423 Interval Too Brief"
+      ],
+      "response": "423 Interval Too Brief"
+    },
+    {
+      "from": "OPTIONS Request",
+      "requisite": "Request-URI identified",
+      "to": "OPTIONS Response",
+      "actions": [
+        "Construct OPTIONS request",
+        "Send OPTIONS request"
+      ],
+      "response": "Receive response to OPTIONS request"
+    },
+    {
+      "from": "OPTIONS Response",
+      "requisite": "Response generated by UAS or proxy",
+      "to": "OPTIONS Response",
+      "actions": [
+        "Construct response based on capabilities"
+      ],
+      "response": "200 OK or other response code"
+    },
+    {
+      "from": "early",
+      "requisite": "2xx final response arrives",
+      "to": "confirmed",
+      "actions": [],
+      "response": "dialog confirmed"
+    },
+    {
+      "from": "early",
+      "requisite": "non-final response or no response",
+      "to": "terminated",
+      "actions": [],
+      "response": "dialog terminated"
+    },
+    {
+      "from": "UAC Initial State",
+      "requisite": "INVITE request sent",
+      "to": "Waiting for INVITE Response",
+      "actions": [
+        "send INVITE"
+      ],
+      "response": "waiting for responses"
+    },
+    {
+      "from": "Waiting for INVITE Response",
+      "requisite": "1xx response received",
+      "to": "Early Dialog Established",
+      "actions": [
+        "establish early dialog"
+      ],
+      "response": "provisional response"
+    },
+    {
+      "from": "Waiting for INVITE Response",
+      "requisite": "2xx response received",
+      "to": "Dialog Confirmed",
+      "actions": [
+        "send ACK"
+      ],
+      "response": "session established"
+    },
+    {
+      "from": "Waiting for INVITE Response",
+      "requisite": "non-2xx response received",
+      "to": "Dialog Terminated",
+      "actions": [
+        "terminate dialog"
+      ],
+      "response": "final response received"
+    },
+    {
+      "from": "Early Dialog Established",
+      "requisite": "subsequent 2xx response received",
+      "to": "Dialog Confirmed",
+      "actions": [
+        "send ACK for each 2xx"
+      ],
+      "response": "additional dialog established"
+    },
+    {
+      "from": "Dialog Confirmed",
+      "requisite": "ACK received",
+      "to": "Dialog Terminated",
+      "actions": [
+        "terminate dialog"
+      ],
+      "response": "dialog closed"
+    },
+    {
+      "from": "UAC",
+      "requisite": "re-INVITE sent",
+      "to": "UAS",
+      "actions": [
+        "check session description",
+        "send response"
+      ],
+      "response": "2xx or non-2xx response"
+    },
+    {
+      "from": "UAS",
+      "requisite": "session description changed",
+      "to": "UAS",
+      "actions": [
+        "adjust session parameters"
+      ],
+      "response": "488 Not Acceptable Here or 2xx response"
+    },
+    {
+      "from": "UAS",
+      "requisite": "no ACK received",
+      "to": "UAS",
+      "actions": [
+        "generate BYE"
+      ],
+      "response": "terminate dialog"
+    },
+    {
+      "from": "UAC",
+      "requisite": "491 response received",
+      "to": "UAC",
+      "actions": [
+        "start timer",
+        "attempt re-INVITE"
+      ],
+      "response": "re-INVITE attempt"
+    },
+    {
+      "from": "UAC",
+      "requisite": "BYE request sent",
+      "to": "Dialog Terminated",
+      "actions": [
+        "stop sending media",
+        "stop listening for media"
+      ],
+      "response": "session terminated"
+    },
+    {
+      "from": "UAS",
+      "requisite": "BYE request received",
+      "to": "Dialog Terminated",
+      "actions": [
+        "terminate session",
+        "stop sending media",
+        "stop listening for media"
+      ],
+      "response": "2xx response to BYE"
+    },
+    {
+      "from": "UAS",
+      "requisite": "BYE does not match existing dialog",
+      "to": "UAS",
+      "actions": [
+        "generate 481 response"
+      ],
+      "response": "Call/Transaction Does Not Exist"
+    },
+    {
+      "from": "Initial",
+      "requisite": "Request received",
+      "to": "Request Validation",
+      "actions": [
+        "Validate the request"
+      ],
+      "response": "Proceed to validate"
+    },
+    {
+      "from": "Request Validation",
+      "requisite": "Validation successful",
+      "to": "Route Information Preprocessing",
+      "actions": [
+        "Preprocess routing information"
+      ],
+      "response": "Proceed to preprocess"
+    },
+    {
+      "from": "Route Information Preprocessing",
+      "requisite": "Preprocessing complete",
+      "to": "Determining Request Targets",
+      "actions": [
+        "Determine targets"
+      ],
+      "response": "Proceed to determine targets"
+    },
+    {
+      "from": "Determining Request Targets",
+      "requisite": "Targets determined",
+      "to": "Request Forwarding",
+      "actions": [
+        "Forward the request"
+      ],
+      "response": "Proceed to forward request"
+    },
+    {
+      "from": "Request Forwarding",
+      "requisite": "Request forwarded",
+      "to": "Response Processing",
+      "actions": [
+        "Process responses"
+      ],
+      "response": "Proceed to process responses"
+    },
+    {
+      "from": "Response Processing",
+      "requisite": "Response received",
+      "to": "Timer C Processing",
+      "actions": [
+        "Update timer C"
+      ],
+      "response": "Proceed to update timer"
+    },
+    {
+      "from": "Timer C Processing",
+      "requisite": "Timer C fires",
+      "to": "Handling Transport Errors",
+      "actions": [
+        "Handle transport errors"
+      ],
+      "response": "Proceed to handle errors"
+    },
+    {
+      "from": "Handling Transport Errors",
+      "requisite": "Error occurred",
+      "to": "CANCEL Processing",
+      "actions": [
+        "Generate CANCEL requests"
+      ],
+      "response": "Proceed to process CANCEL"
+    },
+    {
+      "from": "CANCEL Processing",
+      "requisite": "CANCEL received",
+      "to": "Stateless Proxy",
+      "actions": [
+        "Process CANCEL request"
+      ],
+      "response": "Proceed to stateless processing"
+    },
+    {
+      "from": "Calling",
+      "requisite": "INVITE from TU",
+      "to": "Proceeding",
+      "actions": [
+        "INVITE sent"
+      ],
+      "response": "1xx to TU"
+    },
+    {
+      "from": "Calling",
+      "requisite": "Timer B fires",
+      "to": "Terminated",
+      "actions": [
+        "inform TU"
+      ],
+      "response": "timeout"
+    },
+    {
+      "from": "Calling",
+      "requisite": "300-699",
+      "to": "Completed",
+      "actions": [
+        "ACK sent",
+        "resp. to TU"
+      ],
+      "response": "ACK sent"
+    },
+    {
+      "from": "Proceeding",
+      "requisite": "1xx",
+      "to": "Proceeding",
+      "actions": [
+        "1xx to TU"
+      ],
+      "response": "1xx"
+    },
+    {
+      "from": "Proceeding",
+      "requisite": "200-699",
+      "to": "Completed",
+      "actions": [
+        "resp. to TU"
+      ],
+      "response": "200-699"
+    },
+    {
+      "from": "Completed",
+      "requisite": "Timer D fires",
+      "to": "Terminated",
+      "actions": [],
+      "response": "timeout"
+    },
+    {
+      "from": "Completed",
+      "requisite": "2xx",
+      "to": "Terminated",
+      "actions": [
+        "resp. to TU"
+      ],
+      "response": "2xx"
+    },
+    {
+      "from": "Client Transport",
+      "requisite": "Request to send",
+      "to": "Request Sent",
+      "actions": [
+        "Insert 'sent-by' in Via header",
+        "Send request"
+      ],
+      "response": "Request sent"
+    },
+    {
+      "from": "Request Sent",
+      "requisite": "Response received",
+      "to": "Response Received",
+      "actions": [
+        "Examine top Via header",
+        "Match response to transaction"
+      ],
+      "response": "Response processed"
+    },
+    {
+      "from": "Response Received",
+      "requisite": "Reliable transport",
+      "to": "Connection Established",
+      "actions": [
+        "Send response using existing connection"
+      ],
+      "response": "Response sent"
+    },
+    {
+      "from": "Response Received",
+      "requisite": "Unreliable transport",
+      "to": "Error Handling",
+      "actions": [
+        "Check for ICMP error"
+      ],
+      "response": "Error handling initiated"
+    },
+    {
+      "from": "Connection Established",
+      "requisite": "Connection closed",
+      "to": "Client Transport",
+      "actions": [
+        "Maintain connection for duration"
+      ],
+      "response": "Connection maintained"
+    },
+    {
+      "from": "Provisional 1xx",
+      "requisite": "request received",
+      "to": "Successful 2xx",
+      "actions": [
+        "send response"
+      ],
+      "response": "100 Trying"
+    },
+    {
+      "from": "Provisional 1xx",
+      "requisite": "user alerting",
+      "to": "Successful 2xx",
+      "actions": [
+        "send response"
+      ],
+      "response": "180 Ringing"
+    },
+    {
+      "from": "Provisional 1xx",
+      "requisite": "call forwarding",
+      "to": "Successful 2xx",
+      "actions": [
+        "send response"
+      ],
+      "response": "181 Call Is Being Forwarded"
+    },
+    {
+      "from": "Provisional 1xx",
+      "requisite": "call queued",
+      "to": "Successful 2xx",
+      "actions": [
+        "send response"
+      ],
+      "response": "182 Queued"
+    },
+    {
+      "from": "Provisional 1xx",
+      "requisite": "session progress",
+      "to": "Successful 2xx",
+      "actions": [
+        "send response"
+      ],
+      "response": "183 Session Progress"
+    },
+    {
+      "from": "Successful 2xx",
+      "requisite": "request successful",
+      "to": "Redirection 3xx",
+      "actions": [
+        "send response"
+      ],
+      "response": "200 OK"
+    },
+    {
+      "from": "Redirection 3xx",
+      "requisite": "multiple choices",
+      "to": "Request Failure 4xx",
+      "actions": [
+        "send response"
+      ],
+      "response": "300 Multiple Choices"
+    },
+    {
+      "from": "Redirection 3xx",
+      "requisite": "moved permanently",
+      "to": "Request Failure 4xx",
+      "actions": [
+        "send response"
+      ],
+      "response": "301 Moved Permanently"
+    },
+    {
+      "from": "Request Failure 4xx",
+      "requisite": "bad request",
+      "to": "Server Failure 5xx",
+      "actions": [
+        "send response"
+      ],
+      "response": "400 Bad Request"
+    },
+    {
+      "from": "Server Failure 5xx",
+      "requisite": "internal error",
+      "to": "Global Failures 6xx",
+      "actions": [
+        "send response"
+      ],
+      "response": "500 Server Internal Error"
+    },
+    {
+      "from": "Global Failures 6xx",
+      "requisite": "busy everywhere",
+      "to": "Global Failures 6xx",
+      "actions": [
+        "send response"
+      ],
+      "response": "600 Busy Everywhere"
+    },
+    {
+      "from": "UAC",
+      "requisite": "receives 401 Unauthorized",
+      "to": "UAC",
+      "actions": [
+        "re-originate request with credentials"
+      ],
+      "response": "request with Authorization header"
+    },
+    {
+      "from": "UAC",
+      "requisite": "receives 407 Proxy Authentication Required",
+      "to": "UAC",
+      "actions": [
+        "re-originate request with Proxy-Authorization"
+      ],
+      "response": "request with Proxy-Authorization header"
+    },
+    {
+      "from": "UAS",
+      "requisite": "receives request without credentials",
+      "to": "UAS",
+      "actions": [
+        "send 401 Unauthorized"
+      ],
+      "response": "401 response with WWW-Authenticate"
+    },
+    {
+      "from": "Proxy",
+      "requisite": "receives request without Proxy-Authorization",
+      "to": "Proxy",
+      "actions": [
+        "send 407 Proxy Authentication Required"
+      ],
+      "response": "407 response with Proxy-Authenticate"
+    },
+    {
+      "from": "UAC sends request with S/MIME body",
+      "requisite": "S/MIME body is structured correctly",
+      "to": "UAS receives request with S/MIME body",
+      "actions": [
+        "send request"
+      ],
+      "response": "request received"
+    },
+    {
+      "from": "UAS receives request with S/MIME body",
+      "requisite": "certificate included",
+      "to": "UAS validates certificate",
+      "actions": [
+        "validate certificate"
+      ],
+      "response": "certificate validation initiated"
+    },
+    {
+      "from": "UAS validates certificate",
+      "requisite": "certificate valid",
+      "to": "UAS adds certificate to keyring",
+      "actions": [
+        "add certificate"
+      ],
+      "response": "certificate added"
+    },
+    {
+      "from": "UAS validates certificate",
+      "requisite": "certificate invalid",
+      "to": "User notified of certificate status",
+      "actions": [
+        "notify user"
+      ],
+      "response": "user notified"
+    },
+    {
+      "from": "User notified of certificate status",
+      "requisite": "user authorizes certificate",
+      "to": "UAS adds certificate to keyring",
+      "actions": [
+        "add certificate"
+      ],
+      "response": "certificate added"
+    },
+    {
+      "from": "UAC receives response with S/MIME body",
+      "requisite": "certificate included",
+      "to": "UAC validates certificate",
+      "actions": [
+        "validate certificate"
+      ],
+      "response": "certificate validation initiated"
+    },
+    {
+      "from": "UAC validates certificate",
+      "requisite": "certificate valid",
+      "to": "UAC adds certificate to keyring",
+      "actions": [
+        "add certificate"
+      ],
+      "response": "certificate added"
+    },
+    {
+      "from": "UAC validates certificate",
+      "requisite": "certificate invalid",
+      "to": "User notified of certificate status",
+      "actions": [
+        "notify user"
+      ],
+      "response": "user notified"
+    },
+    {
+      "from": "UAC receives response with S/MIME body",
+      "requisite": "no certificate included",
+      "to": "UAC notifies user of unsecured session",
+      "actions": [
+        "notify user"
+      ],
+      "response": "session unsecured"
+    },
+    {
+      "from": "UAC sends request with S/MIME body",
+      "requisite": "unknown public key",
+      "to": "UAC rejects request with 493 response",
+      "actions": [
+        "reject request"
+      ],
+      "response": "493 Undecipherable response"
+    },
+    {
+      "from": "UAC receives request with S/MIME body",
+      "requisite": "MIME type not understood",
+      "to": "UAC rejects request with 415 response",
+      "actions": [
+        "reject request"
+      ],
+      "response": "415 Unsupported Media Type response"
+    },
+    {
+      "from": "UAC receives response with S/MIME body",
+      "requisite": "no secured body",
+      "to": "UAC notifies user of unsecured session",
+      "actions": [
+        "notify user"
+      ],
+      "response": "session unsecured"
+    },
+    {
+      "from": "UAS receives request with S/MIME body",
+      "requisite": "certificate change detected",
+      "to": "User notified of certificate status",
+      "actions": [
+        "notify user"
+      ],
+      "response": "user notified"
+    },
+    {
+      "from": "User notified of certificate status",
+      "requisite": "user aborts connection",
+      "to": "User aborts connection attempt",
+      "actions": [
+        "abort connection"
+      ],
+      "response": "connection aborted"
+    },
+    {
+      "from": "User notified of certificate status",
+      "requisite": "user confirms key change",
+      "to": "User confirms key change",
+      "actions": [
+        "confirm key change"
+      ],
+      "response": "key change confirmed"
+    },
+    {
+      "from": "Idle",
+      "requisite": "REGISTER message sent",
+      "to": "Registered",
+      "actions": [
+        "Send REGISTER",
+        "Receive 200 OK"
+      ],
+      "response": "Registration successful"
+    },
+    {
+      "from": "Registered",
+      "requisite": "INVITE message sent",
+      "to": "Session Established",
+      "actions": [
+        "Send INVITE",
+        "Receive 200 OK"
+      ],
+      "response": "Session established"
+    },
+    {
+      "from": "Session Established",
+      "requisite": "BYE message sent",
+      "to": "Session Terminated",
+      "actions": [
+        "Send BYE",
+        "Receive 200 OK"
+      ],
+      "response": "Session terminated"
+    }
+  ]
+}

@@ -1,0 +1,225 @@
+{
+  "states": [
+    "Early",
+    "Confirmed",
+    "Calling",
+    "Proceeding",
+    "Completed",
+    "Terminated",
+    "Trying"
+  ],
+  "initial_state": "Calling",
+  "final_states": [
+    "Terminated"
+  ],
+  "transitions": [
+    {
+      "from": "Early",
+      "requisite": "2xx final response received",
+      "to": "Confirmed",
+      "actions": [
+        "Update dialog state to confirmed"
+      ],
+      "response": "2xx"
+    },
+    {
+      "from": "Calling",
+      "requisite": "1xx response received",
+      "to": "Proceeding",
+      "actions": [
+        "pass response to TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Calling",
+      "requisite": "300-699 response received",
+      "to": "Completed",
+      "actions": [
+        "pass response to TU",
+        "generate ACK"
+      ],
+      "response": "ACK sent"
+    },
+    {
+      "from": "Calling",
+      "requisite": "Timer B fires or Transport Error",
+      "to": "Terminated",
+      "actions": [
+        "inform TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Proceeding",
+      "requisite": "300-699 response received",
+      "to": "Completed",
+      "actions": [
+        "pass response to TU",
+        "generate ACK"
+      ],
+      "response": "ACK sent"
+    },
+    {
+      "from": "Proceeding",
+      "requisite": "2xx response received",
+      "to": "Terminated",
+      "actions": [
+        "pass response to TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Completed",
+      "requisite": "Timer D fires",
+      "to": "Terminated",
+      "actions": [],
+      "response": ""
+    },
+    {
+      "from": "Proceeding",
+      "requisite": "Transport Error",
+      "to": "Terminated",
+      "actions": [
+        "inform TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Completed",
+      "requisite": "Transport Error",
+      "to": "Terminated",
+      "actions": [
+        "inform TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Trying",
+      "requisite": "1xx response received",
+      "to": "Proceeding",
+      "actions": [
+        "pass response to TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Trying",
+      "requisite": "200-699 response received",
+      "to": "Completed",
+      "actions": [
+        "pass response to TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Trying",
+      "requisite": "Timer F fires or Transport Error",
+      "to": "Terminated",
+      "actions": [
+        "inform TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Proceeding",
+      "requisite": "200-699 response received",
+      "to": "Completed",
+      "actions": [
+        "pass response to TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Proceeding",
+      "requisite": "Timer F fires or Transport Error",
+      "to": "Terminated",
+      "actions": [
+        "inform TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Completed",
+      "requisite": "Timer K fires",
+      "to": "Terminated",
+      "actions": [],
+      "response": ""
+    },
+    {
+      "from": "Proceeding",
+      "requisite": "300-699 response sent",
+      "to": "Completed",
+      "actions": [
+        "send response"
+      ],
+      "response": "300-699"
+    },
+    {
+      "from": "Proceeding",
+      "requisite": "2xx response sent",
+      "to": "Terminated",
+      "actions": [
+        "send response"
+      ],
+      "response": "2xx"
+    },
+    {
+      "from": "Completed",
+      "requisite": "ACK received",
+      "to": "Confirmed",
+      "actions": [],
+      "response": ""
+    },
+    {
+      "from": "Completed",
+      "requisite": "Timer H fires",
+      "to": "Terminated",
+      "actions": [
+        "inform TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Confirmed",
+      "requisite": "Timer I fires",
+      "to": "Terminated",
+      "actions": [],
+      "response": ""
+    },
+    {
+      "from": "Trying",
+      "requisite": "1xx response sent",
+      "to": "Proceeding",
+      "actions": [
+        "send response"
+      ],
+      "response": "1xx"
+    },
+    {
+      "from": "Trying",
+      "requisite": "200-699 response sent",
+      "to": "Completed",
+      "actions": [
+        "send response"
+      ],
+      "response": "200-699"
+    },
+    {
+      "from": "Proceeding",
+      "requisite": "200-699 response sent",
+      "to": "Completed",
+      "actions": [
+        "send response"
+      ],
+      "response": "200-699"
+    },
+    {
+      "from": "Completed",
+      "requisite": "Timer J fires",
+      "to": "Terminated",
+      "actions": [],
+      "response": ""
+    }
+  ]
+}

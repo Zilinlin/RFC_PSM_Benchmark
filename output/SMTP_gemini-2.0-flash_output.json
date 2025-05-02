@@ -385,5 +385,295 @@
     }
   ],
   "final_response": "```json\n{\n  \"states\": [\n    \"Initial\",\n    \"ClientGreeted\",\n    \"MailTransactionStarted\",\n    \"RecipientAdded\",\n    \"DataReady\",\n    \"SessionEnd\"\n  ],\n  \"initial_state\": \"Initial\",\n  \"final_states\": [\n    \"SessionEnd\"\n  ],\n  \"transitions\": [\n    {\n      \"from\": \"Initial\",\n      \"requisite\": \"Client opens connection, server responds with 220\",\n      \"to\": \"ClientGreeted\",\n      \"actions\": [],\n      \"response\": \"220 Service ready\"\n    },\n    {\n      \"from\": \"Initial\",\n      \"requisite\": \"Server rejects session\",\n      \"to\": \"Initial\",\n      \"actions\": [\n        \"Wait for QUIT\"\n      ],\n      \"response\": \"554 Transaction failed\"\n    },\n    {\n      \"from\": \"ClientGreeted\",\n      \"requisite\": \"Client sends EHLO or HELO\",\n      \"to\": \"ClientGreeted\",\n      \"actions\": [],\n      \"response\": \"250 OK\"\n    },\n    {\n      \"from\": \"ClientGreeted\",\n      \"requisite\": \"Client sends MAIL\",\n      \"to\": \"MailTransactionStarted\",\n      \"actions\": [\n        \"Reset state tables and buffers\"\n      ],\n      \"response\": \"250 OK\"\n    },\n    {\n      \"from\": \"MailTransactionStarted\",\n      \"requisite\": \"Client sends RCPT\",\n      \"to\": \"RecipientAdded\",\n      \"actions\": [\n        \"Store forward-path\"\n      ],\n      \"response\": \"250 OK\"\n    },\n    {\n      \"from\": \"RecipientAdded\",\n      \"requisite\": \"Client sends RCPT\",\n      \"to\": \"RecipientAdded\",\n      \"actions\": [\n        \"Store forward-path\"\n      ],\n      \"response\": \"250 OK\"\n    },\n    {\n      \"from\": \"MailTransactionStarted\",\n      \"requisite\": \"Client sends DATA\",\n      \"to\": \"DataReady\",\n      \"actions\": [],\n      \"response\": \"354 Start mail input; end with <CRLF>.<CRLF>\"\n    },\n    {\n      \"from\": \"RecipientAdded\",\n      \"requisite\": \"Client sends DATA\",\n      \"to\": \"DataReady\",\n      \"actions\": [],\n      \"response\": \"354 Start mail input; end with <CRLF>.<CRLF>\"\n    },\n    {\n      \"from\": \"DataReady\",\n      \"requisite\": \"Client sends end of mail data indicator\",\n      \"to\": \"ClientGreeted\",\n      \"actions\": [\n        \"Process stored recipients and mail data\"\n      ],\n      \"response\": \"250 OK\"\n    },\n    {\n      \"from\": \"ClientGreeted\",\n      \"requisite\": \"Client sends QUIT\",\n      \"to\": \"SessionEnd\",\n      \"actions\": [\n        \"Close connection\"\n      ],\n      \"response\": \"221 Service closing transmission channel\"\n    },\n    {\n      \"from\": \"MailTransactionStarted\",\n      \"requisite\": \"Client sends QUIT\",\n      \"to\": \"SessionEnd\",\n      \"actions\": [\n        \"Close connection\"\n      ],\n      \"response\": \"221 Service closing transmission channel\"\n    },\n    {\n      \"from\": \"RecipientAdded\",\n      \"requisite\": \"Client sends QUIT\",\n      \"to\": \"SessionEnd\",\n      \"actions\": [\n        \"Close connection\"\n      ],\n      \"response\": \"221 Service closing transmission channel\"\n    },\n    {\n      \"from\": \"DataReady\",\n      \"requisite\": \"Client sends QUIT\",\n      \"to\": \"SessionEnd\",\n      \"actions\": [\n        \"Close connection\"\n      ],\n      \"response\": \"221 Service closing transmission channel\"\n    },\n    {\n      \"from\": \"MailTransactionStarted\",\n      \"requisite\": \"Client sends RCPT without MAIL\",\n      \"to\": \"ClientGreeted\",\n      \"actions\": [],\n      \"response\": \"503 Bad sequence of commands\"\n    },\n    {\n      \"from\": \"ClientGreeted\",\n      \"requisite\": \"Client sends DATA without MAIL or RCPT\",\n      \"to\": \"ClientGreeted\",\n      \"actions\": [],\n      \"response\": \"503 Bad sequence of commands\"\n    },\n    {\n      \"from\": \"MailTransactionStarted\",\n      \"requisite\": \"Client sends DATA without RCPT\",\n      \"to\": \"ClientGreeted\",\n      \"actions\": [],\n      \"response\": \"503 Bad sequence of commands\"\n    },\n    {\n      \"from\": \"RecipientAdded\",\n      \"requisite\": \"Client sends MAIL\",\n      \"to\": \"MailTransactionStarted\",\n      \"actions\": [\n        \"Reset state tables and buffers\"\n      ],\n      \"response\": \"250 OK\"\n    }\n  ]\n}\n```",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "Initial",
+      "ClientGreeted",
+      "MailTransactionStarted",
+      "RecipientAdded",
+      "DataReady",
+      "SessionEnd",
+      "EHLO/HELO Sent",
+      "Mail Transaction Open",
+      "Data Input",
+      "Quit Sent"
+    ],
+    "initial_state": "Initial",
+    "final_states": [
+      "SessionEnd",
+      "Quit Sent"
+    ],
+    "transitions": [
+      {
+        "from": "Initial",
+        "requisite": "Client opens connection, server responds with 220",
+        "to": "ClientGreeted",
+        "actions": [],
+        "response": "220 Service ready"
+      },
+      {
+        "from": "Initial",
+        "requisite": "Server rejects session",
+        "to": "Initial",
+        "actions": [
+          "Wait for QUIT"
+        ],
+        "response": "554 Transaction failed"
+      },
+      {
+        "from": "Initial",
+        "requisite": "Connection Established",
+        "to": "Initial",
+        "actions": [],
+        "response": "220 Service ready"
+      },
+      {
+        "from": "Initial",
+        "requisite": "EHLO or HELO",
+        "to": "EHLO/HELO Sent",
+        "actions": [
+          "Clear buffers and state tables"
+        ],
+        "response": "250 OK"
+      },
+      {
+        "from": "Initial",
+        "requisite": "VRFY, EXPN, HELP, NOOP, RSET",
+        "to": "Initial",
+        "actions": [],
+        "response": "2xx"
+      },
+      {
+        "from": "ClientGreeted",
+        "requisite": "Client sends EHLO or HELO",
+        "to": "ClientGreeted",
+        "actions": [],
+        "response": "250 OK"
+      },
+      {
+        "from": "ClientGreeted",
+        "requisite": "Client sends MAIL",
+        "to": "MailTransactionStarted",
+        "actions": [
+          "Reset state tables and buffers"
+        ],
+        "response": "250 OK"
+      },
+      {
+        "from": "EHLO/HELO Sent",
+        "requisite": "MAIL",
+        "to": "Mail Transaction Open",
+        "actions": [
+          "Clear reverse-path, forward-path, and mail data buffers",
+          "Insert reverse-path"
+        ],
+        "response": "250 OK"
+      },
+      {
+        "from": "EHLO/HELO Sent",
+        "requisite": "VRFY, EXPN, HELP, NOOP, RSET",
+        "to": "EHLO/HELO Sent",
+        "actions": [],
+        "response": "2xx"
+      },
+      {
+        "from": "EHLO/HELO Sent",
+        "requisite": "QUIT",
+        "to": "Quit Sent",
+        "actions": [
+          "Close Transmission Channel"
+        ],
+        "response": "221 OK"
+      },
+      {
+        "from": "MailTransactionStarted",
+        "requisite": "Client sends RCPT",
+        "to": "RecipientAdded",
+        "actions": [
+          "Store forward-path"
+        ],
+        "response": "250 OK"
+      },
+      {
+        "from": "RecipientAdded",
+        "requisite": "Client sends RCPT",
+        "to": "RecipientAdded",
+        "actions": [
+          "Store forward-path"
+        ],
+        "response": "250 OK"
+      },
+      {
+        "from": "MailTransactionStarted",
+        "requisite": "Client sends DATA",
+        "to": "DataReady",
+        "actions": [],
+        "response": "354 Start mail input; end with <CRLF>.<CRLF>"
+      },
+      {
+        "from": "RecipientAdded",
+        "requisite": "Client sends DATA",
+        "to": "DataReady",
+        "actions": [],
+        "response": "354 Start mail input; end with <CRLF>.<CRLF>"
+      },
+      {
+        "from": "DataReady",
+        "requisite": "Client sends end of mail data indicator",
+        "to": "ClientGreeted",
+        "actions": [
+          "Process stored recipients and mail data"
+        ],
+        "response": "250 OK"
+      },
+      {
+        "from": "ClientGreeted",
+        "requisite": "Client sends QUIT",
+        "to": "SessionEnd",
+        "actions": [
+          "Close connection"
+        ],
+        "response": "221 Service closing transmission channel"
+      },
+      {
+        "from": "MailTransactionStarted",
+        "requisite": "Client sends QUIT",
+        "to": "SessionEnd",
+        "actions": [
+          "Close connection"
+        ],
+        "response": "221 Service closing transmission channel"
+      },
+      {
+        "from": "RecipientAdded",
+        "requisite": "Client sends QUIT",
+        "to": "SessionEnd",
+        "actions": [
+          "Close connection"
+        ],
+        "response": "221 Service closing transmission channel"
+      },
+      {
+        "from": "DataReady",
+        "requisite": "Client sends QUIT",
+        "to": "SessionEnd",
+        "actions": [
+          "Close connection"
+        ],
+        "response": "221 Service closing transmission channel"
+      },
+      {
+        "from": "MailTransactionStarted",
+        "requisite": "Client sends RCPT without MAIL",
+        "to": "ClientGreeted",
+        "actions": [],
+        "response": "503 Bad sequence of commands"
+      },
+      {
+        "from": "ClientGreeted",
+        "requisite": "Client sends DATA without MAIL or RCPT",
+        "to": "ClientGreeted",
+        "actions": [],
+        "response": "503 Bad sequence of commands"
+      },
+      {
+        "from": "MailTransactionStarted",
+        "requisite": "Client sends DATA without RCPT",
+        "to": "ClientGreeted",
+        "actions": [],
+        "response": "503 Bad sequence of commands"
+      },
+      {
+        "from": "RecipientAdded",
+        "requisite": "Client sends MAIL",
+        "to": "MailTransactionStarted",
+        "actions": [
+          "Reset state tables and buffers"
+        ],
+        "response": "250 OK"
+      },
+      {
+        "from": "Mail Transaction Open",
+        "requisite": "RCPT",
+        "to": "Mail Transaction Open",
+        "actions": [
+          "Append forward-path"
+        ],
+        "response": "250 OK, 251 User not local"
+      },
+      {
+        "from": "Mail Transaction Open",
+        "requisite": "DATA",
+        "to": "Data Input",
+        "actions": [],
+        "response": "354 Start mail input"
+      },
+      {
+        "from": "Mail Transaction Open",
+        "requisite": "RSET",
+        "to": "EHLO/HELO Sent",
+        "actions": [
+          "Discard sender, recipients, and mail data",
+          "Clear buffers and state tables"
+        ],
+        "response": "250 OK"
+      },
+      {
+        "from": "Mail Transaction Open",
+        "requisite": "EHLO",
+        "to": "EHLO/HELO Sent",
+        "actions": [
+          "Clear buffers and state tables"
+        ],
+        "response": "250 OK"
+      },
+      {
+        "from": "Mail Transaction Open",
+        "requisite": "QUIT",
+        "to": "Quit Sent",
+        "actions": [
+          "Abort transaction",
+          "Close Transmission Channel"
+        ],
+        "response": "221 OK"
+      },
+      {
+        "from": "Data Input",
+        "requisite": "<CRLF>.<CRLF>",
+        "to": "EHLO/HELO Sent",
+        "actions": [
+          "Process stored mail transaction information",
+          "Clear reverse-path, forward-path, and mail data buffers"
+        ],
+        "response": "250 OK"
+      },
+      {
+        "from": "Data Input",
+        "requisite": "<CRLF>.<CRLF>",
+        "to": "EHLO/HELO Sent",
+        "actions": [
+          "Process stored mail transaction information",
+          "Clear reverse-path, forward-path, and mail data buffers"
+        ],
+        "response": "5yz, 4yz"
+      },
+      {
+        "from": "EHLO/HELO Sent",
+        "requisite": "MAIL (after DATA)",
+        "to": "Mail Transaction Open",
+        "actions": [
+          "Clear reverse-path, forward-path, and mail data buffers",
+          "Insert reverse-path"
+        ],
+        "response": "250 OK"
+      },
+      {
+        "from": "Quit Sent",
+        "requisite": "Connection Closed",
+        "to": "Initial",
+        "actions": [],
+        "response": ""
+      }
+    ]
+  }
 }

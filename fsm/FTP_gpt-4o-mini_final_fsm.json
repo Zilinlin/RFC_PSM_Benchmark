@@ -1,0 +1,382 @@
+{
+  "states": [
+    "default data connection ports",
+    "non-default data ports",
+    "data connection management",
+    "error recovery and restart",
+    "Initial",
+    "User Identified",
+    "User Logged In",
+    "File Transfer In Progress",
+    "File Transfer Completed",
+    "File Transfer Aborted",
+    "Connection Establishment",
+    "Login",
+    "Logout",
+    "Transfer parameters",
+    "File action commands",
+    "Informational commands",
+    "Miscellaneous commands",
+    "B",
+    "W",
+    "S",
+    "E",
+    "F",
+    "user_authenticated",
+    "file_retrieving",
+    "file_storing",
+    "terminated",
+    "Directory Created",
+    "Directory Exists",
+    "Directory Removed",
+    "Current Directory"
+  ],
+  "initial_state": "default data connection ports",
+  "final_states": [
+    "File Transfer Completed",
+    "File Transfer Aborted",
+    "error recovery and restart",
+    "terminated",
+    "Directory Exists",
+    "Directory Removed"
+  ],
+  "transitions": [
+    {
+      "from": "default data connection ports",
+      "requisite": "User-PI initiates non-default ports",
+      "to": "non-default data ports",
+      "actions": [
+        "specify PORT command",
+        "request PASV command"
+      ],
+      "response": "new data connection established"
+    },
+    {
+      "from": "non-default data ports",
+      "requisite": "data connection established",
+      "to": "data connection management",
+      "actions": [
+        "maintain data connection"
+      ],
+      "response": "data transfer begins"
+    },
+    {
+      "from": "data connection management",
+      "requisite": "transfer complete",
+      "to": "default data connection ports",
+      "actions": [
+        "close data connection"
+      ],
+      "response": "EOF indicated"
+    },
+    {
+      "from": "data connection management",
+      "requisite": "system failure",
+      "to": "error recovery and restart",
+      "actions": [
+        "insert marker code"
+      ],
+      "response": "restart procedure initiated"
+    },
+    {
+      "from": "error recovery and restart",
+      "requisite": "restart command issued",
+      "to": "data connection management",
+      "actions": [
+        "resume data transfer"
+      ],
+      "response": "data transfer resumed"
+    },
+    {
+      "from": "Initial",
+      "requisite": "USER command received",
+      "to": "User Identified",
+      "actions": [
+        "Authenticate user"
+      ],
+      "response": "331 User name okay, need password."
+    },
+    {
+      "from": "User Identified",
+      "requisite": "PASS command received",
+      "to": "User Logged In",
+      "actions": [
+        "Verify password"
+      ],
+      "response": "230 User logged in, proceed."
+    },
+    {
+      "from": "User Logged In",
+      "requisite": "RETR command received",
+      "to": "File Transfer In Progress",
+      "actions": [
+        "Initiate file transfer"
+      ],
+      "response": "150 File status okay; about to open data connection."
+    },
+    {
+      "from": "File Transfer In Progress",
+      "requisite": "Transfer completed",
+      "to": "File Transfer Completed",
+      "actions": [
+        "Close data connection"
+      ],
+      "response": "226 Closing data connection."
+    },
+    {
+      "from": "File Transfer In Progress",
+      "requisite": "ABOR command received",
+      "to": "File Transfer Aborted",
+      "actions": [
+        "Abort transfer"
+      ],
+      "response": "426 Connection closed; transfer aborted."
+    },
+    {
+      "from": "Connection Establishment",
+      "requisite": "120",
+      "to": "Connection Establishment",
+      "actions": [],
+      "response": "220"
+    },
+    {
+      "from": "Login",
+      "requisite": "USER",
+      "to": "Login",
+      "actions": [],
+      "response": "230"
+    },
+    {
+      "from": "Login",
+      "requisite": "PASS",
+      "to": "Login",
+      "actions": [],
+      "response": "230"
+    },
+    {
+      "from": "Logout",
+      "requisite": "REIN",
+      "to": "Connection Establishment",
+      "actions": [],
+      "response": "120"
+    },
+    {
+      "from": "Transfer parameters",
+      "requisite": "PORT",
+      "to": "Transfer parameters",
+      "actions": [],
+      "response": "200"
+    },
+    {
+      "from": "File action commands",
+      "requisite": "STOR",
+      "to": "File action commands",
+      "actions": [],
+      "response": "125"
+    },
+    {
+      "from": "Informational commands",
+      "requisite": "SYST",
+      "to": "Informational commands",
+      "actions": [],
+      "response": "215"
+    },
+    {
+      "from": "Miscellaneous commands",
+      "requisite": "SITE",
+      "to": "Miscellaneous commands",
+      "actions": [],
+      "response": "200"
+    },
+    {
+      "from": "B",
+      "requisite": "cmd",
+      "to": "W",
+      "actions": [],
+      "response": ""
+    },
+    {
+      "from": "W",
+      "requisite": "2",
+      "to": "S",
+      "actions": [],
+      "response": ""
+    },
+    {
+      "from": "W",
+      "requisite": "1,3",
+      "to": "E",
+      "actions": [],
+      "response": ""
+    },
+    {
+      "from": "W",
+      "requisite": "4,5",
+      "to": "F",
+      "actions": [],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "RNFR",
+      "to": "W",
+      "actions": [],
+      "response": ""
+    },
+    {
+      "from": "W",
+      "requisite": "RNTO",
+      "to": "W",
+      "actions": [],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "REST",
+      "to": "W",
+      "actions": [],
+      "response": ""
+    },
+    {
+      "from": "W",
+      "requisite": "cmd",
+      "to": "W",
+      "actions": [],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "USER",
+      "to": "W",
+      "actions": [],
+      "response": ""
+    },
+    {
+      "from": "W",
+      "requisite": "PASS",
+      "to": "W",
+      "actions": [],
+      "response": ""
+    },
+    {
+      "from": "W",
+      "requisite": "ACCT",
+      "to": "W",
+      "actions": [],
+      "response": ""
+    },
+    {
+      "from": "initial",
+      "requisite": "connect to host S",
+      "to": "user_authenticated",
+      "actions": [
+        "ftp (host) multics"
+      ],
+      "response": "220 Service ready"
+    },
+    {
+      "from": "user_authenticated",
+      "requisite": "provide username",
+      "to": "user_authenticated",
+      "actions": [
+        "username Doe"
+      ],
+      "response": "331 User name ok, need password"
+    },
+    {
+      "from": "user_authenticated",
+      "requisite": "provide password",
+      "to": "file_retrieving",
+      "actions": [
+        "password mumble"
+      ],
+      "response": "230 User logged in"
+    },
+    {
+      "from": "file_retrieving",
+      "requisite": "retrieve file",
+      "to": "file_retrieving",
+      "actions": [
+        "retrieve (local type) ASCII",
+        "(for. pathname) test.pl1"
+      ],
+      "response": "150 File status okay; about to open data connection"
+    },
+    {
+      "from": "file_retrieving",
+      "requisite": "file transfer successful",
+      "to": "file_retrieving",
+      "actions": [],
+      "response": "226 Closing data connection, file transfer successful"
+    },
+    {
+      "from": "file_retrieving",
+      "requisite": "change type to Image",
+      "to": "file_storing",
+      "actions": [
+        "type Image"
+      ],
+      "response": "200 Command OK"
+    },
+    {
+      "from": "file_storing",
+      "requisite": "store file",
+      "to": "file_storing",
+      "actions": [
+        "store (local type) image",
+        "(for.pathname) >udd>cn>fd"
+      ],
+      "response": "550 Access denied"
+    },
+    {
+      "from": "file_storing",
+      "requisite": "terminate session",
+      "to": "terminated",
+      "actions": [
+        "terminate"
+      ],
+      "response": "Server closes all connections"
+    },
+    {
+      "from": "Initial",
+      "requisite": "MKD pathname",
+      "to": "Directory Created",
+      "actions": [
+        "Create Directory"
+      ],
+      "response": "257 \"<absolute-pathname>\" directory created"
+    },
+    {
+      "from": "Initial",
+      "requisite": "MKD pathname (exists)",
+      "to": "Directory Exists",
+      "actions": [],
+      "response": "521-\"<absolute-pathname>\" directory already exists; 521 taking no action."
+    },
+    {
+      "from": "Directory Created",
+      "requisite": "CWD <directory-name>",
+      "to": "Current Directory",
+      "actions": [
+        "Change Working Directory"
+      ],
+      "response": "200 directory changed to <directory-name>"
+    },
+    {
+      "from": "Current Directory",
+      "requisite": "PWD",
+      "to": "Current Directory",
+      "actions": [],
+      "response": "257 \"<current-directory>\""
+    },
+    {
+      "from": "Initial",
+      "requisite": "RMD pathname",
+      "to": "Directory Removed",
+      "actions": [
+        "Remove Directory"
+      ],
+      "response": "250 directory removed"
+    }
+  ]
+}

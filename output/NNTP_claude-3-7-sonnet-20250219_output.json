@@ -374,5 +374,282 @@
     }
   ],
   "final_response": "{\n  \"states\": [\"initial\", \"connected\", \"transit_mode\", \"reader_mode\", \"group_selected\", \"article_selected\", \"posting\", \"ihave_transfer\", \"disconnected\"],\n  \"initial_state\": \"initial\",\n  \"final_states\": [\"disconnected\"],\n  \"transitions\": [\n    {\n      \"from\": \"initial\",\n      \"requisite\": \"client connects\",\n      \"to\": \"connected\",\n      \"actions\": [\"server sends greeting\"],\n      \"response\": \"200 (posting allowed) or 201 (posting prohibited) or 400/502 (service unavailable)\"\n    },\n    {\n      \"from\": \"connected\",\n      \"requisite\": \"mode-switching server\",\n      \"to\": \"transit_mode\",\n      \"actions\": [\"advertise MODE-READER capability\", \"do not advertise READER capability\"],\n      \"response\": \"capabilities list with MODE-READER\"\n    },\n    {\n      \"from\": \"transit_mode\",\n      \"requisite\": \"MODE READER command\",\n      \"to\": \"reader_mode\",\n      \"actions\": [\"do not advertise MODE-READER capability\", \"advertise READER capability\"],\n      \"response\": \"200 response\"\n    },\n    {\n      \"from\": \"connected\",\n      \"requisite\": \"inactivity timeout\",\n      \"to\": \"initial\",\n      \"actions\": [\"close connection\"],\n      \"response\": \"none\"\n    },\n    {\n      \"from\": \"transit_mode\",\n      \"requisite\": \"inactivity timeout\",\n      \"to\": \"initial\",\n      \"actions\": [\"close connection\"],\n      \"response\": \"none\"\n    },\n    {\n      \"from\": \"reader_mode\",\n      \"requisite\": \"inactivity timeout\",\n      \"to\": \"initial\",\n      \"actions\": [\"close connection\"],\n      \"response\": \"none\"\n    },\n    {\n      \"from\": \"connected\",\n      \"requisite\": \"Client sends CAPABILITIES\",\n      \"to\": \"connected\",\n      \"actions\": [\"Server returns capability list\"],\n      \"response\": \"101 Capability list follows\"\n    },\n    {\n      \"from\": \"connected\",\n      \"requisite\": \"Client sends MODE READER\",\n      \"to\": \"connected\",\n      \"actions\": [\"Server switches to reader mode if mode-switching\"],\n      \"response\": \"200 (posting allowed) or 201 (posting prohibited) or 502 (reading unavailable)\"\n    },\n    {\n      \"from\": \"connected\",\n      \"requisite\": \"Client sends QUIT\",\n      \"to\": \"disconnected\",\n      \"actions\": [\"Server acknowledges and closes connection\"],\n      \"response\": \"205 Connection closing\"\n    },\n    {\n      \"from\": \"connected\",\n      \"requisite\": \"Server receives 400/502 response or client disconnects\",\n      \"to\": \"disconnected\",\n      \"actions\": [\"Server closes connection\"],\n      \"response\": \"None\"\n    },\n    {\n      \"from\": \"initial\",\n      \"requisite\": \"GROUP command with valid group\",\n      \"to\": \"group_selected\",\n      \"actions\": [\"set currently selected newsgroup\", \"set current article number to first article\"],\n      \"response\": \"211 number low high group\"\n    },\n    {\n      \"from\": \"initial\",\n      \"requisite\": \"GROUP command with invalid group\",\n      \"to\": \"initial\",\n      \"actions\": [],\n      \"response\": \"411 No such newsgroup\"\n    },\n    {\n      \"from\": \"initial\",\n      \"requisite\": \"LISTGROUP command with valid group\",\n      \"to\": \"group_selected\",\n      \"actions\": [\"set currently selected newsgroup\", \"set current article number to first article\"],\n      \"response\": \"211 number low high group list follows (multi-line)\"\n    },\n    {\n      \"from\": \"initial\",\n      \"requisite\": \"LISTGROUP command with invalid group\",\n      \"to\": \"initial\",\n      \"actions\": [],\n      \"response\": \"411 No such newsgroup\"\n    },\n    {\n      \"from\": \"group_selected\",\n      \"requisite\": \"ARTICLE/HEAD/BODY/STAT command with article number\",\n      \"to\": \"article_selected\",\n      \"actions\": [\"set current article number\"],\n      \"response\": \"220/221/222/223 n message-id (with article content for ARTICLE/HEAD/BODY)\"\n    },\n    {\n      \"from\": \"group_selected\",\n      \"requisite\": \"ARTICLE/HEAD/BODY/STAT command with no argument\",\n      \"to\": \"article_selected\",\n      \"actions\": [\"use current article number\"],\n      \"response\": \"220/221/222/223 n message-id (with article content for ARTICLE/HEAD/BODY)\"\n    },\n    {\n      \"from\": \"group_selected\",\n      \"requisite\": \"NEXT command\",\n      \"to\": \"article_selected\",\n      \"actions\": [\"set current article number to next article\"],\n      \"response\": \"223 n message-id\"\n    },\n    {\n      \"from\": \"group_selected\",\n      \"requisite\": \"LAST command\",\n      \"to\": \"article_selected\",\n      \"actions\": [\"set current article number to previous article\"],\n      \"response\": \"223 n message-id\"\n    },\n    {\n      \"from\": \"article_selected\",\n      \"requisite\": \"NEXT command at last article\",\n      \"to\": \"article_selected\",\n      \"actions\": [],\n      \"response\": \"421 No next article in this group\"\n    },\n    {\n      \"from\": \"article_selected\",\n      \"requisite\": \"LAST command at first article\",\n      \"to\": \"article_selected\",\n      \"actions\": [],\n      \"response\": \"422 No previous article in this group\"\n    },\n    {\n      \"from\": \"initial\",\n      \"requisite\": \"POST command when posting allowed\",\n      \"to\": \"posting\",\n      \"actions\": [],\n      \"response\": \"340 Send article to be posted\"\n    },\n    {\n      \"from\": \"initial\",\n      \"requisite\": \"POST command when posting prohibited\",\n      \"to\": \"initial\",\n      \"actions\": [],\n      \"response\": \"440 Posting not permitted\"\n    },\n    {\n      \"from\": \"posting\",\n      \"requisite\": \"Article data sent and accepted\",\n      \"to\": \"initial\",\n      \"actions\": [\"process and store article\"],\n      \"response\": \"240 Article received OK\"\n    },\n    {\n      \"from\": \"posting\",\n      \"requisite\": \"Article data sent but rejected\",\n      \"to\": \"initial\",\n      \"actions\": [],\n      \"response\": \"441 Posting failed\"\n    },\n    {\n      \"from\": \"initial\",\n      \"requisite\": \"IHAVE command with wanted message-id\",\n      \"to\": \"ihave_transfer\",\n      \"actions\": [],\n      \"response\": \"335 Send article to be transferred\"\n    },\n    {\n      \"from\": \"initial\",\n      \"requisite\": \"IHAVE command with unwanted message-id\",\n      \"to\": \"initial\",\n      \"actions\": [],\n      \"response\": \"435 Article not wanted\"\n    },\n    {\n      \"from\": \"initial\",\n      \"requisite\": \"IHAVE command with message-id to retry later\",\n      \"to\": \"initial\",\n      \"actions\": [],\n      \"response\": \"436 Transfer not possible; try again later\"\n    },\n    {\n      \"from\": \"ihave_transfer\",\n      \"requisite\": \"Article data sent and accepted\",\n      \"to\": \"initial\",\n      \"actions\": [\"process and store article\"],\n      \"response\": \"235 Article transferred OK\"\n    },\n    {\n      \"from\": \"ihave_transfer\",\n      \"requisite\": \"Article data sent but transfer failed\",\n      \"to\": \"initial\",\n      \"actions\": [],\n      \"response\": \"436 Transfer failed; try again later\"\n    },\n    {\n      \"from\": \"ihave_transfer\",\n      \"requisite\": \"Article data sent but rejected\",\n      \"to\": \"initial\",\n      \"actions\": [],\n      \"response\": \"437 Transfer rejected; do not retry\"\n    }\n  ]\n}",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "initial",
+      "connected",
+      "transit_mode",
+      "reader_mode",
+      "disconnected",
+      "group_selected",
+      "article_selected",
+      "posting",
+      "ihave_transfer"
+    ],
+    "initial_state": "initial",
+    "final_states": [
+      "disconnected"
+    ],
+    "transitions": [
+      {
+        "from": "initial",
+        "requisite": "client connects",
+        "to": "connected",
+        "actions": [
+          "server sends greeting"
+        ],
+        "response": "greeting"
+      },
+      {
+        "from": "initial",
+        "requisite": "Connection established",
+        "to": "connected",
+        "actions": [
+          "Server sends greeting"
+        ],
+        "response": "200 (posting allowed) or 201 (posting prohibited) or 400/502 (service unavailable)"
+      },
+      {
+        "from": "connected",
+        "requisite": "mode-switching server",
+        "to": "transit_mode",
+        "actions": [
+          "advertise MODE-READER capability",
+          "do not advertise READER capability"
+        ],
+        "response": "capabilities list with MODE-READER"
+      },
+      {
+        "from": "transit_mode",
+        "requisite": "MODE READER command",
+        "to": "reader_mode",
+        "actions": [
+          "do not advertise MODE-READER capability",
+          "advertise READER capability"
+        ],
+        "response": "200 response"
+      },
+      {
+        "from": "connected",
+        "requisite": "Client sends CAPABILITIES",
+        "to": "connected",
+        "actions": [
+          "Server returns capability list"
+        ],
+        "response": "101 Capability list follows"
+      },
+      {
+        "from": "connected",
+        "requisite": "Client sends MODE READER",
+        "to": "connected",
+        "actions": [
+          "Server switches to reader mode if mode-switching"
+        ],
+        "response": "200 (posting allowed) or 201 (posting prohibited) or 502 (reading unavailable)"
+      },
+      {
+        "from": "connected",
+        "requisite": "Client sends QUIT",
+        "to": "disconnected",
+        "actions": [
+          "Server acknowledges and closes connection"
+        ],
+        "response": "205 Connection closing"
+      },
+      {
+        "from": "connected",
+        "requisite": "Server receives 400/502 response or client disconnects",
+        "to": "disconnected",
+        "actions": [
+          "Server closes connection"
+        ],
+        "response": "None"
+      },
+      {
+        "from": "initial",
+        "requisite": "GROUP command with valid group",
+        "to": "group_selected",
+        "actions": [
+          "set currently selected newsgroup",
+          "set current article number to first article"
+        ],
+        "response": "211 number low high group"
+      },
+      {
+        "from": "initial",
+        "requisite": "GROUP command with invalid group",
+        "to": "initial",
+        "actions": [],
+        "response": "411 No such newsgroup"
+      },
+      {
+        "from": "initial",
+        "requisite": "LISTGROUP command with valid group",
+        "to": "group_selected",
+        "actions": [
+          "set currently selected newsgroup",
+          "set current article number to first article"
+        ],
+        "response": "211 number low high group list follows (multi-line)"
+      },
+      {
+        "from": "initial",
+        "requisite": "LISTGROUP command with invalid group",
+        "to": "initial",
+        "actions": [],
+        "response": "411 No such newsgroup"
+      },
+      {
+        "from": "group_selected",
+        "requisite": "ARTICLE/HEAD/BODY/STAT command with article number",
+        "to": "article_selected",
+        "actions": [
+          "set current article number"
+        ],
+        "response": "220/221/222/223 n message-id (with article content for ARTICLE/HEAD/BODY)"
+      },
+      {
+        "from": "group_selected",
+        "requisite": "ARTICLE/HEAD/BODY/STAT command with no argument",
+        "to": "article_selected",
+        "actions": [
+          "use current article number"
+        ],
+        "response": "220/221/222/223 n message-id (with article content for ARTICLE/HEAD/BODY)"
+      },
+      {
+        "from": "group_selected",
+        "requisite": "NEXT command",
+        "to": "article_selected",
+        "actions": [
+          "set current article number to next article"
+        ],
+        "response": "223 n message-id"
+      },
+      {
+        "from": "group_selected",
+        "requisite": "LAST command",
+        "to": "article_selected",
+        "actions": [
+          "set current article number to previous article"
+        ],
+        "response": "223 n message-id"
+      },
+      {
+        "from": "article_selected",
+        "requisite": "NEXT command at last article",
+        "to": "article_selected",
+        "actions": [],
+        "response": "421 No next article in this group"
+      },
+      {
+        "from": "article_selected",
+        "requisite": "LAST command at first article",
+        "to": "article_selected",
+        "actions": [],
+        "response": "422 No previous article in this group"
+      },
+      {
+        "from": "initial",
+        "requisite": "POST command when posting allowed",
+        "to": "posting",
+        "actions": [],
+        "response": "340 Send article to be posted"
+      },
+      {
+        "from": "initial",
+        "requisite": "POST command when posting prohibited",
+        "to": "initial",
+        "actions": [],
+        "response": "440 Posting not permitted"
+      },
+      {
+        "from": "posting",
+        "requisite": "Article data sent and accepted",
+        "to": "initial",
+        "actions": [
+          "process and store article"
+        ],
+        "response": "240 Article received OK"
+      },
+      {
+        "from": "posting",
+        "requisite": "Article data sent but rejected",
+        "to": "initial",
+        "actions": [],
+        "response": "441 Posting failed"
+      },
+      {
+        "from": "initial",
+        "requisite": "IHAVE command with wanted message-id",
+        "to": "ihave_transfer",
+        "actions": [],
+        "response": "335 Send article to be transferred"
+      },
+      {
+        "from": "initial",
+        "requisite": "IHAVE command with unwanted message-id",
+        "to": "initial",
+        "actions": [],
+        "response": "435 Article not wanted"
+      },
+      {
+        "from": "initial",
+        "requisite": "IHAVE command with message-id to retry later",
+        "to": "initial",
+        "actions": [],
+        "response": "436 Transfer not possible; try again later"
+      },
+      {
+        "from": "ihave_transfer",
+        "requisite": "Article data sent and accepted",
+        "to": "initial",
+        "actions": [
+          "process and store article"
+        ],
+        "response": "235 Article transferred OK"
+      },
+      {
+        "from": "ihave_transfer",
+        "requisite": "Article data sent but transfer failed",
+        "to": "initial",
+        "actions": [],
+        "response": "436 Transfer failed; try again later"
+      },
+      {
+        "from": "ihave_transfer",
+        "requisite": "Article data sent but rejected",
+        "to": "initial",
+        "actions": [],
+        "response": "437 Transfer rejected; do not retry"
+      },
+      {
+        "from": "transit_mode",
+        "requisite": "inactivity timeout",
+        "to": "initial",
+        "actions": [
+          "close connection"
+        ],
+        "response": "none"
+      },
+      {
+        "from": "reader_mode",
+        "requisite": "inactivity timeout",
+        "to": "initial",
+        "actions": [
+          "close connection"
+        ],
+        "response": "none"
+      },
+      {
+        "from": "connected",
+        "requisite": "inactivity timeout",
+        "to": "initial",
+        "actions": [
+          "close connection"
+        ],
+        "response": "none"
+      }
+    ]
+  }
 }

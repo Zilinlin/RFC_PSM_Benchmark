@@ -1,0 +1,61 @@
+{
+  "states": [
+    "Connected",
+    "Ready",
+    "Closed"
+  ],
+  "initial_state": "Connected",
+  "final_states": [
+    "Closed"
+  ],
+  "transitions": [
+    {
+      "from": "Connected",
+      "requisite": "Initial connection greeting",
+      "to": "Ready",
+      "actions": [],
+      "response": "200 or 201"
+    },
+    {
+      "from": "Connected",
+      "requisite": "Initial connection greeting",
+      "to": "Closed",
+      "actions": [
+        "close connection"
+      ],
+      "response": "400 or 502"
+    },
+    {
+      "from": "Ready",
+      "requisite": "QUIT command",
+      "to": "Closed",
+      "actions": [
+        "close connection"
+      ],
+      "response": "205"
+    },
+    {
+      "from": "Ready",
+      "requisite": "MODE READER command",
+      "to": "Ready",
+      "actions": [],
+      "response": "200 or 201"
+    },
+    {
+      "from": "Ready",
+      "requisite": "MODE READER command",
+      "to": "Closed",
+      "actions": [
+        "close connection"
+      ],
+      "response": "502"
+    },
+    {
+      "from": "Ready",
+      "requisite": "CAPABILITIES command",
+      "to": "Ready",
+      "actions": [],
+      "response": "101"
+    }
+  ]
+}

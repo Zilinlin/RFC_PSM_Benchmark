@@ -4,7 +4,7 @@ This code is to parse the output to get the FSM from the response of LLM.
 
 import os
 import json
-from typing import Dict, List, Union, Optional
+from typing import Dict, List, Union, Optional,Any
 import re
 
 from openai import OpenAI
@@ -108,12 +108,12 @@ def parse_json_from_response(response: str) -> Union[Any, None]:
     
     
 
-def call_api(model, prompt, temperature=0.0, max_tokens=8192):
+def call_api(prompt, temperature=0.0, max_tokens=8192):
     """
     Calls the chatgpt API and returns the generated text.
     """
     completion = client.chat.completions.create(
-        model=model,
+        model="gpt-4o-mini",
         messages=[
             {"role": "user", "content": prompt}
         ],
@@ -123,38 +123,52 @@ def call_api(model, prompt, temperature=0.0, max_tokens=8192):
     return completion.choices[0].message.content
 
 
-def extract_final_fsm(directory: str, model: str, protocol: str) -> Dict:
+def extract_final_fsm(directory: str, model: str, protocol: str, output_dir: str) -> dict:
     """
-    Locate and load the JSON output file for the given protocol & model,
-    then return its 'final_fsm' field.
-    
-    Parameters:
-      directory  path to the folder containing your output JSON files
-      model      substring of the filename identifying the model (e.g. "deepseek-chat")
-      protocol   substring of the filename identifying the protocol (e.g. "FTP")
-    
-    Returns:
-      A dict representing the FSM, with keys:
-        - states (list of str)
-        - initial_state (str)
-        - final_states (list of str)
-        - transitions (list of dict)
-    
-    Raises:
-      FileNotFoundError if no matching file is found.
-      KeyError if the file doesn’t contain a 'final_fsm' section.
+    Locate and load the JSON output file for the given protocol & model.
+    If 'final_fsm' is present and non-null, return it;
+    otherwise regenerate via o4-mini using partial section responses.
+
+    In all cases, write the final FSM to a JSON file in output_dir named
+    "{protocol}_{model}_final_fsm.json".
     """
+    # ensure output directory exists
+    os.makedirs(output_dir, exist_ok=True)
+
     for fname in os.listdir(directory):
-        if not fname.endswith(".json"):
+        if not fname.endswith('.json'):
             continue
         if model in fname and protocol in fname:
             fullpath = os.path.join(directory, fname)
-            with open(fullpath, "r", encoding="utf-8") as f:
+            with open(fullpath, 'r', encoding='utf-8') as f:
                 data = json.load(f)
-            if "final_fsm" not in data:
-                raise KeyError(f"'final_fsm' field missing in {fname}")
-            return data["final_fsm"]
-    
+
+            final = data.get('final_fsm')
+            # if final_fsm already present
+            if final:
+                out_file = os.path.join(output_dir, f"{protocol}_{model}_final_fsm.json")
+                with open(out_file, 'w', encoding='utf-8') as fo:
+                    json.dump(final, fo, indent=2)
+                return final
+
+            # Otherwise regenerate from partial responses
+            sections = data.get('sections', [])
+            responses = [sec.get('response', '') for sec in sections]
+            prompt = build_fsm_combination_prompt(responses)
+            merged = call_api(prompt)
+            new_fsm = parse_json_from_response(merged)
+
+            if new_fsm:
+                # write regenerated FSM to output_dir
+                out_file = os.path.join(output_dir, f"{protocol}_{model}_final_fsm.json")
+                with open(out_file, 'w', encoding='utf-8') as fo:
+                    json.dump(new_fsm, fo, indent=2)
+                # update original file
+                data['final_fsm'] = new_fsm
+                with open(fullpath, 'w', encoding='utf-8') as f_out:
+                    json.dump(data, f_out, indent=2)
+                return new_fsm
+
     raise FileNotFoundError(
         f"No JSON file in {directory!r} matching model={model!r} and protocol={protocol!r}"
     )
@@ -166,11 +180,12 @@ if __name__ == "__main__":
                  "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP"]
     close_models = ["deepseek-reasoner","gpt-4o-mini", "claude-3-7-sonnet-20250219","gemini-2.0-flash"]
     directory = "output"
+    fsm_dir = "fsm"
+    
     for model in close_models:
         for protocol in protocols:
             try:
-                fsm = extract_final_fsm(directory, model, protocol)
-                print(f"Extracted FSM for {protocol} using {model}:")
-                print(json.dumps(fsm, indent=2))
-            except (FileNotFoundError, KeyError) as e:
-                print(f"Error extracting FSM for {protocol} using {model}: {e}")
+                final_fsm = extract_final_fsm(directory, model, protocol, fsm_dir)
+                print(f"Final FSM for {protocol} with model {model} extracted successfully.")
+            except FileNotFoundError as e:
+                print(e)

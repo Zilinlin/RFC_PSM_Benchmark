@@ -1,0 +1,98 @@
+{
+  "states": [
+    "AUTHORIZATION",
+    "TRANSACTION",
+    "UPDATE"
+  ],
+  "initial_state": "AUTHORIZATION",
+  "final_states": [
+    "UPDATE"
+  ],
+  "transitions": [
+    {
+      "from": "AUTHORIZATION",
+      "requisite": "successful client authentication",
+      "to": "TRANSACTION",
+      "actions": [
+        "acquire resources associated with client's maildrop"
+      ],
+      "response": "+OK"
+    },
+    {
+      "from": "AUTHORIZATION",
+      "requisite": "successful authentication (e.g., USER/PASS, APOP)",
+      "to": "TRANSACTION",
+      "actions": [
+        "acquire exclusive-access lock",
+        "assign message numbers and sizes"
+      ],
+      "response": "positive status indicator (e.g., +OK)"
+    },
+    {
+      "from": "AUTHORIZATION",
+      "requisite": "PASS with valid password",
+      "to": "TRANSACTION",
+      "actions": [
+        "authenticate"
+      ],
+      "response": "+OK maildrop locked and ready"
+    },
+    {
+      "from": "AUTHORIZATION",
+      "requisite": "APOP with valid digest",
+      "to": "TRANSACTION",
+      "actions": [
+        "authenticate"
+      ],
+      "response": "+OK maildrop locked and ready"
+    },
+    {
+      "from": "AUTHORIZATION",
+      "requisite": "PASS",
+      "to": "TRANSACTION",
+      "actions": [
+        "PASS"
+      ],
+      "response": "+OK"
+    },
+    {
+      "from": "AUTHORIZATION",
+      "requisite": "APOP",
+      "to": "TRANSACTION",
+      "actions": [
+        "APOP"
+      ],
+      "response": "+OK mrose's maildrop has 2 messages (320 octets)"
+    },
+    {
+      "from": "TRANSACTION",
+      "requisite": "QUIT command",
+      "to": "UPDATE",
+      "actions": [
+        "release resources",
+        "close TCP connection"
+      ],
+      "response": "+OK goodbye"
+    },
+    {
+      "from": "TRANSACTION",
+      "requisite": "QUIT",
+      "to": "UPDATE",
+      "actions": [
+        "remove all messages marked as deleted",
+        "release exclusive-access lock",
+        "close TCP connection"
+      ],
+      "response": "+OK or -ERR some deleted messages not removed"
+    },
+    {
+      "from": "TRANSACTION",
+      "requisite": "QUIT",
+      "to": "UPDATE",
+      "actions": [
+        "QUIT"
+      ],
+      "response": "+OK dewey POP3 server signing off (maildrop empty)"
+    }
+  ]
+}

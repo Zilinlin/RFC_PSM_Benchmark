@@ -1,0 +1,427 @@
+{
+  "states": [
+    "B",
+    "W",
+    "S",
+    "F",
+    "E",
+    "Ready",
+    "AwaitingPassword",
+    "LoggedIn",
+    "TransferringData",
+    "Closed"
+  ],
+  "initial_state": "Ready",
+  "final_states": [
+    "S",
+    "F",
+    "E",
+    "Closed"
+  ],
+  "transitions": [
+    {
+      "from": "B",
+      "requisite": "ABOR",
+      "to": "W",
+      "actions": [
+        "ABOR"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "ALLO",
+      "to": "W",
+      "actions": [
+        "ALLO"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "DELE",
+      "to": "W",
+      "actions": [
+        "DELE"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "CWD",
+      "to": "W",
+      "actions": [
+        "CWD"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "CDUP",
+      "to": "W",
+      "actions": [
+        "CDUP"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "SMNT",
+      "to": "W",
+      "actions": [
+        "SMNT"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "HELP",
+      "to": "W",
+      "actions": [
+        "HELP"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "MODE",
+      "to": "W",
+      "actions": [
+        "MODE"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "NOOP",
+      "to": "W",
+      "actions": [
+        "NOOP"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "PASV",
+      "to": "W",
+      "actions": [
+        "PASV"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "QUIT",
+      "to": "W",
+      "actions": [
+        "QUIT"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "SITE",
+      "to": "W",
+      "actions": [
+        "SITE"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "PORT",
+      "to": "W",
+      "actions": [
+        "PORT"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "SYST",
+      "to": "W",
+      "actions": [
+        "SYST"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "STAT",
+      "to": "W",
+      "actions": [
+        "STAT"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "RMD",
+      "to": "W",
+      "actions": [
+        "RMD"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "MKD",
+      "to": "W",
+      "actions": [
+        "MKD"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "PWD",
+      "to": "W",
+      "actions": [
+        "PWD"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "STRU",
+      "to": "W",
+      "actions": [
+        "STRU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "TYPE",
+      "to": "W",
+      "actions": [
+        "TYPE"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "APPE",
+      "to": "W",
+      "actions": [
+        "APPE"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "LIST",
+      "to": "W",
+      "actions": [
+        "LIST"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "NLST",
+      "to": "W",
+      "actions": [
+        "NLST"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "REIN",
+      "to": "W",
+      "actions": [
+        "REIN"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "RETR",
+      "to": "W",
+      "actions": [
+        "RETR"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "STOR",
+      "to": "W",
+      "actions": [
+        "STOR"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "STOU",
+      "to": "W",
+      "actions": [
+        "STOU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "RNFR",
+      "to": "W",
+      "actions": [
+        "RNFR"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "RNTO",
+      "to": "W",
+      "actions": [
+        "RNTO"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "REST",
+      "to": "W",
+      "actions": [
+        "REST"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "USER",
+      "to": "W",
+      "actions": [
+        "USER"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "PASS",
+      "to": "W",
+      "actions": [
+        "PASS"
+      ],
+      "response": ""
+    },
+    {
+      "from": "B",
+      "requisite": "ACCT",
+      "to": "W",
+      "actions": [
+        "ACCT"
+      ],
+      "response": ""
+    },
+    {
+      "from": "W",
+      "requisite": "1",
+      "to": "E",
+      "actions": [],
+      "response": "E"
+    },
+    {
+      "from": "W",
+      "requisite": "2",
+      "to": "S",
+      "actions": [],
+      "response": "S"
+    },
+    {
+      "from": "W",
+      "requisite": "3",
+      "to": "E",
+      "actions": [],
+      "response": "E"
+    },
+    {
+      "from": "W",
+      "requisite": "4",
+      "to": "F",
+      "actions": [],
+      "response": "F"
+    },
+    {
+      "from": "W",
+      "requisite": "5",
+      "to": "F",
+      "actions": [],
+      "response": "F"
+    },
+    {
+      "from": "W",
+      "requisite": "3",
+      "to": "B",
+      "actions": [],
+      "response": ""
+    },
+    {
+      "from": "W",
+      "requisite": "1",
+      "to": "W",
+      "actions": [],
+      "response": ""
+    },
+    {
+      "from": "Ready",
+      "requisite": "USER Doe",
+      "to": "AwaitingPassword",
+      "actions": [],
+      "response": "331 User name ok, need password"
+    },
+    {
+      "from": "AwaitingPassword",
+      "requisite": "PASS mumble",
+      "to": "LoggedIn",
+      "actions": [],
+      "response": "230 User logged in"
+    },
+    {
+      "from": "LoggedIn",
+      "requisite": "RETR test.pl1",
+      "to": "TransferringData",
+      "actions": [
+        "User-FTP opens local file in ASCII"
+      ],
+      "response": "150 File status okay; about to open data connection"
+    },
+    {
+      "from": "TransferringData",
+      "requisite": "226 Closing data connection",
+      "to": "LoggedIn",
+      "actions": [
+        "Server makes data connection to port U",
+        "Server closes data connection"
+      ],
+      "response": "226 Closing data connection, file transfer successful"
+    },
+    {
+      "from": "LoggedIn",
+      "requisite": "TYPE I",
+      "to": "LoggedIn",
+      "actions": [],
+      "response": "200 Command OK"
+    },
+    {
+      "from": "LoggedIn",
+      "requisite": "STOR >udd>cn>fd",
+      "to": "LoggedIn",
+      "actions": [
+        "User-FTP opens local file in Image"
+      ],
+      "response": "550 Access denied"
+    },
+    {
+      "from": "LoggedIn",
+      "requisite": "QUIT",
+      "to": "Closed",
+      "actions": [
+        "Server closes all connections"
+      ],
+      "response": ""
+    }
+  ]
+}

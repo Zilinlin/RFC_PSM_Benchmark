@@ -355,5 +355,418 @@
     }
   ],
   "final_response": "```json\n{\n  \"states\": [\n    \"STABLE\",\n    \"CHANGING\",\n    \"UNSTABLE\",\n    \"Receiving Packet with Data Checksum Option\",\n    \"Check Data Checksum Feature Enabled\",\n    \"Check Data Checksum Feature Disabled\",\n    \"Application Requested Delivery of Known-Corrupt Data\",\n    \"Application Did Not Request Delivery of Known-Corrupt Data\",\n    \"Old State 0\",\n    \"Old State 1\",\n    \"Old State 3\",\n    \"Old State 0/1\"\n  ],\n  \"initial_state\": \"STABLE\",\n  \"final_states\": [\n    \"Application Requested Delivery of Known-Corrupt Data\",\n    \"Application Did Not Request Delivery of Known-Corrupt Data\",\n    \"Old State 0/1\"\n  ],\n  \"transitions\": [\n    {\n      \"from\": \"STABLE\",\n      \"requisite\": \"rcv Change R\",\n      \"to\": \"STABLE\",\n      \"actions\": [\n        \"calc new value\",\n        \"snd Confirm L\"\n      ],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"STABLE\",\n      \"requisite\": \"app/protocol evt : snd Change L\",\n      \"to\": \"CHANGING\",\n      \"actions\": [],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"CHANGING\",\n      \"requisite\": \"rcv Confirm R\",\n      \"to\": \"STABLE\",\n      \"actions\": [\n        \"accept value\"\n      ],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"CHANGING\",\n      \"requisite\": \"rcv empty Confirm R\",\n      \"to\": \"STABLE\",\n      \"actions\": [\n        \"revert to old value\"\n      ],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"CHANGING\",\n      \"requisite\": \"timeout/rcv non-ack\",\n      \"to\": \"CHANGING\",\n      \"actions\": [\n        \"snd Change L\"\n      ],\n      \"response\": \"ignore\"\n    },\n    {\n      \"from\": \"UNSTABLE\",\n      \"requisite\": \"pref list changes\",\n      \"to\": \"UNSTABLE\",\n      \"actions\": [],\n      \"response\": \"snd Change L\"\n    },\n    {\n      \"from\": \"UNSTABLE\",\n      \"requisite\": \"rcv Confirm/Change R\",\n      \"to\": \"UNSTABLE\",\n      \"actions\": [],\n      \"response\": \"ignore\"\n    },\n    {\n      \"from\": \"Receiving Packet with Data Checksum Option\",\n      \"requisite\": \"Check Data Checksum/B is one\",\n      \"to\": \"Check Data Checksum Feature Enabled\",\n      \"actions\": [\n        \"MUST check Data Checksum option\"\n      ],\n      \"response\": \"N/A\"\n    },\n    {\n      \"from\": \"Receiving Packet with Data Checksum Option\",\n      \"requisite\": \"Check Data Checksum/B is zero\",\n      \"to\": \"Check Data Checksum Feature Disabled\",\n      \"actions\": [\n        \"MAY check Data Checksum option\"\n      ],\n      \"response\": \"N/A\"\n    },\n    {\n      \"from\": \"Check Data Checksum Feature Enabled\",\n      \"requisite\": \"CRCs differ AND application requested delivery of known-corrupt data\",\n      \"to\": \"Application Requested Delivery of Known-Corrupt Data\",\n      \"actions\": [\n        \"Deliver data to application with note that it is corrupt\",\n        \"Report packet as delivered corrupt using Data Dropped option (Drop Code 7)\"\n      ],\n      \"response\": \"Acknowledgeable (Received or Received ECN Marked)\"\n    },\n    {\n      \"from\": \"Check Data Checksum Feature Enabled\",\n      \"requisite\": \"CRCs differ AND application did not request delivery of known-corrupt data\",\n      \"to\": \"Application Did Not Request Delivery of Known-Corrupt Data\",\n      \"actions\": [\n        \"Drop application data\",\n        \"Report data as dropped due to corruption using Data Dropped option (Drop Code 3)\"\n      ],\n      \"response\": \"Acknowledgeable (Received or Received ECN Marked)\"\n    },\n    {\n      \"from\": \"Check Data Checksum Feature Disabled\",\n      \"requisite\": \"CRCs differ AND application requested delivery of known-corrupt data\",\n      \"to\": \"Application Requested Delivery of Known-Corrupt Data\",\n      \"actions\": [\n        \"Deliver data to application with note that it is corrupt\",\n        \"Report packet as delivered corrupt using Data Dropped option (Drop Code 7)\"\n      ],\n      \"response\": \"Acknowledgeable (Received or Received ECN Marked)\"\n    },\n    {\n      \"from\": \"Check Data Checksum Feature Disabled\",\n      \"requisite\": \"CRCs differ AND application did not request delivery of known-corrupt data\",\n      \"to\": \"Application Did Not Request Delivery of Known-Corrupt Data\",\n      \"actions\": [\n        \"Drop application data\",\n        \"Report data as dropped due to corruption using Data Dropped option (Drop Code 3)\"\n      ],\n      \"response\": \"Acknowledgeable (Received or Received ECN Marked)\"\n    },\n    {\n      \"from\": \"Check Data Checksum Feature Enabled\",\n      \"requisite\": \"CRCs match\",\n      \"to\": \"Receiving Packet with Data Checksum Option\",\n      \"actions\": [],\n      \"response\": \"Acknowledgeable (Received or Received ECN Marked)\"\n    },\n    {\n      \"from\": \"Check Data Checksum Feature Disabled\",\n      \"requisite\": \"CRCs match\",\n      \"to\": \"Receiving Packet with Data Checksum Option\",\n      \"actions\": [],\n      \"response\": \"Acknowledgeable (Received or Received ECN Marked)\"\n    },\n    {\n      \"from\": \"Old State 0\",\n      \"requisite\": \"Received State 0\",\n      \"to\": \"Old State 0\",\n      \"actions\": [],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"Old State 0\",\n      \"requisite\": \"Received State 1\",\n      \"to\": \"Old State 0/1\",\n      \"actions\": [],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"Old State 0\",\n      \"requisite\": \"Received State 3\",\n      \"to\": \"Old State 0\",\n      \"actions\": [],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"Old State 1\",\n      \"requisite\": \"Received State 0\",\n      \"to\": \"Old State 1\",\n      \"actions\": [],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"Old State 1\",\n      \"requisite\": \"Received State 1\",\n      \"to\": \"Old State 1\",\n      \"actions\": [],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"Old State 1\",\n      \"requisite\": \"Received State 3\",\n      \"to\": \"Old State 1\",\n      \"actions\": [],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"Old State 3\",\n      \"requisite\": \"Received State 0\",\n      \"to\": \"Old State 0\",\n      \"actions\": [],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"Old State 3\",\n      \"requisite\": \"Received State 1\",\n      \"to\": \"Old State 1\",\n      \"actions\": [],\n      \"response\": \"\"\n    },\n    {\n      \"from\": \"Old State 3\",\n      \"requisite\": \"Received State 3\",\n      \"to\": \"Old State 3\",\n      \"actions\": [],\n      \"response\": \"\"\n    }\n  ]\n}\n```",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "CLOSED",
+      "LISTEN",
+      "REQUEST",
+      "RESPOND",
+      "PARTOPEN",
+      "OPEN",
+      "CLOSEREQ",
+      "CLOSING",
+      "TIMEWAIT",
+      "STABLE",
+      "CHANGING",
+      "UNSTABLE",
+      "Receiving Packet with Data Checksum Option",
+      "Check Data Checksum Feature Enabled",
+      "Check Data Checksum Feature Disabled",
+      "Application Requested Delivery of Known-Corrupt Data",
+      "Application Did Not Request Delivery of Known-Corrupt Data",
+      "Old State 0",
+      "Old State 1",
+      "Old State 3"
+    ],
+    "initial_state": "CLOSED",
+    "final_states": [
+      "CLOSED",
+      "Application Requested Delivery of Known-Corrupt Data",
+      "Application Did Not Request Delivery of Known-Corrupt Data",
+      "Old State 0",
+      "Old State 1",
+      "Old State 3"
+    ],
+    "transitions": [
+      {
+        "from": "CLOSED",
+        "requisite": "Client sends DCCP-Request",
+        "to": "REQUEST",
+        "actions": [
+          "Send DCCP-Request"
+        ],
+        "response": ""
+      },
+      {
+        "from": "CLOSED",
+        "requisite": "active open",
+        "to": "REQUEST",
+        "actions": [
+          "snd Request"
+        ],
+        "response": null
+      },
+      {
+        "from": "LISTEN",
+        "requisite": "Server receives DCCP-Request",
+        "to": "RESPOND",
+        "actions": [
+          "Receive DCCP-Request"
+        ],
+        "response": "Send DCCP-Response"
+      },
+      {
+        "from": "LISTEN",
+        "requisite": "rcv Request",
+        "to": "RESPOND",
+        "actions": [
+          "snd Response"
+        ],
+        "response": null
+      },
+      {
+        "from": "REQUEST",
+        "requisite": "Client receives DCCP-Response",
+        "to": "PARTOPEN",
+        "actions": [
+          "Receive DCCP-Response"
+        ],
+        "response": ""
+      },
+      {
+        "from": "REQUEST",
+        "requisite": "rcv Response",
+        "to": "PARTOPEN",
+        "actions": [
+          "snd Ack"
+        ],
+        "response": null
+      },
+      {
+        "from": "PARTOPEN",
+        "requisite": "Client sends DCCP-Ack or DCCP-DataAck",
+        "to": "OPEN",
+        "actions": [
+          "Send DCCP-Ack or DCCP-DataAck"
+        ],
+        "response": ""
+      },
+      {
+        "from": "PARTOPEN",
+        "requisite": "rcv packet",
+        "to": "OPEN",
+        "actions": [],
+        "response": null
+      },
+      {
+        "from": "RESPOND",
+        "requisite": "Server receives DCCP-Ack or DCCP-DataAck",
+        "to": "OPEN",
+        "actions": [
+          "Receive DCCP-Ack or DCCP-DataAck"
+        ],
+        "response": ""
+      },
+      {
+        "from": "RESPOND",
+        "requisite": "rcv Ack/DataAck",
+        "to": "OPEN",
+        "actions": [],
+        "response": null
+      },
+      {
+        "from": "OPEN",
+        "requisite": "Server sends DCCP-CloseReq",
+        "to": "CLOSEREQ",
+        "actions": [
+          "Send DCCP-CloseReq"
+        ],
+        "response": ""
+      },
+      {
+        "from": "OPEN",
+        "requisite": "server active close",
+        "to": "CLOSEREQ",
+        "actions": [
+          "snd CloseReq"
+        ],
+        "response": null
+      },
+      {
+        "from": "OPEN",
+        "requisite": "active close or rcv CloseReq",
+        "to": "CLOSING",
+        "actions": [
+          "snd Close"
+        ],
+        "response": null
+      },
+      {
+        "from": "OPEN",
+        "requisite": "Client sends DCCP-Close",
+        "to": "CLOSING",
+        "actions": [
+          "Send DCCP-Close"
+        ],
+        "response": null
+      },
+      {
+        "from": "CLOSEREQ",
+        "requisite": "Client sends DCCP-Close",
+        "to": "CLOSING",
+        "actions": [
+          "Send DCCP-Close"
+        ],
+        "response": null
+      },
+      {
+        "from": "CLOSEREQ",
+        "requisite": "rcv Close",
+        "to": "CLOSED",
+        "actions": [
+          "snd Reset"
+        ],
+        "response": null
+      },
+      {
+        "from": "CLOSING",
+        "requisite": "Server sends DCCP-Reset",
+        "to": "CLOSED",
+        "actions": [
+          "Send DCCP-Reset"
+        ],
+        "response": null
+      },
+      {
+        "from": "CLOSING",
+        "requisite": "rcv Reset",
+        "to": "TIMEWAIT",
+        "actions": [],
+        "response": null
+      },
+      {
+        "from": "CLOSING",
+        "requisite": "Client enters TIMEWAIT",
+        "to": "TIMEWAIT",
+        "actions": [
+          "Hold state for 2MSL"
+        ],
+        "response": null
+      },
+      {
+        "from": "CLOSING",
+        "requisite": "2MSL timer expires",
+        "to": "CLOSED",
+        "actions": [],
+        "response": null
+      },
+      {
+        "from": "TIMEWAIT",
+        "requisite": "After 2MSL",
+        "to": "CLOSED",
+        "actions": [],
+        "response": null
+      },
+      {
+        "from": "Any",
+        "requisite": "rcv Reset",
+        "to": "TIMEWAIT",
+        "actions": [],
+        "response": null
+      },
+      {
+        "from": "STABLE",
+        "requisite": "rcv Change R",
+        "to": "STABLE",
+        "actions": [
+          "calc new value",
+          "snd Confirm L"
+        ],
+        "response": null
+      },
+      {
+        "from": "STABLE",
+        "requisite": "app/protocol evt : snd Change L",
+        "to": "CHANGING",
+        "actions": [],
+        "response": null
+      },
+      {
+        "from": "CHANGING",
+        "requisite": "rcv Confirm R",
+        "to": "STABLE",
+        "actions": [
+          "accept value"
+        ],
+        "response": null
+      },
+      {
+        "from": "CHANGING",
+        "requisite": "rcv empty Confirm R",
+        "to": "STABLE",
+        "actions": [
+          "revert to old value"
+        ],
+        "response": null
+      },
+      {
+        "from": "CHANGING",
+        "requisite": "timeout/rcv non-ack",
+        "to": "CHANGING",
+        "actions": [
+          "snd Change L"
+        ],
+        "response": "ignore"
+      },
+      {
+        "from": "UNSTABLE",
+        "requisite": "pref list changes",
+        "to": "UNSTABLE",
+        "actions": [],
+        "response": "snd Change L"
+      },
+      {
+        "from": "UNSTABLE",
+        "requisite": "rcv Confirm/Change R",
+        "to": "UNSTABLE",
+        "actions": [],
+        "response": "ignore"
+      },
+      {
+        "from": "Receiving Packet with Data Checksum Option",
+        "requisite": "Check Data Checksum/B is one",
+        "to": "Check Data Checksum Feature Enabled",
+        "actions": [
+          "MUST check Data Checksum option"
+        ],
+        "response": "N/A"
+      },
+      {
+        "from": "Receiving Packet with Data Checksum Option",
+        "requisite": "Check Data Checksum/B is zero",
+        "to": "Check Data Checksum Feature Disabled",
+        "actions": [
+          "MAY check Data Checksum option"
+        ],
+        "response": "N/A"
+      },
+      {
+        "from": "Check Data Checksum Feature Enabled",
+        "requisite": "CRCs differ AND application requested delivery of known-corrupt data",
+        "to": "Application Requested Delivery of Known-Corrupt Data",
+        "actions": [
+          "Deliver data to application with note that it is corrupt",
+          "Report packet as delivered corrupt using Data Dropped option (Drop Code 7)"
+        ],
+        "response": "Acknowledgeable (Received or Received ECN Marked)"
+      },
+      {
+        "from": "Check Data Checksum Feature Enabled",
+        "requisite": "CRCs differ AND application did not request delivery of known-corrupt data",
+        "to": "Application Did Not Request Delivery of Known-Corrupt Data",
+        "actions": [
+          "Drop application data",
+          "Report data as dropped due to corruption using Data Dropped option (Drop Code 3)"
+        ],
+        "response": "Acknowledgeable (Received or Received ECN Marked)"
+      },
+      {
+        "from": "Check Data Checksum Feature Disabled",
+        "requisite": "CRCs differ AND application requested delivery of known-corrupt data",
+        "to": "Application Requested Delivery of Known-Corrupt Data",
+        "actions": [
+          "Deliver data to application with note that it is corrupt",
+          "Report packet as delivered corrupt using Data Dropped option (Drop Code 7)"
+        ],
+        "response": "Acknowledgeable (Received or Received ECN Marked)"
+      },
+      {
+        "from": "Check Data Checksum Feature Disabled",
+        "requisite": "CRCs differ AND application did not request delivery of known-corrupt data",
+        "to": "Application Did Not Request Delivery of Known-Corrupt Data",
+        "actions": [
+          "Drop application data",
+          "Report data as dropped due to corruption using Data Dropped option (Drop Code 3)"
+        ],
+        "response": "Acknowledgeable (Received or Received ECN Marked)"
+      },
+      {
+        "from": "Check Data Checksum Feature Enabled",
+        "requisite": "CRCs match",
+        "to": "Receiving Packet with Data Checksum Option",
+        "actions": [],
+        "response": "Acknowledgeable (Received or Received ECN Marked)"
+      },
+      {
+        "from": "Check Data Checksum Feature Disabled",
+        "requisite": "CRCs match",
+        "to": "Receiving Packet with Data Checksum Option",
+        "actions": [],
+        "response": "Acknowledgeable (Received or Received ECN Marked)"
+      },
+      {
+        "from": "Old State 0",
+        "requisite": "Received State 0",
+        "to": "Old State 0",
+        "actions": [],
+        "response": null
+      },
+      {
+        "from": "Old State 0",
+        "requisite": "Received State 1",
+        "to": "Old State 0/1",
+        "actions": [],
+        "response": null
+      },
+      {
+        "from": "Old State 0",
+        "requisite": "Received State 3",
+        "to": "Old State 0",
+        "actions": [],
+        "response": null
+      },
+      {
+        "from": "Old State 1",
+        "requisite": "Received State 0",
+        "to": "Old State 1",
+        "actions": [],
+        "response": null
+      },
+      {
+        "from": "Old State 1",
+        "requisite": "Received State 1",
+        "to": "Old State 1",
+        "actions": [],
+        "response": null
+      },
+      {
+        "from": "Old State 1",
+        "requisite": "Received State 3",
+        "to": "Old State 1",
+        "actions": [],
+        "response": null
+      },
+      {
+        "from": "Old State 3",
+        "requisite": "Received State 0",
+        "to": "Old State 0",
+        "actions": [],
+        "response": null
+      },
+      {
+        "from": "Old State 3",
+        "requisite": "Received State 1",
+        "to": "Old State 1",
+        "actions": [],
+        "response": null
+      },
+      {
+        "from": "Old State 3",
+        "requisite": "Received State 3",
+        "to": "Old State 3",
+        "actions": [],
+        "response": null
+      }
+    ]
+  }
 }
