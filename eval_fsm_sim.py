@@ -12,6 +12,8 @@ def label_sim(a, b, threshold=0.5):
     sim = util.cos_sim(emb1, emb2).item()
     return sim > threshold, sim
 
+
+
 def compare_action_lists(a1, a2, threshold=0.5):
     if not a1 and not a2:
         return "full"
@@ -33,19 +35,41 @@ def compare_action_lists(a1, a2, threshold=0.5):
     else:
         return "none"
 
+
+
 def match_transitions_fuzzy_states(trans1, trans2, threshold=0.5, allow_partial=True):
     matched = []
     unmatched = []
     fully_correct = 0
     partially_correct = 0
     trans2_copy = trans2.copy()
+
     for t1 in trans1:
+        # Skip transitions with null 'from' or 'to' fields
+        if t1.get("from") is None or t1.get("to") is None:
+            continue
+
         found = False
         for t2 in trans2_copy:
+            # Skip transitions with null 'from' or 'to' fields
+            if t2.get("from") is None or t2.get("to") is None:
+                continue
+
             from_match, _ = label_sim(t1["from"], t2["from"], threshold)
             to_match, _ = label_sim(t1["to"], t2["to"], threshold)
-            req_match, _ = label_sim(t1["requisite"], t2["requisite"], threshold)
-            act_match_type = compare_action_lists(t1["actions"], t2["actions"], threshold)
+
+            # Handle 'requisite' field comparison
+            req1 = t1.get("requisite")
+            req2 = t2.get("requisite")
+            if req1 is None and req2 is None:
+                req_match = True
+            elif req1 is None or req2 is None:
+                req_match = False
+            else:
+                req_match, _ = label_sim(req1, req2, threshold)
+
+            act_match_type = compare_action_lists(t1.get("actions"), t2.get("actions"), threshold)
+
             if from_match and to_match and req_match:
                 if act_match_type == "full" or (allow_partial and act_match_type == "partial"):
                     matched.append((t1, t2))
@@ -58,7 +82,10 @@ def match_transitions_fuzzy_states(trans1, trans2, threshold=0.5, allow_partial=
                     break
         if not found:
             unmatched.append(t1)
+
     return matched, unmatched, fully_correct, partially_correct
+
+
 
 def compute_match_metrics(matched, gt_trans, ex_trans):
     tp = len(matched)
@@ -68,6 +95,7 @@ def compute_match_metrics(matched, gt_trans, ex_trans):
     recall = tp / (tp + fn + 1e-6)
     f1 = 2 * precision * recall / (precision + recall + 1e-6)
     return precision, recall, f1
+
 
 def evaluate_fsm_similarity(fsm1_json, fsm2_json, allow_partial=True, threshold=0.5):
     matched, unmatched, fully_correct, partially_correct = match_transitions_fuzzy_states(
@@ -83,48 +111,68 @@ def evaluate_fsm_similarity(fsm1_json, fsm2_json, allow_partial=True, threshold=
         "unmatched": len(unmatched),
     }
 
+
+
 def batch_evaluate_fsm_similarity():
-    protocols = ["DCCP", "DHCP", "FTP", "IMAP", "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP"]
+    # TODO IMAP ground truth file is missing, need to handle this case.
+    # "IMAP", 
+    # "POP3" has bugs
+    protocols = ["SIP", "RTSP", "DCCP", "DHCP", "FTP", "NNTP", "SMTP", "TCP"]
     close_models = ["deepseek-reasoner", "gpt-4o-mini", "claude-3-7-sonnet-20250219", "gemini-2.0-flash"]
     fsm_dir = "fsm"
     results = {}
 
+    # Iterate over each protocol
     for protocol in protocols:
         protocol_dir = os.path.join(protocol)
         gt_file = None
+
+        # Find the ground truth FSM file for the protocol
         for file in os.listdir(protocol_dir):
             if file.endswith("_state_machine.json"):
                 gt_file = os.path.join(protocol_dir, file)
                 break
+
         if not gt_file:
             continue
 
+        # Load the ground truth FSM
         with open(gt_file, 'r') as f:
             ground_truth = json.load(f)
 
+        # Iterate over each model
         for model in close_models:
             extracted_file = None
+
+            # Find the extracted FSM file for the protocol and model
             for file in os.listdir(fsm_dir):
                 if protocol in file and model in file and file.endswith(".json"):
                     extracted_file = os.path.join(fsm_dir, file)
                     break
+
             if not extracted_file:
                 continue
 
+            # Load the extracted FSM
             with open(extracted_file, 'r') as f:
                 extracted = json.load(f)
 
+            # Evaluate the similarity between ground truth and extracted FSMs
             results_key = f"{protocol}_{model}"
             results[results_key] = {
                 "with_partial": evaluate_fsm_similarity(ground_truth, extracted, allow_partial=True),
                 "no_partial": evaluate_fsm_similarity(ground_truth, extracted, allow_partial=False)
             }
+
+            # Print the evaluation results
             print(f"Evaluated {protocol} with model {model}")
             print(f"Results for {results_key}:")
             print(results[results_key])
 
-    with open("fsm_evaluation_results.json", "w") as outfile:
-        json.dump(results, outfile, indent=2)
+            # Write the current results to the output file
+            with open("fsm_evaluation_results.json", "w") as outfile:
+                json.dump(results, outfile, indent=2)
+
 
 if __name__ == "__main__":
     batch_evaluate_fsm_similarity()

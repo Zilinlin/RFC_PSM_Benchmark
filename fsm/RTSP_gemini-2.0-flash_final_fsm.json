@@ -34,14 +34,14 @@
     },
     {
       "from": "Init",
-      "event": "SETUP",
+      "actions": ["SETUP"],
       "requisite": "None",
       "to": "Ready",
       "response": "NRM=1, RP=0.0"
     },
     {
       "from": "Init",
-      "event": "SETUP",
+      "actions": ["SETUP"],
       "requisite": "Needs Redirect",
       "to": "Init",
       "response": "3rr Redirect"
@@ -57,14 +57,14 @@
     },
     {
       "from": "Ready",
-      "event": "SETUP",
+      "actions": ["SETUP"],
       "requisite": "New URI",
       "to": "Ready",
       "response": "NRM +=1"
     },
     {
       "from": "Ready",
-      "event": "SETUP",
+      "actions": ["SETUP"],
       "requisite": "URI Setup prior",
       "to": "Ready",
       "response": "Change transport param"
@@ -80,28 +80,28 @@
     },
     {
       "from": "Ready",
-      "event": "PLAY",
+      "actions": ["PLAY"],
       "requisite": "Prs URI, No range",
       "to": "Play",
       "response": "Play from RP"
     },
     {
       "from": "Ready",
-      "event": "PLAY",
+      "actions": ["PLAY"],
       "requisite": "Prs URI, Range",
       "to": "Play",
       "response": "According to range"
     },
     {
       "from": "Ready",
-      "event": "PLAY",
+      "actions": ["PLAY"],
       "requisite": "md URI, NRM=1, Range",
       "to": "Play",
       "response": "According to range"
     },
     {
       "from": "Ready",
-      "event": "PLAY",
+      "actions": ["PLAY"],
       "requisite": "md URI, NRM=1",
       "to": "Play",
       "response": "Play from RP"
@@ -118,7 +118,7 @@
     },
     {
       "from": "Ready",
-      "event": "PAUSE",
+      "actions": ["PAUSE"],
       "requisite": "Prs URI",
       "to": "Ready",
       "response": "Return PP"
@@ -136,21 +136,21 @@
     },
     {
       "from": "Ready",
-      "event": "TEARDOWN",
+      "actions": ["TEARDOWN"],
       "requisite": "Prs URI, ",
       "to": "Init",
       "response": "No session hdr, NRM = 0"
     },
     {
       "from": "Ready",
-      "event": "TEARDOWN",
+      "actions": ["TEARDOWN"],
       "requisite": "md URI,NRM=1",
       "to": "Init",
       "response": "No Session hdr, NRM = 0"
     },
     {
       "from": "Ready",
-      "event": "TEARDOWN",
+      "actions": ["TEARDOWN"],
       "requisite": "md URI,NRM>1",
       "to": "Ready",
       "response": "Session hdr, NRM -= 1"
@@ -167,35 +167,35 @@
     },
     {
       "from": "Play",
-      "event": "PAUSE",
+      "actions": ["PAUSE"],
       "requisite": "Prs URI",
       "to": "Ready",
       "response": "Set RP to present point"
     },
     {
       "from": "Play",
-      "event": "End of media",
+      "actions": ["End of media"],
       "requisite": "All media",
       "to": "Play",
       "response": "Set RP = End of media"
     },
     {
       "from": "Play",
-      "event": "End of range",
+      "actions": ["End of range"],
       "requisite": "None",
       "to": "Play",
       "response": "Set RP = End of range"
     },
     {
       "from": "Play",
-      "event": "PLAY",
+      "actions": ["PLAY"],
       "requisite": "Prs URI, No range",
       "to": "Play",
       "response": "Play from present point"
     },
     {
       "from": "Play",
-      "event": "PLAY",
+      "actions": ["PLAY"],
       "requisite": "Prs URI, Range",
       "to": "Play",
       "response": "According to range"
@@ -213,21 +213,21 @@
     },
     {
       "from": "Play",
-      "event": "TEARDOWN",
+      "actions": ["TEARDOWN"],
       "requisite": "Prs URI",
       "to": "Init",
       "response": "No session hdr"
     },
     {
       "from": "Play",
-      "event": "TEARDOWN",
+      "actions": ["TEARDOWN"],
       "requisite": "md URI,NRM=1",
       "to": "Init",
       "response": "No Session hdr, NRM=0"
     },
     {
       "from": "Play",
-      "event": "Timeout",
+      "actions": ["Timeout"],
       "requisite": "None",
       "to": "Init",
       "response": "Stop Media playout"
