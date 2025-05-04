@@ -21,19 +21,22 @@ def compare_action_lists(a1, a2, threshold=0.5):
         a1 = [a1]
     if isinstance(a2, str):
         a2 = [a2]
+
+    match_scores = []
     matches = 0
     for item1 in a1:
         for item2 in a2:
-            match, _ = label_sim(item1, item2, threshold)
+            match, score = label_sim(item1, item2, threshold)
+            match_scores.append(score)
             if match:
                 matches += 1
                 break
     if matches == len(a1) == len(a2):
-        return "full"
+        return "full", match_scores
     elif matches > 0:
-        return "partial"
+        return "partial", match_scores
     else:
-        return "none"
+        return "none", match_scores
 
 
 
@@ -44,31 +47,46 @@ def match_transitions_fuzzy_states(trans1, trans2, threshold=0.5, allow_partial=
     partially_correct = 0
     trans2_copy = trans2.copy()
 
-    for t1 in trans1:
+    for idx1, t1 in enumerate(trans1):
         # Skip transitions with null 'from' or 'to' fields
         if t1.get("from") is None or t1.get("to") is None:
             continue
 
         found = False
-        for t2 in trans2_copy:
+        for idx2, t2 in enumerate(trans2_copy):
             # Skip transitions with null 'from' or 'to' fields
             if t2.get("from") is None or t2.get("to") is None:
                 continue
 
-            from_match, _ = label_sim(t1["from"], t2["from"], threshold)
-            to_match, _ = label_sim(t1["to"], t2["to"], threshold)
+            from_match, from_score = label_sim(t1["from"], t2["from"], threshold)
+            to_match, to_score = label_sim(t1["to"], t2["to"], threshold)
 
             # Handle 'requisite' field comparison
             req1 = t1.get("requisite")
             req2 = t2.get("requisite")
             if req1 is None and req2 is None:
                 req_match = True
+                req_score = 1.0
             elif req1 is None or req2 is None:
                 req_match = False
+                req_score = 0.0
             else:
-                req_match, _ = label_sim(req1, req2, threshold)
+                req_match, req_score = label_sim(req1, req2, threshold)
 
-            act_match_type = compare_action_lists(t1.get("actions"), t2.get("actions"), threshold)
+            act_match_type, act_scores = compare_action_lists(t1.get("actions"), t2.get("actions"), threshold)
+
+            # Format action scores for display
+            if isinstance(act_scores, list):
+                act_scores_str = ', '.join(f"{score:.2f}" for score in act_scores)
+            else:
+                act_scores_str = f"{act_scores:.2f}"
+
+            # Debugging output
+            print(f"\nComparing Transition {idx1} (trans1) with Transition {idx2} (trans2):")
+            print(f"  From: '{t1['from']}' vs '{t2['from']}' | Match: {from_match} | Score: {from_score:.2f}")
+            print(f"  To: '{t1['to']}' vs '{t2['to']}' | Match: {to_match} | Score: {to_score:.2f}")
+            print(f"  Requisite: '{req1}' vs '{req2}' | Match: {req_match} | Score: {req_score:.2f}")
+            print(f"  Actions: {t1.get('actions')} vs {t2.get('actions')} | Match Type: {act_match_type} | Scores: [{act_scores_str}]")
 
             if from_match and to_match and req_match:
                 if act_match_type == "full" or (allow_partial and act_match_type == "partial"):
@@ -79,12 +97,13 @@ def match_transitions_fuzzy_states(trans1, trans2, threshold=0.5, allow_partial=
                         partially_correct += 1
                     trans2_copy.remove(t2)
                     found = True
+                    print("  --> Matched\n")
                     break
         if not found:
             unmatched.append(t1)
+            print("  --> Not Matched\n")
 
     return matched, unmatched, fully_correct, partially_correct
-
 
 
 def compute_match_metrics(matched, gt_trans, ex_trans):
@@ -117,9 +136,11 @@ def batch_evaluate_fsm_similarity():
     # TODO IMAP ground truth file is missing, need to handle this case.
     # "IMAP", 
     # "POP3" has bugs
-    protocols = ["IMAP", "POP3"]
+    #protocols = ["IMAP", "POP3"]
+    protocols = ['SMTP'] # check for testing
     #protocols = ["SIP", "RTSP", "DCCP", "DHCP", "FTP", "NNTP", "SMTP", "TCP"]
-    close_models = ["deepseek-reasoner", "gpt-4o-mini", "claude-3-7-sonnet-20250219", "gemini-2.0-flash"]
+    close_models = ["claude-3-7-sonnet-20250219"]
+    # close_models = ["deepseek-reasoner", "gpt-4o-mini", "claude-3-7-sonnet-20250219", "gemini-2.0-flash"]
     fsm_dir = "fsm"
     results = {}
 
