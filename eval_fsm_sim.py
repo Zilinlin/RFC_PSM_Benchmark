@@ -117,7 +117,8 @@ def batch_evaluate_fsm_similarity():
     # TODO IMAP ground truth file is missing, need to handle this case.
     # "IMAP", 
     # "POP3" has bugs
-    protocols = ["SIP", "RTSP", "DCCP", "DHCP", "FTP", "NNTP", "SMTP", "TCP"]
+    protocols = ["IMAP", "POP3"]
+    #protocols = ["SIP", "RTSP", "DCCP", "DHCP", "FTP", "NNTP", "SMTP", "TCP"]
     close_models = ["deepseek-reasoner", "gpt-4o-mini", "claude-3-7-sonnet-20250219", "gemini-2.0-flash"]
     fsm_dir = "fsm"
     results = {}
