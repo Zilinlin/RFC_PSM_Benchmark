@@ -1,0 +1,324 @@
+{
+  "states": [
+    "Init",
+    "Ready",
+    "Play",
+    "Client sends RTSP request with Accept-Credentials: User",
+    "Proxy sets up TLS session to next hop",
+    "Proxy extracts peer certificate chain",
+    "Proxy checks for matching identity and hash in Accept-Credentials header",
+    "Certificate Match",
+    "Certificate Mismatch",
+    "Proxy responds with 470 or 407 and Connection-Credentials header",
+    "Client receives 470 or 407 with Connection-Credentials",
+    "Client decides to accept certificate",
+    "Client decides to reject certificate",
+    "Client resends RTSP request with Accept-Credentials including certificate hash",
+    "Proxy forwards request to next hop"
+  ],
+  "initial_state": "Init",
+  "final_states": [
+    "Certificate Match",
+    "Certificate Mismatch"
+  ],
+  "transitions": [
+    {
+      "from": "Init",
+      "requisite": "SETUP request",
+      "to": "Ready",
+      "actions": [
+        "Create RTSP session",
+        "Specify transport mechanism"
+      ],
+      "response": "200 OK (with Session header)"
+    },
+    {
+      "from": "Init",
+      "actions": ["SETUP"],
+      "requisite": "None",
+      "to": "Ready",
+      "response": "NRM=1, RP=0.0"
+    },
+    {
+      "from": "Init",
+      "actions": ["SETUP"],
+      "requisite": "Needs Redirect",
+      "to": "Init",
+      "response": "3rr Redirect"
+    },
+    {
+      "from": "Ready",
+      "requisite": "SETUP request",
+      "to": "Ready",
+      "actions": [
+        "Change transport parameters"
+      ],
+      "response": "200 OK"
+    },
+    {
+      "from": "Ready",
+      "actions": ["SETUP"],
+      "requisite": "New URI",
+      "to": "Ready",
+      "response": "NRM +=1"
+    },
+    {
+      "from": "Ready",
+      "actions": ["SETUP"],
+      "requisite": "URI Setup prior",
+      "to": "Ready",
+      "response": "Change transport param"
+    },
+    {
+      "from": "Ready",
+      "requisite": "PLAY request",
+      "to": "Play",
+      "actions": [
+        "Start sending data"
+      ],
+      "response": "200 OK (with Range and RTP-Info headers)"
+    },
+    {
+      "from": "Ready",
+      "actions": ["PLAY"],
+      "requisite": "Prs URI, No range",
+      "to": "Play",
+      "response": "Play from RP"
+    },
+    {
+      "from": "Ready",
+      "actions": ["PLAY"],
+      "requisite": "Prs URI, Range",
+      "to": "Play",
+      "response": "According to range"
+    },
+    {
+      "from": "Ready",
+      "actions": ["PLAY"],
+      "requisite": "md URI, NRM=1, Range",
+      "to": "Play",
+      "response": "According to range"
+    },
+    {
+      "from": "Ready",
+      "actions": ["PLAY"],
+      "requisite": "md URI, NRM=1",
+      "to": "Play",
+      "response": "Play from RP"
+    },
+    {
+      "from": "Ready",
+      "requisite": "PAUSE request",
+      "to": "Ready",
+      "actions": [
+        "Interrupt stream delivery",
+        "Set pause point"
+      ],
+      "response": "200 OK (with Range header)"
+    },
+    {
+      "from": "Ready",
+      "actions": ["PAUSE"],
+      "requisite": "Prs URI",
+      "to": "Ready",
+      "response": "Return PP"
+    },
+    {
+      "from": "Ready",
+      "requisite": "TEARDOWN request",
+      "to": "Init",
+      "actions": [
+        "Stop stream delivery",
+        "Free resources",
+        "Destroy session state"
+      ],
+      "response": "200 OK (without Session header)"
+    },
+    {
+      "from": "Ready",
+      "actions": ["TEARDOWN"],
+      "requisite": "Prs URI, ",
+      "to": "Init",
+      "response": "No session hdr, NRM = 0"
+    },
+    {
+      "from": "Ready",
+      "actions": ["TEARDOWN"],
+      "requisite": "md URI,NRM=1",
+      "to": "Init",
+      "response": "No Session hdr, NRM = 0"
+    },
+    {
+      "from": "Ready",
+      "actions": ["TEARDOWN"],
+      "requisite": "md URI,NRM>1",
+      "to": "Ready",
+      "response": "Session hdr, NRM -= 1"
+    },
+    {
+      "from": "Play",
+      "requisite": "PAUSE request",
+      "to": "Ready",
+      "actions": [
+        "Interrupt stream delivery",
+        "Set pause point"
+      ],
+      "response": "200 OK (with Range header)"
+    },
+    {
+      "from": "Play",
+      "actions": ["PAUSE"],
+      "requisite": "Prs URI",
+      "to": "Ready",
+      "response": "Set RP to present point"
+    },
+    {
+      "from": "Play",
+      "actions": ["End of media"],
+      "requisite": "All media",
+      "to": "Play",
+      "response": "Set RP = End of media"
+    },
+    {
+      "from": "Play",
+      "actions": ["End of range"],
+      "requisite": "None",
+      "to": "Play",
+      "response": "Set RP = End of range"
+    },
+    {
+      "from": "Play",
+      "actions": ["PLAY"],
+      "requisite": "Prs URI, No range",
+      "to": "Play",
+      "response": "Play from present point"
+    },
+    {
+      "from": "Play",
+      "actions": ["PLAY"],
+      "requisite": "Prs URI, Range",
+      "to": "Play",
+      "response": "According to range"
+    },
+    {
+      "from": "Play",
+      "requisite": "TEARDOWN request",
+      "to": "Init",
+      "actions": [
+        "Stop stream delivery",
+        "Free resources",
+        "Destroy session state"
+      ],
+      "response": "200 OK (without Session header)"
+    },
+    {
+      "from": "Play",
+      "actions": ["TEARDOWN"],
+      "requisite": "Prs URI",
+      "to": "Init",
+      "response": "No session hdr"
+    },
+    {
+      "from": "Play",
+      "actions": ["TEARDOWN"],
+      "requisite": "md URI,NRM=1",
+      "to": "Init",
+      "response": "No Session hdr, NRM=0"
+    },
+    {
+      "from": "Play",
+      "actions": ["Timeout"],
+      "requisite": "None",
+      "to": "Init",
+      "response": "Stop Media playout"
+    },
+    {
+      "from": "Client sends RTSP request with Accept-Credentials: User",
+      "requisite": "Always",
+      "to": "Proxy sets up TLS session to next hop",
+      "actions": [],
+      "response": null
+    },
+    {
+      "from": "Proxy sets up TLS session to next hop",
+      "requisite": "Always",
+      "to": "Proxy extracts peer certificate chain",
+      "actions": [],
+      "response": null
+    },
+    {
+      "from": "Proxy extracts peer certificate chain",
+      "requisite": "Always",
+      "to": "Proxy checks for matching identity and hash in Accept-Credentials header",
+      "actions": [],
+      "response": null
+    },
+    {
+      "from": "Proxy checks for matching identity and hash in Accept-Credentials header",
+      "requisite": "Matching identity and hash found",
+      "to": "Certificate Match",
+      "actions": [],
+      "response": null
+    },
+    {
+      "from": "Proxy checks for matching identity and hash in Accept-Credentials header",
+      "requisite": "No matching identity and hash found",
+      "to": "Certificate Mismatch",
+      "actions": [],
+      "response": null
+    },
+    {
+      "from": "Certificate Match",
+      "requisite": "Always",
+      "to": "Proxy forwards request to next hop",
+      "actions": [],
+      "response": null
+    },
+    {
+      "from": "Certificate Mismatch",
+      "requisite": "Always",
+      "to": "Proxy responds with 470 or 407 and Connection-Credentials header",
+      "actions": [
+        "Include Connection-Credentials header with next hop's identity and certificate"
+      ],
+      "response": "470 or 407"
+    },
+    {
+      "from": "Proxy responds with 470 or 407 and Connection-Credentials header",
+      "requisite": "Always",
+      "to": "Client receives 470 or 407 with Connection-Credentials",
+      "actions": [],
+      "response": null
+    },
+    {
+      "from": "Client receives 470 or 407 with Connection-Credentials",
+      "requisite": "Client decides to accept certificate",
+      "to": "Client decides to accept certificate",
+      "actions": [],
+      "response": null
+    },
+    {
+      "from": "Client receives 470 or 407 with Connection-Credentials",
+      "requisite": "Client decides to reject certificate",
+      "to": "Client decides to reject certificate",
+      "actions": [],
+      "response": null
+    },
+    {
+      "from": "Client decides to accept certificate",
+      "requisite": "Always",
+      "to": "Client resends RTSP request with Accept-Credentials including certificate hash",
+      "actions": [
+        "Include hash over DER-encoded certificate for all trusted proxies"
+      ],
+      "response": null
+    },
+    {
+      "from": "Client resends RTSP request with Accept-Credentials including certificate hash",
+      "requisite": "Always",
+      "to": "Proxy sets up TLS session to next hop",
+      "actions": [],
+      "response": null
+    }
+  ]
+}

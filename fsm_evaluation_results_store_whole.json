@@ -1,0 +1,242 @@
+{
+  "DCCP_deepseek-reasoner": {
+    "with_partial": {
+      "precision": 0.620689633769323,
+      "recall": 0.7199999712000011,
+      "f1_score": 0.6666661447191644,
+      "matched": 18,
+      "fully_correct": 0,
+      "partially_correct": 18,
+      "unmatched": 7
+    },
+    "no_partial": {
+      "precision": 0.10344827229488716,
+      "recall": 0.11999999520000018,
+      "f1_score": 0.11111060974159431,
+      "matched": 3,
+      "fully_correct": 3,
+      "partially_correct": 0,
+      "unmatched": 22
+    }
+  },
+  "DCCP_gpt-4o-mini": {
+    "with_partial": {
+      "precision": 0.1454545428099174,
+      "recall": 0.3199999872000005,
+      "f1_score": 0.19999956531341978,
+      "matched": 8,
+      "fully_correct": 0,
+      "partially_correct": 8,
+      "unmatched": 17
+    },
+    "no_partial": {
+      "precision": 0.018181817851239675,
+      "recall": 0.03999999840000006,
+      "f1_score": 0.024999569694881627,
+      "matched": 1,
+      "fully_correct": 1,
+      "partially_correct": 0,
+      "unmatched": 24
+    }
+  },
+  "DCCP_claude-3-7-sonnet-20250219": {
+    "with_partial": {
+      "precision": 0.4749999881250003,
+      "recall": 0.7599999696000012,
+      "f1_score": 0.5846148932548201,
+      "matched": 19,
+      "fully_correct": 2,
+      "partially_correct": 17,
+      "unmatched": 6
+    },
+    "no_partial": {
+      "precision": 0.1499999962500001,
+      "recall": 0.23999999040000036,
+      "f1_score": 0.1846149055633425,
+      "matched": 6,
+      "fully_correct": 6,
+      "partially_correct": 0,
+      "unmatched": 19
+    }
+  },
+  "DCCP_gemini-2.0-flash": {
+    "with_partial": {
+      "precision": 0.36363635537190103,
+      "recall": 0.639999974400001,
+      "f1_score": 0.4637676404121369,
+      "matched": 16,
+      "fully_correct": 3,
+      "partially_correct": 13,
+      "unmatched": 9
+    },
+    "no_partial": {
+      "precision": 0.09090908884297526,
+      "recall": 0.15999999360000025,
+      "f1_score": 0.11594156353891162,
+      "matched": 4,
+      "fully_correct": 4,
+      "partially_correct": 0,
+      "unmatched": 21
+    }
+  },
+  "DHCP_deepseek-reasoner": {
+    "with_partial": {
+      "precision": 0.5999999700000015,
+      "recall": 0.6315789141274255,
+      "f1_score": 0.6153840841555683,
+      "matched": 12,
+      "fully_correct": 6,
+      "partially_correct": 6,
+      "unmatched": 7
+    },
+    "no_partial": {
+      "precision": 0.34999998250000086,
+      "recall": 0.36842103324099823,
+      "f1_score": 0.3589738408948449,
+      "matched": 7,
+      "fully_correct": 7,
+      "partially_correct": 0,
+      "unmatched": 12
+    }
+  },
+  "DHCP_gpt-4o-mini": {
+    "with_partial": {
+      "precision": 0.3461538328402372,
+      "recall": 0.47368418559556913,
+      "f1_score": 0.3999994943215825,
+      "matched": 9,
+      "fully_correct": 5,
+      "partially_correct": 4,
+      "unmatched": 10
+    },
+    "no_partial": {
+      "precision": 0.26923075887574005,
+      "recall": 0.36842103324099823,
+      "f1_score": 0.31111060938348073,
+      "matched": 7,
+      "fully_correct": 7,
+      "partially_correct": 0,
+      "unmatched": 12
+    }
+  },
+  "DHCP_claude-3-7-sonnet-20250219": {
+    "with_partial": {
+      "precision": 0.7777777345679036,
+      "recall": 0.7368420664819965,
+      "f1_score": 0.7567562162165483,
+      "matched": 14,
+      "fully_correct": 7,
+      "partially_correct": 7,
+      "unmatched": 5
+    },
+    "no_partial": {
+      "precision": 0.3888888672839518,
+      "recall": 0.36842103324099823,
+      "f1_score": 0.37837785829138393,
+      "matched": 7,
+      "fully_correct": 7,
+      "partially_correct": 0,
+      "unmatched": 12
+    }
+  },
+  "DHCP_gemini-2.0-flash": {
+    "with_partial": {
+      "precision": 0.2592592496570648,
+      "recall": 0.36842103324099823,
+      "f1_score": 0.30434732797808745,
+      "matched": 7,
+      "fully_correct": 5,
+      "partially_correct": 2,
+      "unmatched": 12
+    },
+    "no_partial": {
+      "precision": 0.22222221399176983,
+      "recall": 0.31578945706371275,
+      "f1_score": 0.26086906899901,
+      "matched": 6,
+      "fully_correct": 6,
+      "partially_correct": 0,
+      "unmatched": 13
+    }
+  },
+  "IMAP_deepseek-reasoner": {
+    "with_partial": {
+      "precision": 0.1714285665306124,
+      "recall": 0.5454544958677732,
+      "f1_score": 0.2608691899815927,
+      "matched": 6,
+      "fully_correct": 0,
+      "partially_correct": 6,
+      "unmatched": 5
+    },
+    "no_partial": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "matched": 0,
+      "fully_correct": 0,
+      "partially_correct": 0,
+      "unmatched": 11
+    }
+  },
+  "IMAP_gpt-4o-mini": {
+    "with_partial": {
+      "precision": 0.08928571269132657,
+      "recall": 0.4545454132231443,
+      "f1_score": 0.14925345243978738,
+      "matched": 5,
+      "fully_correct": 0,
+      "partially_correct": 5,
+      "unmatched": 6
+    },
+    "no_partial": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "matched": 0,
+      "fully_correct": 0,
+      "partially_correct": 0,
+      "unmatched": 11
+    }
+  },
+  "IMAP_claude-3-7-sonnet-20250219": {
+    "with_partial": {
+      "precision": 0.14583333029513895,
+      "recall": 0.636363578512402,
+      "f1_score": 0.23728782418882638,
+      "matched": 7,
+      "fully_correct": 0,
+      "partially_correct": 7,
+      "unmatched": 4
+    },
+    "no_partial": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "matched": 0,
+      "fully_correct": 0,
+      "partially_correct": 0,
+      "unmatched": 11
+    }
+  },
+  "IMAP_gemini-2.0-flash": {
+    "with_partial": {
+      "precision": 0.07777777691358026,
+      "recall": 0.636363578512402,
+      "f1_score": 0.13861366454295163,
+      "matched": 7,
+      "fully_correct": 0,
+      "partially_correct": 7,
+      "unmatched": 4
+    },
+    "no_partial": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "matched": 0,
+      "fully_correct": 0,
+      "partially_correct": 0,
+      "unmatched": 11
+    }
+  }
+}

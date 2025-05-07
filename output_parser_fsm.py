@@ -176,8 +176,10 @@ def extract_final_fsm(directory: str, model: str, protocol: str, output_dir: str
 
 
 if __name__ == "__main__":
-    protocols = ["DCCP","DHCP", "FTP", "IMAP", 
-                 "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP"]
+    # protocols = ["DCCP","DHCP", "FTP", "IMAP", 
+    #              "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP"]
+    # TODO sip!
+    protocols = ["RTSP","SMTP", "TCP"]
     close_models = ["deepseek-reasoner","gpt-4o-mini", "claude-3-7-sonnet-20250219","gemini-2.0-flash"]
     directory = "output"
     fsm_dir = "fsm"

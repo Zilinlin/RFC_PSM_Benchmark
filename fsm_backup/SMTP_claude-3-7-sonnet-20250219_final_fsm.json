@@ -1,0 +1,306 @@
+{
+  "states": [
+    "INITIAL",
+    "GREETING",
+    "MAIL",
+    "RCPT",
+    "DATA",
+    "DATA_TRANSMISSION",
+    "QUIT",
+    "CLOSED"
+  ],
+  "initial_state": "INITIAL",
+  "final_states": [
+    "CLOSED"
+  ],
+  "transitions": [
+    {
+      "from": "INITIAL",
+      "requisite": "Connection established",
+      "to": "GREETING",
+      "actions": [
+        "Server sends greeting"
+      ],
+      "response": "220 Service ready"
+    },
+    {
+      "from": "GREETING",
+      "requisite": "EHLO/HELO command",
+      "to": "MAIL",
+      "actions": [
+        "Server identifies client",
+        "Server lists supported extensions (for EHLO)",
+        "clear_buffers"
+      ],
+      "response": "250 OK"
+    },
+    {
+      "from": "MAIL",
+      "requisite": "MAIL FROM command",
+      "to": "RCPT",
+      "actions": [
+        "Server resets state tables and buffers",
+        "Server records reverse-path",
+        "clear_buffers",
+        "store_reverse_path"
+      ],
+      "response": "250 OK"
+    },
+    {
+      "from": "RCPT",
+      "requisite": "RCPT TO command",
+      "to": "RCPT",
+      "actions": [
+        "Server stores forward-path",
+        "append_forward_path"
+      ],
+      "response": "250 OK"
+    },
+    {
+      "from": "RCPT",
+      "requisite": "DATA command",
+      "to": "DATA",
+      "actions": [
+        "Server prepares to receive message content"
+      ],
+      "response": "354 Start mail input"
+    },
+    {
+      "from": "DATA",
+      "requisite": "Message content",
+      "to": "DATA_TRANSMISSION",
+      "actions": [
+        "Server receives message content"
+      ],
+      "response": ""
+    },
+    {
+      "from": "DATA_TRANSMISSION",
+      "requisite": "End of mail data indicator ('.')",
+      "to": "MAIL",
+      "actions": [
+        "Server processes stored recipients and mail data",
+        "process_mail_transaction",
+        "clear_buffers"
+      ],
+      "response": "250 OK"
+    },
+    {
+      "from": "MAIL",
+      "requisite": "QUIT command",
+      "to": "CLOSED",
+      "actions": [
+        "Server terminates session",
+        "close_connection"
+      ],
+      "response": "221 Service closing transmission channel"
+    },
+    {
+      "from": "RCPT",
+      "requisite": "QUIT command",
+      "to": "CLOSED",
+      "actions": [
+        "close_connection"
+      ],
+      "response": "221 Service closing"
+    },
+    {
+      "from": "DATA",
+      "requisite": "QUIT command",
+      "to": "CLOSED",
+      "actions": [
+        "close_connection"
+      ],
+      "response": "221 Service closing"
+    },
+    {
+      "from": "DATA_TRANSMISSION",
+      "requisite": "QUIT command",
+      "to": "CLOSED",
+      "actions": [
+        "close_connection"
+      ],
+      "response": "221 Service closing"
+    },
+    {
+      "from": "GREETING",
+      "requisite": "QUIT command",
+      "to": "CLOSED",
+      "actions": [
+        "close_connection"
+      ],
+      "response": "221 Service closing"
+    },
+    {
+      "from": "MAIL",
+      "requisite": "RSET command",
+      "to": "MAIL",
+      "actions": [
+        "clear_buffers"
+      ],
+      "response": "250 OK"
+    },
+    {
+      "from": "RCPT",
+      "requisite": "RSET command",
+      "to": "MAIL",
+      "actions": [
+        "clear_buffers"
+      ],
+      "response": "250 OK"
+    },
+    {
+      "from": "DATA",
+      "requisite": "RSET command",
+      "to": "MAIL",
+      "actions": [
+        "clear_buffers"
+      ],
+      "response": "250 OK"
+    },
+    {
+      "from": "DATA_TRANSMISSION",
+      "requisite": "RSET command",
+      "to": "MAIL",
+      "actions": [
+        "clear_buffers"
+      ],
+      "response": "250 OK"
+    },
+    {
+      "from": "MAIL",
+      "requisite": "NOOP command",
+      "to": "MAIL",
+      "actions": [],
+      "response": "250 OK"
+    },
+    {
+      "from": "RCPT",
+      "requisite": "NOOP command",
+      "to": "RCPT",
+      "actions": [],
+      "response": "250 OK"
+    },
+    {
+      "from": "DATA",
+      "requisite": "NOOP command",
+      "to": "DATA",
+      "actions": [],
+      "response": "250 OK"
+    },
+    {
+      "from": "DATA_TRANSMISSION",
+      "requisite": "NOOP command",
+      "to": "DATA_TRANSMISSION",
+      "actions": [],
+      "response": "250 OK"
+    },
+    {
+      "from": "GREETING",
+      "requisite": "NOOP command",
+      "to": "GREETING",
+      "actions": [],
+      "response": "250 OK"
+    },
+    {
+      "from": "MAIL",
+      "requisite": "VRFY command",
+      "to": "MAIL",
+      "actions": [
+        "verify_user"
+      ],
+      "response": "250/251/252 User information"
+    },
+    {
+      "from": "RCPT",
+      "requisite": "VRFY command",
+      "to": "RCPT",
+      "actions": [
+        "verify_user"
+      ],
+      "response": "250/251/252 User information"
+    },
+    {
+      "from": "DATA",
+      "requisite": "VRFY command",
+      "to": "DATA",
+      "actions": [
+        "verify_user"
+      ],
+      "response": "250/251/252 User information"
+    },
+    {
+      "from": "GREETING",
+      "requisite": "VRFY command",
+      "to": "GREETING",
+      "actions": [
+        "verify_user"
+      ],
+      "response": "250/251/252 User information"
+    },
+    {
+      "from": "MAIL",
+      "requisite": "EXPN command",
+      "to": "MAIL",
+      "actions": [
+        "expand_mailing_list"
+      ],
+      "response": "250 Mailing list information"
+    },
+    {
+      "from": "RCPT",
+      "requisite": "EXPN command",
+      "to": "RCPT",
+      "actions": [
+        "expand_mailing_list"
+      ],
+      "response": "250 Mailing list information"
+    },
+    {
+      "from": "DATA",
+      "requisite": "EXPN command",
+      "to": "DATA",
+      "actions": [
+        "expand_mailing_list"
+      ],
+      "response": "250 Mailing list information"
+    },
+    {
+      "from": "GREETING",
+      "requisite": "EXPN command",
+      "to": "GREETING",
+      "actions": [
+        "expand_mailing_list"
+      ],
+      "response": "250 Mailing list information"
+    },
+    {
+      "from": "MAIL",
+      "requisite": "HELP command",
+      "to": "MAIL",
+      "actions": [],
+      "response": "211/214 Help information"
+    },
+    {
+      "from": "RCPT",
+      "requisite": "HELP command",
+      "to": "RCPT",
+      "actions": [],
+      "response": "211/214 Help information"
+    },
+    {
+      "from": "DATA",
+      "requisite": "HELP command",
+      "to": "DATA",
+      "actions": [],
+      "response": "211/214 Help information"
+    },
+    {
+      "from": "GREETING",
+      "requisite": "HELP command",
+      "to": "GREETING",
+      "actions": [],
+      "response": "211/214 Help information"
+    }
+  ]
+}

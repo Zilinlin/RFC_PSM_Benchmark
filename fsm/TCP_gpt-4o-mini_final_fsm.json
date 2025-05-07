@@ -2,113 +2,82 @@
   "states": [
     "CLOSED",
     "LISTEN",
-    "SYN-SENT",
-    "SYN-RECEIVED",
+    "SYN_SENT",
+    "SYN_RECEIVED",
     "ESTABLISHED",
-    "FIN-WAIT-1",
-    "FIN-WAIT-2",
-    "CLOSE-WAIT",
+    "FIN_WAIT_1",
+    "FIN_WAIT_2",
+    "CLOSE_WAIT",
     "CLOSING",
-    "LAST-ACK",
-    "TIME-WAIT"
+    "LAST_ACK",
+    "TIME_WAIT"
   ],
   "initial_state": "CLOSED",
   "final_states": [
-    "LAST-ACK",
-    "TIME-WAIT"
+    "CLOSED",
+    "LAST_ACK",
+    "TIME_WAIT"
   ],
   "transitions": [
     {
       "from": "CLOSED",
-      "requisite": "OPEN call",
-      "to": "LISTEN",
-      "actions": [
-        "create TCB"
-      ],
-      "response": "local connection name"
+      "event": "receive SYN",
+      "action": "send RST",
+      "to": "CLOSED"
+    },
+    {
+      "from": "CLOSED",
+      "event": "receive RST",
+      "action": "send RST",
+      "to": "CLOSED"
     },
     {
       "from": "LISTEN",
-      "requisite": "rcv SYN",
-      "to": "SYN-RECEIVED",
-      "actions": [
-        "set RCV.NXT",
-        "send SYN,ACK"
-      ],
-      "response": "acknowledge SYN"
+      "event": "receive SYN",
+      "action": "send SYN,ACK",
+      "to": "SYN_RECEIVED"
     },
     {
-      "from": "SYN-SENT",
-      "requisite": "rcv SYN,ACK",
-      "to": "ESTABLISHED",
-      "actions": [
-        "set SND.UNA",
-        "send ACK"
-      ],
-      "response": "acknowledge SYN,ACK"
+      "from": "SYN_SENT",
+      "event": "receive SYN,ACK",
+      "action": "set established",
+      "to": "ESTABLISHED"
+    },
+    {
+      "from": "SYN_RECEIVED",
+      "event": "receive RST",
+      "action": "reset connection",
+      "to": "CLOSED"
     },
     {
       "from": "ESTABLISHED",
-      "requisite": "CLOSE call",
-      "to": "FIN-WAIT-1",
-      "actions": [
-        "send FIN"
-      ],
-      "response": "acknowledge FIN"
+      "event": "receive FIN",
+      "action": "send ACK",
+      "to": "CLOSE_WAIT"
     },
     {
-      "from": "FIN-WAIT-1",
-      "requisite": "rcv FIN",
-      "to": "FIN-WAIT-2",
-      "actions": [
-        "send ACK"
-      ],
-      "response": "acknowledge FIN"
+      "from": "CLOSE_WAIT",
+      "event": "receive FIN",
+      "action": "send ACK",
+      "to": "LAST_ACK"
     },
     {
-      "from": "FIN-WAIT-2",
-      "requisite": "rcv FIN",
-      "to": "TIME-WAIT",
-      "actions": [
-        "send ACK"
-      ],
-      "response": "acknowledge FIN"
+      "from": "FIN_WAIT_1",
+      "event": "receive FIN",
+      "action": "send ACK",
+      "to": "FIN_WAIT_2"
     },
     {
-      "from": "TIME-WAIT",
-      "requisite": "timeout",
-      "to": "CLOSED",
-      "actions": [
-        "delete TCB"
-      ],
-      "response": "connection closed"
+      "from": "FIN_WAIT_2",
+      "event": "receive FIN",
+      "action": "send ACK",
+      "to": "TIME_WAIT"
     },
     {
-      "from": "SYN-RECEIVED",
-      "requisite": "rcv RST",
-      "to": "LISTEN",
-      "actions": [
-        "delete TCB"
-      ],
-      "response": "return to LISTEN"
-    },
-    {
-      "from": "CLOSE-WAIT",
-      "requisite": "CLOSE call",
-      "to": "LAST-ACK",
-      "actions": [
-        "send FIN"
-      ],
-      "response": "acknowledge FIN"
-    },
-    {
-      "from": "CLOSING",
-      "requisite": "rcv ACK",
-      "to": "TIME-WAIT",
-      "actions": [
-        "delete TCB"
-      ],
-      "response": "acknowledge FIN"
+      "from": "TIME_WAIT",
+      "event": "timeout",
+      "action": "delete TCB",
+      "to": "CLOSED"
     }
   ]
 }

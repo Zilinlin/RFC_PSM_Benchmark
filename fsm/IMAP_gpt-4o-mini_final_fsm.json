@@ -1,222 +1,372 @@
 {
   "states": [
-    "Client Command State",
-    "Server Response State",
-    "Command Continuation State",
-    "Not Authenticated",
+    "WaitingForCommand",
+    "CommandInProgress",
+    "CommandCompleted",
+    "ErrorDetected",
+    "ReceivingData",
+    "SendingResponse",
+    "NotAuthenticated",
     "Authenticated",
     "Selected",
     "Logout",
-    "Any State",
-    "Not Authenticated State",
-    "Authenticated State",
-    "Selected State",
-    "initial",
-    "authenticated",
-    "selected",
-    "STARTTLS",
-    "AUTHENTICATE",
-    "FETCH",
-    "STORE"
+    "Idle",
+    "WaitingForResponse",
+    "CommandContinuation",
+    "ServiceReady",
+    "TLSNegotiation",
+    "Enabled",
+    "Fetching",
+    "Storing",
+    "LoggingOut",
+    "Cleartext",
+    "WaitingForTLS"
   ],
-  "initial_state": "Client Command State",
+  "initial_state": "WaitingForCommand",
   "final_states": [
+    "CommandCompleted",
+    "ErrorDetected",
     "Logout",
-    "STARTTLS"
+    "Idle",
+    "LoggingOut",
+    "Error"
   ],
   "transitions": [
     {
-      "from": "Client Command State",
-      "requisite": "Client sends command",
-      "to": "Server Response State",
-      "actions": [
-        "Parse command",
-        "Send command to server"
-      ],
-      "response": "Server sends response"
+      "from": "WaitingForCommand",
+      "event": "receive COMMAND",
+      "action": "set CommandInProgress",
+      "to": "CommandInProgress"
     },
     {
-      "from": "Server Response State",
-      "requisite": "Server sends untagged response",
-      "to": "Command Continuation State",
-      "actions": [
-        "Handle untagged response"
-      ],
-      "response": "Client processes response"
+      "from": "CommandInProgress",
+      "event": "receive CONTINUATION",
+      "action": "reply +",
+      "to": "ReceivingData"
     },
     {
-      "from": "Command Continuation State",
-      "requisite": "Server sends command continuation request",
-      "to": "Client Command State",
-      "actions": [
-        "Client sends continuation"
-      ],
-      "response": "Server processes continuation"
+      "from": "ReceivingData",
+      "event": "receive DATA",
+      "action": "set CommandCompleted",
+      "to": "CommandCompleted"
     },
     {
-      "from": "Not Authenticated",
-      "requisite": "connection without pre-authentication",
-      "to": "Not Authenticated",
-      "actions": [],
-      "response": "OK greeting"
+      "from": "CommandInProgress",
+      "event": "receive ERROR",
+      "action": "set ErrorDetected",
+      "to": "ErrorDetected"
     },
     {
-      "from": "Not Authenticated",
-      "requisite": "pre-authenticated connection",
-      "to": "Authenticated",
-      "actions": [],
-      "response": "PREAUTH greeting"
+      "from": "CommandCompleted",
+      "event": "send RESPONSE",
+      "action": "reply OK",
+      "to": "WaitingForCommand"
     },
     {
-      "from": "Not Authenticated",
-      "requisite": "rejected connection",
-      "to": "Logout",
-      "actions": [],
-      "response": "BYE greeting"
+      "from": "ErrorDetected",
+      "event": "send ERROR_RESPONSE",
+      "action": "reply BAD",
+      "to": "WaitingForCommand"
     },
     {
-      "from": "Not Authenticated",
-      "requisite": "successful LOGIN or AUTHENTICATE command",
-      "to": "Authenticated",
-      "actions": [],
-      "response": "success"
+      "from": "NotAuthenticated",
+      "event": "receive LOGIN",
+      "action": "reply 230",
+      "to": "Authenticated"
     },
     {
       "from": "Authenticated",
-      "requisite": "successful SELECT or EXAMINE command",
-      "to": "Selected",
-      "actions": [],
-      "response": "success"
+      "event": "receive SELECT",
+      "action": "reply 200",
+      "to": "Selected"
     },
     {
       "from": "Authenticated",
-      "requisite": "CLOSE or UNSELECT command, unsolicited CLOSED response code, or failed SELECT or EXAMINE command",
-      "to": "Authenticated",
-      "actions": [],
-      "response": "success"
+      "event": "receive CLOSE",
+      "action": "reply 200",
+      "to": "Authenticated"
     },
     {
       "from": "Authenticated",
-      "requisite": "LOGOUT command, server shutdown, or connection closed",
-      "to": "Logout",
-      "actions": [],
-      "response": "server response"
+      "event": "receive UNSELECT",
+      "action": "reply 200",
+      "to": "Authenticated"
     },
     {
       "from": "Selected",
-      "requisite": "LOGOUT command, server shutdown, or connection closed",
-      "to": "Logout",
-      "actions": [],
-      "response": "server response"
+      "event": "receive LOGOUT",
+      "action": "send BYE",
+      "to": "Logout"
     },
     {
-      "from": "Any State",
-      "requisite": "CAPABILITY, NOOP, LOGOUT",
-      "to": "Any State",
-      "actions": [],
-      "response": "OK"
+      "from": "Logout",
+      "event": "timeout",
+      "action": "close connection",
+      "to": "Logout"
     },
     {
-      "from": "Not Authenticated State",
-      "requisite": "STARTTLS, AUTHENTICATE, LOGIN",
-      "to": "Authenticated State",
-      "actions": [],
-      "response": "OK"
+      "from": "NotAuthenticated",
+      "event": "receive PREAUTH",
+      "action": "reply 230",
+      "to": "Authenticated"
     },
     {
-      "from": "Authenticated State",
-      "requisite": "ENABLE, SELECT, EXAMINE, NAMESPACE, CREATE, DELETE, RENAME, SUBSCRIBE, UNSUBSCRIBE, LIST, STATUS, APPEND, IDLE",
-      "to": "Selected State",
-      "actions": [],
-      "response": "OK"
+      "from": "NotAuthenticated",
+      "event": "receive BYE",
+      "action": "close connection",
+      "to": "Logout"
     },
     {
-      "from": "Selected State",
-      "requisite": "CLOSE, UNSELECT, EXPUNGE, SEARCH, FETCH, STORE, COPY, MOVE, UID",
-      "to": "Selected State",
-      "actions": [],
-      "response": "OK"
+      "from": "Idle",
+      "event": "receive COMMAND",
+      "action": "set CommandInProgress",
+      "to": "CommandInProgress"
     },
     {
-      "from": "initial",
-      "requisite": "client sends LOGIN or AUTHENTICATE",
-      "to": "authenticated",
-      "actions": [
-        "process authentication"
-      ],
-      "response": "OK or NO with response code"
+      "from": "CommandInProgress",
+      "event": "send RESPONSE",
+      "action": "set WaitingForResponse",
+      "to": "WaitingForResponse"
     },
     {
-      "from": "authenticated",
-      "requisite": "client selects a mailbox",
-      "to": "selected",
-      "actions": [
-        "check mailbox status"
-      ],
-      "response": "EXISTS or FLAGS response"
+      "from": "WaitingForResponse",
+      "event": "receive COMMAND",
+      "action": "reply ERROR",
+      "to": "WaitingForResponse"
     },
     {
-      "from": "selected",
-      "requisite": "client issues commands",
-      "to": "selected",
-      "actions": [
-        "execute command"
-      ],
-      "response": "untagged responses or command completion"
+      "from": "WaitingForResponse",
+      "event": "timeout 30m",
+      "action": "close session",
+      "to": "Idle"
     },
     {
-      "from": "STARTTLS",
-      "requisite": "Client requests STARTTLS",
-      "to": "AUTHENTICATE",
-      "actions": [
-        "Initiate TLS negotiation"
-      ],
-      "response": "OK Proceed with TLS negotiation"
+      "from": "AnyState",
+      "event": "receive CAPABILITY",
+      "action": "reply OK",
+      "to": "AnyState"
     },
     {
-      "from": "AUTHENTICATE",
-      "requisite": "Client sends authentication data",
-      "to": "SELECT",
-      "actions": [
-        "Authenticate user"
-      ],
-      "response": "OK SCRAM-SHA-256 authentication successful"
+      "from": "AnyState",
+      "event": "receive NOOP",
+      "action": "reply OK",
+      "to": "AnyState"
     },
     {
-      "from": "SELECT",
-      "requisite": "Client selects mailbox",
-      "to": "FETCH",
-      "actions": [
-        "Select mailbox"
-      ],
-      "response": "OK [READ-WRITE] SELECT completed"
+      "from": "AnyState",
+      "event": "receive LOGOUT",
+      "action": "reply BYE",
+      "to": "AnyState"
     },
     {
-      "from": "FETCH",
-      "requisite": "Client requests message data",
-      "to": "STORE",
-      "actions": [
-        "Fetch message data"
-      ],
-      "response": "OK FETCH completed"
+      "from": "NotAuthenticatedState",
+      "event": "receive STARTTLS",
+      "action": "reply OK",
+      "to": "NotAuthenticatedState"
     },
     {
-      "from": "STORE",
-      "requisite": "Client requests to store flags",
-      "to": "LOGOUT",
-      "actions": [
-        "Store flags"
-      ],
-      "response": "OK +FLAGS completed"
+      "from": "NotAuthenticatedState",
+      "event": "receive AUTHENTICATE",
+      "action": "reply OK",
+      "to": "AuthenticatedState"
     },
     {
-      "from": "LOGOUT",
-      "requisite": "Client requests logout",
-      "to": "STARTTLS",
-      "actions": [
-        "Terminate connection"
-      ],
-      "response": "OK LOGOUT completed"
+      "from": "NotAuthenticatedState",
+      "event": "receive LOGIN",
+      "action": "reply OK",
+      "to": "AuthenticatedState"
+    },
+    {
+      "from": "AuthenticatedState",
+      "event": "receive ENABLE",
+      "action": "reply OK",
+      "to": "AuthenticatedState"
+    },
+    {
+      "from": "AuthenticatedState",
+      "event": "receive SELECT",
+      "action": "reply OK",
+      "to": "SelectedState"
+    },
+    {
+      "from": "AuthenticatedState",
+      "event": "receive EXAMINE",
+      "action": "reply OK",
+      "to": "SelectedState"
+    },
+    {
+      "from": "SelectedState",
+      "event": "receive CLOSE",
+      "action": "reply OK",
+      "to": "AuthenticatedState"
+    },
+    {
+      "from": "SelectedState",
+      "event": "receive UNSELECT",
+      "action": "reply OK",
+      "to": "AuthenticatedState"
+    },
+    {
+      "from": "SelectedState",
+      "event": "receive EXPUNGE",
+      "action": "reply OK",
+      "to": "SelectedState"
+    },
+    {
+      "from": "SelectedState",
+      "event": "receive SEARCH",
+      "action": "reply OK",
+      "to": "SelectedState"
+    },
+    {
+      "from": "SelectedState",
+      "event": "receive FETCH",
+      "action": "reply OK",
+      "to": "SelectedState"
+    },
+    {
+      "from": "SelectedState",
+      "event": "receive STORE",
+      "action": "reply OK",
+      "to": "SelectedState"
+    },
+    {
+      "from": "SelectedState",
+      "event": "receive COPY",
+      "action": "reply OK",
+      "to": "SelectedState"
+    },
+    {
+      "from": "SelectedState",
+      "event": "receive MOVE",
+      "action": "reply OK",
+      "to": "SelectedState"
+    },
+    {
+      "from": "SelectedState",
+      "event": "receive UID",
+      "action": "reply OK",
+      "to": "SelectedState"
+    },
+    {
+      "from": "WaitingForReply",
+      "event": "receive COMMAND",
+      "action": "reply CODE",
+      "to": "WaitingForReply"
+    },
+    {
+      "from": "WaitingForReply",
+      "event": "receive STATUS",
+      "action": "reply UNTAGGED",
+      "to": "WaitingForReply"
+    },
+    {
+      "from": "WaitingForReply",
+      "event": "receive DATA",
+      "action": "reply UNTAGGED",
+      "to": "WaitingForReply"
+    },
+    {
+      "from": "WaitingForReply",
+      "event": "receive CONTINUATION",
+      "action": "send CONTINUATION",
+      "to": "CommandContinuation"
+    },
+    {
+      "from": "CommandContinuation",
+      "event": "receive DATA",
+      "action": "reply CODE",
+      "to": "WaitingForReply"
+    },
+    {
+      "from": "Selected",
+      "event": "receive EXISTS",
+      "action": "update mailbox size",
+      "to": "Selected"
+    },
+    {
+      "from": "Selected",
+      "event": "receive EXPUNGE",
+      "action": "update mailbox size",
+      "to": "Selected"
+    },
+    {
+      "from": "ServiceReady",
+      "event": "receive starttls",
+      "action": "reply OK Proceed with TLS negotiation",
+      "to": "TLSNegotiation"
+    },
+    {
+      "from": "TLSNegotiation",
+      "event": "complete TLS negotiation",
+      "action": "send AUTHENTICATE SCRAM-SHA-256",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive SCRAM-SHA-256 authentication successful",
+      "action": "reply ENABLED IMAP4rev2",
+      "to": "Enabled"
+    },
+    {
+      "from": "Enabled",
+      "event": "receive select inbox",
+      "action": "reply SELECT completed",
+      "to": "Selected"
+    },
+    {
+      "from": "Selected",
+      "event": "receive fetch 12 full",
+      "action": "reply FETCH completed",
+      "to": "Fetching"
+    },
+    {
+      "from": "Fetching",
+      "event": "receive fetch 12 body[header]",
+      "action": "reply FETCH completed",
+      "to": "Fetching"
+    },
+    {
+      "from": "Fetching",
+      "event": "receive store 12 +flags \\deleted",
+      "action": "reply +FLAGS completed",
+      "to": "Storing"
+    },
+    {
+      "from": "Storing",
+      "event": "receive logout",
+      "action": "reply LOGOUT completed",
+      "to": "LoggingOut"
+    },
+    {
+      "from": "Cleartext",
+      "event": "receive STARTTLS",
+      "action": "reply 220",
+      "to": "WaitingForTLS"
+    },
+    {
+      "from": "WaitingForTLS",
+      "event": "send TLS negotiation",
+      "action": "reply 200",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive AUTHENTICATE",
+      "action": "reply 200",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Cleartext",
+      "event": "receive AUTHENTICATE",
+      "action": "reply 400",
+      "to": "Error"
+    },
+    {
+      "from": "Error",
+      "event": "timeout 5s",
+      "action": "reset",
+      "to": "Cleartext"
     }
   ]
 }

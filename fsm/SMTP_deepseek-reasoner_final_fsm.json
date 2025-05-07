@@ -1,180 +1,290 @@
 {
   "states": [
-    "INIT",
-    "CONNECTED",
-    "REJECTED",
-    "EHLO_RECEIVED",
-    "MAIL_RECEIVED",
-    "RCPT_RECEIVED",
-    "DATA_RECEIVED",
-    "Processing Data",
-    "CLOSED"
+    "Connected",
+    "AwaitingEhloHelo",
+    "AwaitingQuit",
+    "Ready",
+    "SenderSpecified",
+    "AwaitingRcpt",
+    "RecipientSpecified",
+    "ReceivingData",
+    "ProcessingData",
+    "Closed"
   ],
-  "initial_state": "INIT",
+  "initial_state": "Connected",
   "final_states": [
-    "CLOSED"
+    "Closed"
   ],
   "transitions": [
     {
-      "from": "INIT",
-      "requisite": "connection",
-      "to": "CONNECTED",
-      "actions": [],
-      "response": "220"
+      "from": "Connected",
+      "event": "client_connect",
+      "action": "reply 220",
+      "to": "AwaitingEhloHelo"
     },
     {
-      "from": "INIT",
-      "requisite": "connection",
-      "to": "REJECTED",
-      "actions": [],
-      "response": "554"
+      "from": "Connected",
+      "event": "client_connect",
+      "action": "reply 554",
+      "to": "AwaitingQuit"
     },
     {
-      "from": "CONNECTED",
-      "requisite": "EHLO/HELO",
-      "to": "EHLO_RECEIVED",
-      "actions": [
-        "clear buffers"
-      ],
-      "response": "250 OK"
+      "from": "AwaitingEhloHelo",
+      "event": "receive EHLO",
+      "action": "reply 250",
+      "to": "Ready"
     },
     {
-      "from": "CONNECTED",
-      "requisite": "QUIT command",
-      "to": "CLOSED",
-      "actions": [
-        "close transmission channel"
-      ],
-      "response": "221 Service closing"
+      "from": "AwaitingEhloHelo",
+      "event": "receive HELO",
+      "action": "reply 250",
+      "to": "Ready"
     },
     {
-      "from": "REJECTED",
-      "requisite": "QUIT",
-      "to": "CLOSED",
-      "actions": [],
-      "response": "221"
+      "from": "Ready",
+      "event": "receive MAIL",
+      "action": "reply 250",
+      "to": "AwaitingRcpt"
     },
     {
-      "from": "EHLO_RECEIVED",
-      "requisite": "MAIL",
-      "to": "MAIL_RECEIVED",
-      "actions": [
-        "reset_state"
-      ],
-      "response": "250"
+      "from": "Ready",
+      "event": "receive MAIL FROM",
+      "action": "reply 250 OK",
+      "to": "SenderSpecified"
     },
     {
-      "from": "EHLO_RECEIVED",
-      "requisite": "QUIT",
-      "to": "CLOSED",
-      "actions": [],
-      "response": "221"
+      "from": "SenderSpecified",
+      "event": "receive RCPT TO",
+      "action": "reply 250 OK",
+      "to": "RecipientSpecified"
     },
     {
-      "from": "EHLO_RECEIVED",
-      "requisite": "RSET command",
-      "to": "CONNECTED",
-      "actions": [
-        "clear all buffers"
-      ],
-      "response": "250 OK"
+      "from": "RecipientSpecified",
+      "event": "receive RCPT TO",
+      "action": "reply 250 OK",
+      "to": "RecipientSpecified"
     },
     {
-      "from": "MAIL_RECEIVED",
-      "requisite": "RCPT",
-      "to": "RCPT_RECEIVED",
-      "actions": [
-        "add_recipient"
-      ],
-      "response": "250"
+      "from": "RecipientSpecified",
+      "event": "receive DATA",
+      "action": "reply 354",
+      "to": "ReceivingData"
     },
     {
-      "from": "MAIL_RECEIVED",
-      "requisite": "QUIT",
-      "to": "CLOSED",
-      "actions": [],
-      "response": "221"
+      "from": "AwaitingRcpt",
+      "event": "receive RCPT",
+      "action": "reply 250",
+      "to": "AwaitingRcpt"
     },
     {
-      "from": "MAIL_RECEIVED",
-      "requisite": "RSET command",
-      "to": "CONNECTED",
-      "actions": [
-        "clear all buffers"
-      ],
-      "response": "250 OK"
+      "from": "AwaitingRcpt",
+      "event": "receive DATA",
+      "action": "reply 354",
+      "to": "ReceivingData"
     },
     {
-      "from": "RCPT_RECEIVED",
-      "requisite": "RCPT",
-      "to": "RCPT_RECEIVED",
-      "actions": [
-        "add_recipient"
-      ],
-      "response": "250"
+      "from": "ReceivingData",
+      "event": "receive DataEnd",
+      "action": "reply 250",
+      "to": "Ready"
     },
     {
-      "from": "RCPT_RECEIVED",
-      "requisite": "DATA",
-      "to": "DATA_RECEIVED",
-      "actions": [],
-      "response": "354 Start mail input"
+      "from": "ReceivingData",
+      "event": "receive .",
+      "action": "reply 250 OK",
+      "to": "Ready"
     },
     {
-      "from": "RCPT_RECEIVED",
-      "requisite": "QUIT",
-      "to": "CLOSED",
-      "actions": [],
-      "response": "221"
+      "from": "ReceivingData",
+      "event": "receive data_end",
+      "action": "process_data",
+      "to": "ProcessingData"
     },
     {
-      "from": "RCPT_RECEIVED",
-      "requisite": "RSET command",
-      "to": "CONNECTED",
-      "actions": [
-        "clear all buffers"
-      ],
-      "response": "250 OK"
+      "from": "ProcessingData",
+      "event": "complete",
+      "action": "reply 250",
+      "to": "Ready"
     },
     {
-      "from": "DATA_RECEIVED",
-      "requisite": "data_end",
-      "to": "EHLO_RECEIVED",
-      "actions": [
-        "process_data"
-      ],
-      "response": "250"
+      "from": "ReceivingData",
+      "event": "receive RSET",
+      "action": "reply 250",
+      "to": "Ready"
     },
     {
-      "from": "DATA_RECEIVED",
-      "requisite": "QUIT",
-      "to": "CLOSED",
-      "actions": [],
-      "response": "221"
+      "from": "AwaitingRcpt",
+      "event": "receive RSET",
+      "action": "reply 250",
+      "to": "Ready"
     },
     {
-      "from": "DATA_RECEIVED",
-      "requisite": "mail data + <CRLF>.<CRLF>",
-      "to": "Processing Data",
-      "actions": [
-        "process mail data",
-        "clear buffers"
-      ],
-      "response": "250 OK / 4xx / 5xx"
+      "from": "Ready",
+      "event": "receive RSET",
+      "action": "reply 250",
+      "to": "Ready"
     },
     {
-      "from": "Processing Data",
-      "requisite": "new transaction (MAIL/RCPT)",
-      "to": "EHLO_RECEIVED",
-      "actions": [],
-      "response": ""
+      "from": "SenderSpecified",
+      "event": "receive RSET",
+      "action": "reply 250 OK",
+      "to": "Ready"
     },
     {
-      "from": "Processing Data",
-      "requisite": "QUIT",
-      "to": "CLOSED",
-      "actions": [],
-      "response": ""
+      "from": "RecipientSpecified",
+      "event": "receive RSET",
+      "action": "reply 250 OK",
+      "to": "Ready"
+    },
+    {
+      "from": "Ready",
+      "event": "receive VRFY",
+      "action": "reply 252",
+      "to": "Ready"
+    },
+    {
+      "from": "Ready",
+      "event": "receive NOOP",
+      "action": "reply 250",
+      "to": "Ready"
+    },
+    {
+      "from": "AwaitingEhloHelo",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "Closed"
+    },
+    {
+      "from": "Ready",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "Closed"
+    },
+    {
+      "from": "AwaitingRcpt",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "Closed"
+    },
+    {
+      "from": "ReceivingData",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "Closed"
+    },
+    {
+      "from": "AwaitingQuit",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "Closed"
+    },
+    {
+      "from": "Connected",
+      "event": "invalid_command",
+      "action": "reply 500",
+      "to": "Ready"
+    },
+    {
+      "from": "AwaitingEhloHelo",
+      "event": "invalid_command",
+      "action": "reply 500",
+      "to": "Ready"
+    },
+    {
+      "from": "Ready",
+      "event": "invalid_command",
+      "action": "reply 500",
+      "to": "Ready"
+    },
+    {
+      "from": "AwaitingRcpt",
+      "event": "invalid_command",
+      "action": "reply 500",
+      "to": "Ready"
+    },
+    {
+      "from": "RecipientSpecified",
+      "event": "invalid_command",
+      "action": "reply 500",
+      "to": "Ready"
+    },
+    {
+      "from": "ReceivingData",
+      "event": "invalid_command",
+      "action": "reply 500",
+      "to": "Ready"
+    },
+    {
+      "from": "Connected",
+      "event": "syntax_error",
+      "action": "reply 501",
+      "to": "Ready"
+    },
+    {
+      "from": "AwaitingEhloHelo",
+      "event": "syntax_error",
+      "action": "reply 501",
+      "to": "Ready"
+    },
+    {
+      "from": "Ready",
+      "event": "syntax_error",
+      "action": "reply 501",
+      "to": "Ready"
+    },
+    {
+      "from": "AwaitingRcpt",
+      "event": "syntax_error",
+      "action": "reply 501",
+      "to": "Ready"
+    },
+    {
+      "from": "RecipientSpecified",
+      "event": "syntax_error",
+      "action": "reply 501",
+      "to": "Ready"
+    },
+    {
+      "from": "ReceivingData",
+      "event": "syntax_error",
+      "action": "reply 501",
+      "to": "Ready"
+    },
+    {
+      "from": "Connected",
+      "event": "bad_sequence",
+      "action": "reply 503",
+      "to": "Ready"
+    },
+    {
+      "from": "AwaitingEhloHelo",
+      "event": "bad_sequence",
+      "action": "reply 503",
+      "to": "Ready"
+    },
+    {
+      "from": "Ready",
+      "event": "bad_sequence",
+      "action": "reply 503",
+      "to": "Ready"
+    },
+    {
+      "from": "AwaitingRcpt",
+      "event": "bad_sequence",
+      "action": "reply 503",
+      "to": "Ready"
+    },
+    {
+      "from": "RecipientSpecified",
+      "event": "bad_sequence",
+      "action": "reply 503",
+      "to": "Ready"
+    },
+    {
+      "from": "ReceivingData",
+      "event": "bad_sequence",
+      "action": "reply 503",
+      "to": "Ready"
     }
   ]
 }

@@ -6,41 +6,18 @@ from sentence_transformers import SentenceTransformer, util
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
-def label_sim(a, b, threshold=0.5):
+def compute_similarity(a, b):
     emb1 = model.encode(a, convert_to_tensor=True)
     emb2 = model.encode(b, convert_to_tensor=True)
     sim = util.cos_sim(emb1, emb2).item()
-    return sim > threshold, sim
-
-
-
-def compare_action_lists(a1, a2, threshold=0.5):
-    if not a1 and not a2:
-        return "full"
-    if isinstance(a1, str):
-        a1 = [a1]
-    if isinstance(a2, str):
-        a2 = [a2]
-
-    match_scores = []
-    matches = 0
-    for item1 in a1:
-        for item2 in a2:
-            match, score = label_sim(item1, item2, threshold)
-            match_scores.append(score)
-            if match:
-                matches += 1
-                break
-    if matches == len(a1) == len(a2):
-        return "full", match_scores
-    elif matches > 0:
-        return "partial", match_scores
-    else:
-        return "none", match_scores
+    return sim
 
 
 
 def match_transitions_fuzzy_states(trans1, trans2, threshold=0.5, allow_partial=True):
+    """
+    Compare transitions from two FSMs and classify matches as fully correct, partially correct, or unmatched.
+    """
     matched = []
     unmatched = []
     fully_correct = 0
@@ -48,56 +25,39 @@ def match_transitions_fuzzy_states(trans1, trans2, threshold=0.5, allow_partial=
     trans2_copy = trans2.copy()
 
     for idx1, t1 in enumerate(trans1):
-        # Skip transitions with null 'from' or 'to' fields
-        if t1.get("from") is None or t1.get("to") is None:
-            continue
-
         found = False
         for idx2, t2 in enumerate(trans2_copy):
-            # Skip transitions with null 'from' or 'to' fields
-            if t2.get("from") is None or t2.get("to") is None:
-                continue
+            from_score = compute_similarity(t1.get("from", ""), t2.get("from", ""))
+            to_score = compute_similarity(t1.get("to", ""), t2.get("to", ""))
+            event_score = compute_similarity(t1.get("event", ""), t2.get("event", ""))
+            action_score = compute_similarity(t1.get("action", ""), t2.get("action", ""))
 
-            from_match, from_score = label_sim(t1["from"], t2["from"], threshold)
-            to_match, to_score = label_sim(t1["to"], t2["to"], threshold)
-
-            # Handle 'requisite' field comparison
-            req1 = t1.get("requisite")
-            req2 = t2.get("requisite")
-            if req1 is None and req2 is None:
-                req_match = True
-                req_score = 1.0
-            elif req1 is None or req2 is None:
-                req_match = False
-                req_score = 0.0
-            else:
-                req_match, req_score = label_sim(req1, req2, threshold)
-
-            act_match_type, act_scores = compare_action_lists(t1.get("actions"), t2.get("actions"), threshold)
-
-            # Format action scores for display
-            if isinstance(act_scores, list):
-                act_scores_str = ', '.join(f"{score:.2f}" for score in act_scores)
-            else:
-                act_scores_str = f"{act_scores:.2f}"
+            from_match = from_score >= threshold
+            to_match = to_score >= threshold
+            event_match = event_score >= threshold
+            action_match = action_score >= threshold
 
             # Debugging output
             print(f"\nComparing Transition {idx1} (trans1) with Transition {idx2} (trans2):")
-            print(f"  From: '{t1['from']}' vs '{t2['from']}' | Match: {from_match} | Score: {from_score:.2f}")
-            print(f"  To: '{t1['to']}' vs '{t2['to']}' | Match: {to_match} | Score: {to_score:.2f}")
-            print(f"  Requisite: '{req1}' vs '{req2}' | Match: {req_match} | Score: {req_score:.2f}")
-            print(f"  Actions: {t1.get('actions')} vs {t2.get('actions')} | Match Type: {act_match_type} | Scores: [{act_scores_str}]")
+            print(f"  From: '{t1.get('from')}' vs '{t2.get('from')}' | Match: {from_match} | Score: {from_score:.2f}")
+            print(f"  To: '{t1.get('to')}' vs '{t2.get('to')}' | Match: {to_match} | Score: {to_score:.2f}")
+            print(f"  Event: '{t1.get('event')}' vs '{t2.get('event')}' | Match: {event_match} | Score: {event_score:.2f}")
+            print(f"  Action: '{t1.get('action')}' vs '{t2.get('action')}' | Match: {action_match} | Score: {action_score:.2f}")
 
-            if from_match and to_match and req_match:
-                if act_match_type == "full" or (allow_partial and act_match_type == "partial"):
+            if from_match and to_match:
+                if event_match and action_match:
                     matched.append((t1, t2))
-                    if act_match_type == "full":
-                        fully_correct += 1
-                    elif act_match_type == "partial":
-                        partially_correct += 1
+                    fully_correct += 1
                     trans2_copy.remove(t2)
                     found = True
-                    print("  --> Matched\n")
+                    print("  --> Fully Matched\n")
+                    break
+                elif allow_partial and (event_match or action_match):
+                    matched.append((t1, t2))
+                    partially_correct += 1
+                    trans2_copy.remove(t2)
+                    found = True
+                    print("  --> Partially Matched\n")
                     break
         if not found:
             unmatched.append(t1)
@@ -133,14 +93,14 @@ def evaluate_fsm_similarity(fsm1_json, fsm2_json, allow_partial=True, threshold=
 
 
 def batch_evaluate_fsm_similarity():
-    # TODO IMAP ground truth file is missing, need to handle this case.
+    # IMAP ground truth file is missing, need to handle this case.
     # "IMAP", 
     # "POP3" has bugs
     #protocols = ["IMAP", "POP3"]
-    protocols = ['SMTP'] # check for testing
+    protocols = ["RTSP","SMTP", "TCP"] # check for testing
     #protocols = ["SIP", "RTSP", "DCCP", "DHCP", "FTP", "NNTP", "SMTP", "TCP"]
-    close_models = ["claude-3-7-sonnet-20250219"]
-    # close_models = ["deepseek-reasoner", "gpt-4o-mini", "claude-3-7-sonnet-20250219", "gemini-2.0-flash"]
+    # close_models = ["claude-3-7-sonnet-20250219"]
+    close_models = ["deepseek-reasoner", "gpt-4o-mini", "claude-3-7-sonnet-20250219", "gemini-2.0-flash"]
     fsm_dir = "fsm"
     results = {}
 

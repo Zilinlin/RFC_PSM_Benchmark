@@ -1,239 +1,205 @@
 {
-    "states": ["Init", "Ready", "Play"],
-    "initial_state": "Init",
-    "final_states": [],
-    "transitions": [
-      {
-        "from": "Init",
-        "requisite": "",
-        "to": "Ready",
-        "actions": ["SETUP"],
-        "response": "NRM=1, RP=0.0"
-      },
-      {
-        "from": "Init",
-        "requisite": "Needs Redirect",
-        "to": "Init",
-        "actions": ["SETUP"],
-        "response": "3rr Redirect"
-      },
-      {
-        "from": "Init",
-        "requisite": "No Session hdr",
-        "to": "Init",
-        "actions": ["S -> C: REDIRECT"],
-        "response": "Terminate all SES"
-      },
-      {
-        "from": "Ready",
-        "requisite": "New URI",
-        "to": "Ready",
-        "actions": ["SETUP"],
-        "response": "NRM +=1"
-      },
-      {
-        "from": "Ready",
-        "requisite": "URI Setup prior",
-        "to": "Ready",
-        "actions": ["SETUP"],
-        "response": "Change transport param"
-      },
-      {
-        "from": "Ready",
-        "requisite": "Prs URI",
-        "to": "Init",
-        "actions": ["TEARDOWN"],
-        "response": "No session hdr, NRM = 0"
-      },
-      {
-        "from": "Ready",
-        "requisite": "md URI,NRM=1",
-        "to": "Init",
-        "actions": ["TEARDOWN"],
-        "response": "No Session hdr, NRM = 0"
-      },
-      {
-        "from": "Ready",
-        "requisite": "md URI,NRM>1",
-        "to": "Ready",
-        "actions": ["TEARDOWN"],
-        "response": "Session hdr, NRM -= 1"
-      },
-      {
-        "from": "Ready",
-        "requisite": "Prs URI, No range",
-        "to": "Play",
-        "actions": ["PLAY"],
-        "response": "Play from RP"
-      },
-      {
-        "from": "Ready",
-        "requisite": "Prs URI, Range",
-        "to": "Play",
-        "actions": ["PLAY"],
-        "response": "According to range"
-      },
-      {
-        "from": "Ready",
-        "requisite": "md URI, NRM=1, Range",
-        "to": "Play",
-        "actions": ["PLAY"],
-        "response": "According to range"
-      },
-      {
-        "from": "Ready",
-        "requisite": "md URI, NRM=1",
-        "to": "Play",
-        "actions": ["PLAY"],
-        "response": "Play from RP"
-      },
-      {
-        "from": "Ready",
-        "requisite": "Prs URI",
-        "to": "Ready",
-        "actions": ["PAUSE"],
-        "response": "Return PP"
-      },
-      {
-        "from": "Ready",
-        "requisite": "Terminate-Reason",
-        "to": "Ready",
-        "actions": ["SC:REDIRECT"],
-        "response": "Set RedP"
-      },
-      {
-        "from": "Ready",
-        "requisite": "No Terminate-Reason time parameter",
-        "to": "Init",
-        "actions": ["SC:REDIRECT"],
-        "response": "Session is removed"
-      },
-      {
-        "from": "Ready",
-        "requisite": "",
-        "to": "Init",
-        "actions": ["Timeout"],
-        "response": ""
-      },
-      {
-        "from": "Ready",
-        "requisite": "",
-        "to": "Init",
-        "actions": ["RedP reached"],
-        "response": "TEARDOWN of session"
-      },
-      {
-        "from": "Play",
-        "requisite": "Prs URI",
-        "to": "Ready",
-        "actions": ["PAUSE"],
-        "response": "Set RP to present point"
-      },
-      {
-        "from": "Play",
-        "requisite": "All media",
-        "to": "Play",
-        "actions": ["End of media"],
-        "response": "Set RP = End of media"
-      },
-      {
-        "from": "Play",
-        "requisite": "",
-        "to": "Play",
-        "actions": ["End of range"],
-        "response": "Set RP = End of range"
-      },
-      {
-        "from": "Play",
-        "requisite": "Prs URI, No range",
-        "to": "Play",
-        "actions": ["PLAY"],
-        "response": "Play from present point"
-      },
-      {
-        "from": "Play",
-        "requisite": "Prs URI, Range",
-        "to": "Play",
-        "actions": ["PLAY"],
-        "response": "According to range"
-      },
-      {
-        "from": "Play",
-        "requisite": "",
-        "to": "Play",
-        "actions": ["SC:PLAY_NOTIFY"],
-        "response": "200"
-      },
-      {
-        "from": "Play",
-        "requisite": "New URI",
-        "to": "Play",
-        "actions": ["SETUP"],
-        "response": "455"
-      },
-      {
-        "from": "Play",
-        "requisite": "md URI",
-        "to": "Play",
-        "actions": ["SETUP"],
-        "response": "455"
-      },
-      {
-        "from": "Play",
-        "requisite": "md URI, IFI",
-        "to": "Play",
-        "actions": ["SETUP"],
-        "response": "Change transport param."
-      },
-      {
-        "from": "Play",
-        "requisite": "Prs URI",
-        "to": "Init",
-        "actions": ["TEARDOWN"],
-        "response": "No session hdr"
-      },
-      {
-        "from": "Play",
-        "requisite": "md URI,NRM=1",
-        "to": "Init",
-        "actions": ["TEARDOWN"],
-        "response": "No Session hdr, NRM=0"
-      },
-      {
-        "from": "Play",
-        "requisite": "md URI",
-        "to": "Play",
-        "actions": ["TEARDOWN"],
-        "response": "455"
-      },
-      {
-        "from": "Play",
-        "requisite": "Terminate Reason with Time parameter",
-        "to": "Play",
-        "actions": ["SC:REDIRECT"],
-        "response": "Set RedP"
-      },
-      {
-        "from": "Play",
-        "requisite": "",
-        "to": "Init",
-        "actions": ["SC:REDIRECT"],
-        "response": "Session is removed"
-      },
-      {
-        "from": "Play",
-        "requisite": "",
-        "to": "Init",
-        "actions": ["RedP reached"],
-        "response": "TEARDOWN of session"
-      },
-      {
-        "from": "Play",
-        "requisite": "",
-        "to": "Init",
-        "actions": ["Timeout"],
-        "response": "Stop Media playout"
-      }
-    ]
+  "states": ["Init", "Ready", "Play"],
+  "initial_state": "Init",
+  "final_states": [],
+  "transitions": [
+    {
+      "from": "Init",
+      "event": "cond default",
+      "action": "send SETUP; reply NRM=1, RP=0.0",
+      "to": "Ready"
+    },
+    {
+      "from": "Init",
+      "event": "cond Needs Redirect",
+      "action": "send SETUP; reply 3rr Redirect",
+      "to": "Init"
+    },
+    {
+      "from": "Init",
+      "event": "cond No Session hdr",
+      "action": "send S -> C: REDIRECT; reply Terminate all SES",
+      "to": "Init"
+    },
+    {
+      "from": "Ready",
+      "event": "cond New URI",
+      "action": "send SETUP; reply NRM +=1",
+      "to": "Ready"
+    },
+    {
+      "from": "Ready",
+      "event": "cond URI Setup prior",
+      "action": "send SETUP; reply Change transport param",
+      "to": "Ready"
+    },
+    {
+      "from": "Ready",
+      "event": "cond Prs URI",
+      "action": "send TEARDOWN; reply No session hdr, NRM = 0",
+      "to": "Init"
+    },
+    {
+      "from": "Ready",
+      "event": "cond md URI,NRM=1",
+      "action": "send TEARDOWN; reply No Session hdr, NRM = 0",
+      "to": "Init"
+    },
+    {
+      "from": "Ready",
+      "event": "cond md URI,NRM>1",
+      "action": "send TEARDOWN; reply Session hdr, NRM -= 1",
+      "to": "Ready"
+    },
+    {
+      "from": "Ready",
+      "event": "cond Prs URI, No range",
+      "action": "send PLAY; reply Play from RP",
+      "to": "Play"
+    },
+    {
+      "from": "Ready",
+      "event": "cond Prs URI, Range",
+      "action": "send PLAY; reply According to range",
+      "to": "Play"
+    },
+    {
+      "from": "Ready",
+      "event": "cond md URI, NRM=1, Range",
+      "action": "send PLAY; reply According to range",
+      "to": "Play"
+    },
+    {
+      "from": "Ready",
+      "event": "cond md URI, NRM=1",
+      "action": "send PLAY; reply Play from RP",
+      "to": "Play"
+    },
+    {
+      "from": "Ready",
+      "event": "cond Prs URI",
+      "action": "send PAUSE; reply Return PP",
+      "to": "Ready"
+    },
+    {
+      "from": "Ready",
+      "event": "cond Terminate-Reason",
+      "action": "send SC:REDIRECT; reply Set RedP",
+      "to": "Ready"
+    },
+    {
+      "from": "Ready",
+      "event": "cond No Terminate-Reason time parameter",
+      "action": "send SC:REDIRECT; reply Session is removed",
+      "to": "Init"
+    },
+    {
+      "from": "Ready",
+      "event": "cond default",
+      "action": "timeout",
+      "to": "Init"
+    },
+    {
+      "from": "Ready",
+      "event": "cond default",
+      "action": "cond RedP reached; reply TEARDOWN of session",
+      "to": "Init"
+    },
+    {
+      "from": "Play",
+      "event": "cond Prs URI",
+      "action": "send PAUSE; reply Set RP to present point",
+      "to": "Ready"
+    },
+    {
+      "from": "Play",
+      "event": "cond All media",
+      "action": "set Set RP = End of media",
+      "to": "Play"
+    },
+    {
+      "from": "Play",
+      "event": "cond default",
+      "action": "set Set RP = End of range",
+      "to": "Play"
+    },
+    {
+      "from": "Play",
+      "event": "cond Prs URI, No range",
+      "action": "send PLAY; reply Play from present point",
+      "to": "Play"
+    },
+    {
+      "from": "Play",
+      "event": "cond Prs URI, Range",
+      "action": "send PLAY; reply According to range",
+      "to": "Play"
+    },
+    {
+      "from": "Play",
+      "event": "cond default",
+      "action": "send SC:PLAY_NOTIFY; reply 200",
+      "to": "Play"
+    },
+    {
+      "from": "Play",
+      "event": "cond New URI",
+      "action": "send SETUP; reply 455",
+      "to": "Play"
+    },
+    {
+      "from": "Play",
+      "event": "cond md URI",
+      "action": "send SETUP; reply 455",
+      "to": "Play"
+    },
+    {
+      "from": "Play",
+      "event": "cond md URI, IFI",
+      "action": "send SETUP; reply Change transport param.",
+      "to": "Play"
+    },
+    {
+      "from": "Play",
+      "event": "cond Prs URI",
+      "action": "send TEARDOWN; reply No session hdr",
+      "to": "Init"
+    },
+    {
+      "from": "Play",
+      "event": "cond md URI,NRM=1",
+      "action": "send TEARDOWN; reply No Session hdr, NRM=0",
+      "to": "Init"
+    },
+    {
+      "from": "Play",
+      "event": "cond md URI",
+      "action": "send TEARDOWN; reply 455",
+      "to": "Play"
+    },
+    {
+      "from": "Play",
+      "event": "cond Terminate Reason with Time parameter",
+      "action": "send SC:REDIRECT; reply Set RedP",
+      "to": "Play"
+    },
+    {
+      "from": "Play",
+      "event": "cond default",
+      "action": "send SC:REDIRECT; reply Session is removed",
+      "to": "Init"
+    },
+    {
+      "from": "Play",
+      "event": "cond default",
+      "action": "cond RedP reached; reply TEARDOWN of session",
+      "to": "Init"
+    },
+    {
+      "from": "Play",
+      "event": "cond default",
+      "action": "timeout; reply Stop Media playout",
+      "to": "Init"
+    }
+  ]
 }
-      

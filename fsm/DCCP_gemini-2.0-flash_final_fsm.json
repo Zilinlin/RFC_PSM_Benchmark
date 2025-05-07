@@ -1,414 +1,296 @@
 {
   "states": [
-    "CLOSED",
-    "LISTEN",
-    "REQUEST",
-    "RESPOND",
-    "PARTOPEN",
-    "OPEN",
-    "CLOSEREQ",
-    "CLOSING",
-    "TIMEWAIT",
-    "STABLE",
-    "CHANGING",
-    "UNSTABLE",
-    "Receiving Packet with Data Checksum Option",
-    "Check Data Checksum Feature Enabled",
-    "Check Data Checksum Feature Disabled",
-    "Application Requested Delivery of Known-Corrupt Data",
-    "Application Did Not Request Delivery of Known-Corrupt Data",
-    "Old State 0",
-    "Old State 1",
-    "Old State 3"
+    "Closed",
+    "Listen",
+    "Request",
+    "Respond",
+    "PartOpen",
+    "Open",
+    "CloseReq",
+    "Closing",
+    "TimeWait",
+    "Stable",
+    "Changing",
+    "Unstable",
+    "CheckingDataChecksum",
+    "NotCheckingDataChecksum",
+    "DataChecksumMandatory",
+    "MinimumChecksumCoverageZero",
+    "MinimumChecksumCoverageNonZero",
+    "EcnCapable",
+    "EcnIncapableWaitingConfirm",
+    "EcnIncapable"
   ],
-  "initial_state": "CLOSED",
+  "initial_state": "Closed",
   "final_states": [
-    "CLOSED",
-    "Application Requested Delivery of Known-Corrupt Data",
-    "Application Did Not Request Delivery of Known-Corrupt Data",
-    "Old State 0",
-    "Old State 1",
-    "Old State 3"
+    "Closed",
+    "TimeWait",
+    "EcnIncapable"
   ],
   "transitions": [
     {
-      "from": "CLOSED",
-      "requisite": "Client sends DCCP-Request",
-      "to": "REQUEST",
-      "actions": [
-        "Send DCCP-Request"
-      ],
-      "response": ""
+      "from": "Closed",
+      "event": "send DCCP-Request",
+      "action": "transition Request",
+      "to": "Request"
     },
     {
-      "from": "CLOSED",
-      "requisite": "active open",
-      "to": "REQUEST",
-      "actions": [
-        "snd Request"
-      ],
-      "response": null
+      "from": "Listen",
+      "event": "recv DCCP-Request",
+      "action": "transition Respond",
+      "to": "Respond"
     },
     {
-      "from": "LISTEN",
-      "requisite": "Server receives DCCP-Request",
-      "to": "RESPOND",
-      "actions": [
-        "Receive DCCP-Request"
-      ],
-      "response": "Send DCCP-Response"
+      "from": "Request",
+      "event": "recv DCCP-Response",
+      "action": "transition PartOpen",
+      "to": "PartOpen"
     },
     {
-      "from": "LISTEN",
-      "requisite": "rcv Request",
-      "to": "RESPOND",
-      "actions": [
-        "snd Response"
-      ],
-      "response": null
+      "from": "Respond",
+      "event": "send DCCP-Response",
+      "action": "transition Open",
+      "to": "Open"
     },
     {
-      "from": "REQUEST",
-      "requisite": "Client receives DCCP-Response",
-      "to": "PARTOPEN",
-      "actions": [
-        "Receive DCCP-Response"
-      ],
-      "response": ""
+      "from": "PartOpen",
+      "event": "send DCCP-Ack or DCCP-DataAck",
+      "action": "transition Open",
+      "to": "Open"
     },
     {
-      "from": "REQUEST",
-      "requisite": "rcv Response",
-      "to": "PARTOPEN",
-      "actions": [
-        "snd Ack"
-      ],
-      "response": null
+      "from": "Open",
+      "event": "recv DCCP-CloseReq",
+      "action": "transition CloseReq",
+      "to": "CloseReq"
     },
     {
-      "from": "PARTOPEN",
-      "requisite": "Client sends DCCP-Ack or DCCP-DataAck",
-      "to": "OPEN",
-      "actions": [
-        "Send DCCP-Ack or DCCP-DataAck"
-      ],
-      "response": ""
+      "from": "CloseReq",
+      "event": "send DCCP-Close",
+      "action": "transition Closed",
+      "to": "Closed"
     },
     {
-      "from": "PARTOPEN",
-      "requisite": "rcv packet",
-      "to": "OPEN",
-      "actions": [],
-      "response": null
+      "from": "CloseReq",
+      "event": "send DCCP-Close",
+      "action": "transition TimeWait",
+      "to": "TimeWait"
     },
     {
-      "from": "RESPOND",
-      "requisite": "Server receives DCCP-Ack or DCCP-DataAck",
-      "to": "OPEN",
-      "actions": [
-        "Receive DCCP-Ack or DCCP-DataAck"
-      ],
-      "response": ""
+      "from": "Open",
+      "event": "send DCCP-Close",
+      "action": "transition Closing",
+      "to": "Closing"
     },
     {
-      "from": "RESPOND",
-      "requisite": "rcv Ack/DataAck",
-      "to": "OPEN",
-      "actions": [],
-      "response": null
+      "from": "Closing",
+      "event": "recv DCCP-Reset",
+      "action": "transition Closed",
+      "to": "Closed"
     },
     {
-      "from": "OPEN",
-      "requisite": "Server sends DCCP-CloseReq",
-      "to": "CLOSEREQ",
-      "actions": [
-        "Send DCCP-CloseReq"
-      ],
-      "response": ""
+      "from": "TimeWait",
+      "event": "timeout 2MSL",
+      "action": "transition Closed",
+      "to": "Closed"
     },
     {
-      "from": "OPEN",
-      "requisite": "server active close",
-      "to": "CLOSEREQ",
-      "actions": [
-        "snd CloseReq"
-      ],
-      "response": null
+      "from": "Changing",
+      "event": "recv Confirm R",
+      "action": "ignore",
+      "to": "Changing"
     },
     {
-      "from": "OPEN",
-      "requisite": "active close or rcv CloseReq",
-      "to": "CLOSING",
-      "actions": [
-        "snd Close"
-      ],
-      "response": null
+      "from": "Stable",
+      "event": "send Change L",
+      "action": "transition Changing",
+      "to": "Changing"
     },
     {
-      "from": "OPEN",
-      "requisite": "Client sends DCCP-Close",
-      "to": "CLOSING",
-      "actions": [
-        "Send DCCP-Close"
-      ],
-      "response": null
+      "from": "Changing",
+      "event": "recv Change R",
+      "action": "calc new value, send Confirm L",
+      "to": "Stable"
     },
     {
-      "from": "CLOSEREQ",
-      "requisite": "Client sends DCCP-Close",
-      "to": "CLOSING",
-      "actions": [
-        "Send DCCP-Close"
-      ],
-      "response": null
+      "from": "Changing",
+      "event": "recv empty Confirm R",
+      "action": "revert to old value",
+      "to": "Stable"
     },
     {
-      "from": "CLOSEREQ",
-      "requisite": "rcv Close",
-      "to": "CLOSED",
-      "actions": [
-        "snd Reset"
-      ],
-      "response": null
+      "from": "Stable",
+      "event": "recv Change R",
+      "action": "calc new value, send Confirm L",
+      "to": "Stable"
     },
     {
-      "from": "CLOSING",
-      "requisite": "Server sends DCCP-Reset",
-      "to": "CLOSED",
-      "actions": [
-        "Send DCCP-Reset"
-      ],
-      "response": null
+      "from": "Stable",
+      "event": "pref list changes",
+      "action": "transition Unstable",
+      "to": "Unstable"
     },
     {
-      "from": "CLOSING",
-      "requisite": "rcv Reset",
-      "to": "TIMEWAIT",
-      "actions": [],
-      "response": null
+      "from": "Unstable",
+      "event": "send Change L",
+      "action": "transition Changing",
+      "to": "Changing"
     },
     {
-      "from": "CLOSING",
-      "requisite": "Client enters TIMEWAIT",
-      "to": "TIMEWAIT",
-      "actions": [
-        "Hold state for 2MSL"
-      ],
-      "response": null
+      "from": "Unstable",
+      "event": "recv Confirm R",
+      "action": "ignore",
+      "to": "Unstable"
     },
     {
-      "from": "CLOSING",
-      "requisite": "2MSL timer expires",
-      "to": "CLOSED",
-      "actions": [],
-      "response": null
+      "from": "Unstable",
+      "event": "recv Change R",
+      "action": "ignore",
+      "to": "Unstable"
     },
     {
-      "from": "TIMEWAIT",
-      "requisite": "After 2MSL",
-      "to": "CLOSED",
-      "actions": [],
-      "response": null
+      "from": "Closed",
+      "event": "recv DCCP-Data",
+      "action": "reply DCCP-Sync",
+      "to": "Closed"
     },
     {
-      "from": "Any",
-      "requisite": "rcv Reset",
-      "to": "TIMEWAIT",
-      "actions": [],
-      "response": null
+      "from": "Open",
+      "event": "recv sequence-invalid DCCP-Reset",
+      "action": "reply DCCP-Sync",
+      "to": "Open"
     },
     {
-      "from": "STABLE",
-      "requisite": "rcv Change R",
-      "to": "STABLE",
-      "actions": [
-        "calc new value",
-        "snd Confirm L"
-      ],
-      "response": null
+      "from": "Request",
+      "event": "recv DCCP-Sync",
+      "action": "reply DCCP-Reset",
+      "to": "Request"
     },
     {
-      "from": "STABLE",
-      "requisite": "app/protocol evt : snd Change L",
-      "to": "CHANGING",
-      "actions": [],
-      "response": null
+      "from": "Listen",
+      "event": "recv Request",
+      "action": "send Response",
+      "to": "Respond"
     },
     {
-      "from": "CHANGING",
-      "requisite": "rcv Confirm R",
-      "to": "STABLE",
-      "actions": [
-        "accept value"
-      ],
-      "response": null
+      "from": "Request",
+      "event": "recv Response",
+      "action": "send Ack",
+      "to": "PartOpen"
     },
     {
-      "from": "CHANGING",
-      "requisite": "rcv empty Confirm R",
-      "to": "STABLE",
-      "actions": [
-        "revert to old value"
-      ],
-      "response": null
+      "from": "Respond",
+      "event": "recv Ack",
+      "action": "transition Open",
+      "to": "Open"
     },
     {
-      "from": "CHANGING",
-      "requisite": "timeout/rcv non-ack",
-      "to": "CHANGING",
-      "actions": [
-        "snd Change L"
-      ],
-      "response": "ignore"
+      "from": "PartOpen",
+      "event": "recv packet",
+      "action": "transition Open",
+      "to": "Open"
     },
     {
-      "from": "UNSTABLE",
-      "requisite": "pref list changes",
-      "to": "UNSTABLE",
-      "actions": [],
-      "response": "snd Change L"
+      "from": "Open",
+      "event": "send CloseReq",
+      "action": "transition CloseReq",
+      "to": "CloseReq"
     },
     {
-      "from": "UNSTABLE",
-      "requisite": "rcv Confirm/Change R",
-      "to": "UNSTABLE",
-      "actions": [],
-      "response": "ignore"
+      "from": "Open",
+      "event": "send Close",
+      "action": "transition Closing",
+      "to": "Closing"
     },
     {
-      "from": "Receiving Packet with Data Checksum Option",
-      "requisite": "Check Data Checksum/B is one",
-      "to": "Check Data Checksum Feature Enabled",
-      "actions": [
-        "MUST check Data Checksum option"
-      ],
-      "response": "N/A"
+      "from": "CloseReq",
+      "event": "recv Close",
+      "action": "send Reset",
+      "to": "Closed"
     },
     {
-      "from": "Receiving Packet with Data Checksum Option",
-      "requisite": "Check Data Checksum/B is zero",
-      "to": "Check Data Checksum Feature Disabled",
-      "actions": [
-        "MAY check Data Checksum option"
-      ],
-      "response": "N/A"
+      "from": "Closing",
+      "event": "recv Reset",
+      "action": "transition TimeWait",
+      "to": "TimeWait"
     },
     {
-      "from": "Check Data Checksum Feature Enabled",
-      "requisite": "CRCs differ AND application requested delivery of known-corrupt data",
-      "to": "Application Requested Delivery of Known-Corrupt Data",
-      "actions": [
-        "Deliver data to application with note that it is corrupt",
-        "Report packet as delivered corrupt using Data Dropped option (Drop Code 7)"
-      ],
-      "response": "Acknowledgeable (Received or Received ECN Marked)"
+      "from": "Open",
+      "event": "recv Close",
+      "action": "send Reset",
+      "to": "Closed"
     },
     {
-      "from": "Check Data Checksum Feature Enabled",
-      "requisite": "CRCs differ AND application did not request delivery of known-corrupt data",
-      "to": "Application Did Not Request Delivery of Known-Corrupt Data",
-      "actions": [
-        "Drop application data",
-        "Report data as dropped due to corruption using Data Dropped option (Drop Code 3)"
-      ],
-      "response": "Acknowledgeable (Received or Received ECN Marked)"
+      "from": "ANY",
+      "event": "recv Reset",
+      "action": "transition TimeWait",
+      "to": "TimeWait"
     },
     {
-      "from": "Check Data Checksum Feature Disabled",
-      "requisite": "CRCs differ AND application requested delivery of known-corrupt data",
-      "to": "Application Requested Delivery of Known-Corrupt Data",
-      "actions": [
-        "Deliver data to application with note that it is corrupt",
-        "Report packet as delivered corrupt using Data Dropped option (Drop Code 7)"
-      ],
-      "response": "Acknowledgeable (Received or Received ECN Marked)"
+      "from": "Respond",
+      "event": "timeout 4MSL",
+      "action": "send Reset",
+      "to": "Closed"
     },
     {
-      "from": "Check Data Checksum Feature Disabled",
-      "requisite": "CRCs differ AND application did not request delivery of known-corrupt data",
-      "to": "Application Did Not Request Delivery of Known-Corrupt Data",
-      "actions": [
-        "Drop application data",
-        "Report data as dropped due to corruption using Data Dropped option (Drop Code 3)"
-      ],
-      "response": "Acknowledgeable (Received or Received ECN Marked)"
+      "from": "PartOpen",
+      "event": "timeout 4MSL",
+      "action": "send Reset",
+      "to": "Closed"
     },
     {
-      "from": "Check Data Checksum Feature Enabled",
-      "requisite": "CRCs match",
-      "to": "Receiving Packet with Data Checksum Option",
-      "actions": [],
-      "response": "Acknowledgeable (Received or Received ECN Marked)"
+      "from": "NotCheckingDataChecksum",
+      "event": "recv ChangeRCheckDataChecksum1",
+      "action": "transition DataChecksumMandatory",
+      "to": "DataChecksumMandatory"
     },
     {
-      "from": "Check Data Checksum Feature Disabled",
-      "requisite": "CRCs match",
-      "to": "Receiving Packet with Data Checksum Option",
-      "actions": [],
-      "response": "Acknowledgeable (Received or Received ECN Marked)"
+      "from": "CheckingDataChecksum",
+      "event": "recv DataChecksumOption",
+      "action": "check data checksum",
+      "to": "CheckingDataChecksum"
     },
     {
-      "from": "Old State 0",
-      "requisite": "Received State 0",
-      "to": "Old State 0",
-      "actions": [],
-      "response": null
+      "from": "NotCheckingDataChecksum",
+      "event": "recv DataChecksumOption",
+      "action": "may check data checksum",
+      "to": "NotCheckingDataChecksum"
     },
     {
-      "from": "Old State 0",
-      "requisite": "Received State 1",
-      "to": "Old State 0/1",
-      "actions": [],
-      "response": null
+      "from": "MinimumChecksumCoverageZero",
+      "event": "recv ChangeRMinimumChecksumCoverageValue",
+      "action": "set minimum coverage value",
+      "to": "MinimumChecksumCoverageNonZero"
     },
     {
-      "from": "Old State 0",
-      "requisite": "Received State 3",
-      "to": "Old State 0",
-      "actions": [],
-      "response": null
+      "from": "MinimumChecksumCoverageNonZero",
+      "event": "recv ChangeRMinimumChecksumCoverageZero",
+      "action": "set minimum coverage zero",
+      "to": "MinimumChecksumCoverageZero"
     },
     {
-      "from": "Old State 1",
-      "requisite": "Received State 0",
-      "to": "Old State 1",
-      "actions": [],
-      "response": null
+      "from": "EcnCapable",
+      "event": "cond not ECN capable",
+      "action": "send Change L(ECN Incapable, 1)",
+      "to": "EcnIncapableWaitingConfirm"
     },
     {
-      "from": "Old State 1",
-      "requisite": "Received State 1",
-      "to": "Old State 1",
-      "actions": [],
-      "response": null
+      "from": "EcnIncapableWaitingConfirm",
+      "event": "recv Confirm R(ECN Incapable, 1)",
+      "action": "transition to EcnIncapable",
+      "to": "EcnIncapable"
     },
     {
-      "from": "Old State 1",
-      "requisite": "Received State 3",
-      "to": "Old State 1",
-      "actions": [],
-      "response": null
+      "from": "EcnIncapableWaitingConfirm",
+      "event": "timeout retransmit",
+      "action": "send Change L(ECN Incapable, 1)",
+      "to": "EcnIncapableWaitingConfirm"
     },
     {
-      "from": "Old State 3",
-      "requisite": "Received State 0",
-      "to": "Old State 0",
-      "actions": [],
-      "response": null
-    },
-    {
-      "from": "Old State 3",
-      "requisite": "Received State 1",
-      "to": "Old State 1",
-      "actions": [],
-      "response": null
-    },
-    {
-      "from": "Old State 3",
-      "requisite": "Received State 3",
-      "to": "Old State 3",
-      "actions": [],
-      "response": null
+      "from": "EcnIncapableWaitingConfirm",
+      "event": "recv Data",
+      "action": "reply Data Dropped",
+      "to": "EcnIncapableWaitingConfirm"
     }
   ]
 }

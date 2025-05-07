@@ -1,0 +1,419 @@
+{
+  "states": [
+    "CLOSED",
+    "LISTEN",
+    "REQUEST",
+    "RESPOND",
+    "PARTOPEN",
+    "OPEN",
+    "CLOSEREQ",
+    "CLOSING",
+    "TIMEWAIT",
+    "STABLE",
+    "CHANGING",
+    "UNSTABLE",
+    "Initial State",
+    "Checksum Coverage Set",
+    "Data Checksum Option Set",
+    "Data Checksum Checked",
+    "Corruption Detected",
+    "Data Delivered Corrupt",
+    "Data Dropped Due to Corruption",
+    "Bidirectional Connection",
+    "Unidirectional Connection",
+    "Quiescent State",
+    "Acknowledgement State",
+    "ECN Capable",
+    "ECN Incapable",
+    "Initial",
+    "Timestamp Received",
+    "Timestamp Echo Sent",
+    "Elapsed Time Option Sent",
+    "PMTU Decreased",
+    "Packet Size Check",
+    "Fragmentation Request",
+    "Error Handling",
+    "State 0",
+    "State 1",
+    "State 3"
+  ],
+  "initial_state": "CLOSED",
+  "final_states": [
+    "CLOSED",
+    "TIMEWAIT",
+    "UNSTABLE",
+    "Data Delivered Corrupt",
+    "Data Dropped Due to Corruption",
+    "ECN Incapable",
+    "Error Handling",
+    "State 0"
+  ],
+  "transitions": [
+    {
+      "from": "CLOSED",
+      "requisite": "DCCP-Request sent",
+      "to": "REQUEST",
+      "actions": [],
+      "response": "DCCP-Response received"
+    },
+    {
+      "from": "CLOSED",
+      "requisite": "DCCP-Request(seq 400)",
+      "to": "REQUEST",
+      "actions": [
+        "send DCCP-Sync"
+      ],
+      "response": "DCCP-Sync(seq 11, ack 400)"
+    },
+    {
+      "from": "LISTEN",
+      "requisite": "DCCP-Request received",
+      "to": "RESPOND",
+      "actions": [],
+      "response": "DCCP-Response sent"
+    },
+    {
+      "from": "LISTEN",
+      "requisite": "DCCP-Request(seq 402)",
+      "to": "REQUEST",
+      "actions": [
+        "process DCCP-Request"
+      ],
+      "response": "..."
+    },
+    {
+      "from": "REQUEST",
+      "requisite": "DCCP-Response received",
+      "to": "PARTOPEN",
+      "actions": [],
+      "response": "DCCP-Ack sent"
+    },
+    {
+      "from": "REQUEST",
+      "requisite": "DCCP-Sync(seq 11, ack 400)",
+      "to": "OPEN",
+      "actions": [
+        "send DCCP-SyncAck"
+      ],
+      "response": "DCCP-SyncAck(seq 102, ack 11)"
+    },
+    {
+      "from": "PARTOPEN",
+      "requisite": "DCCP-Data, Ack, DataAck exchanged",
+      "to": "OPEN",
+      "actions": [],
+      "response": "Data transfer ongoing"
+    },
+    {
+      "from": "PARTOPEN",
+      "requisite": "rcv packet",
+      "to": "OPEN",
+      "actions": [],
+      "response": ""
+    },
+    {
+      "from": "OPEN",
+      "requisite": "DCCP-CloseReq received",
+      "to": "CLOSEREQ",
+      "actions": [],
+      "response": "DCCP-Close sent"
+    },
+    {
+      "from": "OPEN",
+      "requisite": "DCCP-Reset(seq 401, ack 11)",
+      "to": "CLOSED",
+      "actions": [
+        "abort connection"
+      ],
+      "response": "CLOSED"
+    },
+    {
+      "from": "OPEN",
+      "requisite": "DCCP-Close sent",
+      "to": "CLOSING",
+      "actions": [
+        "snd Close"
+      ],
+      "response": ""
+    },
+    {
+      "from": "CLOSEREQ",
+      "requisite": "DCCP-Reset received",
+      "to": "CLOSED",
+      "actions": [
+        "snd Reset"
+      ],
+      "response": ""
+    },
+    {
+      "from": "CLOSING",
+      "requisite": "2MSL elapsed",
+      "to": "TIMEWAIT",
+      "actions": [],
+      "response": "Connection in TIMEWAIT"
+    },
+    {
+      "from": "STABLE",
+      "requisite": "rcv Change R",
+      "to": "CHANGING",
+      "actions": [
+        "calc new value",
+        "snd Confirm L"
+      ],
+      "response": "ignore"
+    },
+    {
+      "from": "CHANGING",
+      "requisite": "rcv Confirm R",
+      "to": "STABLE",
+      "actions": [
+        "accept value"
+      ],
+      "response": "snd Confirm L"
+    },
+    {
+      "from": "CHANGING",
+      "requisite": "rcv empty Confirm R",
+      "to": "STABLE",
+      "actions": [
+        "revert to old value"
+      ],
+      "response": "ignore"
+    },
+    {
+      "from": "CHANGING",
+      "requisite": "pref list changes",
+      "to": "UNSTABLE",
+      "actions": [
+        "snd Change L"
+      ],
+      "response": "ignore"
+    },
+    {
+      "from": "UNSTABLE",
+      "requisite": "rcv Confirm/Change R",
+      "to": "CHANGING",
+      "actions": [
+        "ignore"
+      ],
+      "response": "ignore"
+    },
+    {
+      "from": "Initial State",
+      "requisite": "Checksum Coverage requested",
+      "to": "Checksum Coverage Set",
+      "actions": [
+        "Set Checksum Coverage"
+      ],
+      "response": "Checksum Coverage established"
+    },
+    {
+      "from": "Checksum Coverage Set",
+      "requisite": "Data Checksum option included",
+      "to": "Data Checksum Option Set",
+      "actions": [
+        "Include Data Checksum"
+      ],
+      "response": "Data Checksum option set"
+    },
+    {
+      "from": "Data Checksum Option Set",
+      "requisite": "Data Checksum checked",
+      "to": "Data Checksum Checked",
+      "actions": [
+        "Check Data Checksum"
+      ],
+      "response": "Data Checksum checked"
+    },
+    {
+      "from": "Data Checksum Checked",
+      "requisite": "CRC mismatch",
+      "to": "Corruption Detected",
+      "actions": [
+        "Report Corruption"
+      ],
+      "response": "Corruption detected"
+    },
+    {
+      "from": "Corruption Detected",
+      "requisite": "Delivery of corrupt data requested",
+      "to": "Data Delivered Corrupt",
+      "actions": [
+        "Deliver corrupt data"
+      ],
+      "response": "Data delivered as corrupt"
+    },
+    {
+      "from": "Corruption Detected",
+      "requisite": "No delivery of corrupt data requested",
+      "to": "Data Dropped Due to Corruption",
+      "actions": [
+        "Drop corrupt data"
+      ],
+      "response": "Data dropped due to corruption"
+    },
+    {
+      "from": "Bidirectional Connection",
+      "requisite": "DCCP B stops sending data",
+      "to": "Unidirectional Connection",
+      "actions": [
+        "DCCP A acknowledges DCCP B's acks"
+      ],
+      "response": "DCCP A switches to unidirectional ack pattern"
+    },
+    {
+      "from": "Unidirectional Connection",
+      "requisite": "DCCP A sends DCCP-Data or DCCP-DataAck",
+      "to": "Bidirectional Connection",
+      "actions": [
+        "DCCP A acknowledges DCCP B's data"
+      ],
+      "response": "DCCP A switches to bidirectional ack pattern"
+    },
+    {
+      "from": "Unidirectional Connection",
+      "requisite": "DCCP B goes quiescent",
+      "to": "Quiescent State",
+      "actions": [
+        "DCCP A monitors acks-of-acks"
+      ],
+      "response": "DCCP A manages acks-of-acks"
+    },
+    {
+      "from": "Quiescent State",
+      "requisite": "DCCP B sends data",
+      "to": "Unidirectional Connection",
+      "actions": [
+        "DCCP A acknowledges DCCP B's data"
+      ],
+      "response": "DCCP A resumes normal operation"
+    },
+    {
+      "from": "ECN Capable",
+      "requisite": "ECN Incapable feature is set to 1",
+      "to": "ECN Incapable",
+      "actions": [
+        "send Change L(ECN Incapable, 1)"
+      ],
+      "response": "wait for Confirm R(ECN Incapable, 1)"
+    },
+    {
+      "from": "ECN Incapable",
+      "requisite": "Confirm R(ECN Incapable, 1) received",
+      "to": "ECN Incapable",
+      "actions": [
+        "send packets as ECN incapable"
+      ],
+      "response": "accept data only as ECN incapable"
+    },
+    {
+      "from": "ECN Incapable",
+      "requisite": "data received from ECN capable sender",
+      "to": "ECN Incapable",
+      "actions": [
+        "send Data Dropped with Drop Code 0"
+      ],
+      "response": "do not accept data"
+    },
+    {
+      "from": "Initial",
+      "requisite": "Timestamp option received",
+      "to": "Timestamp Received",
+      "actions": [],
+      "response": "Send Timestamp Echo option"
+    },
+    {
+      "from": "Timestamp Received",
+      "requisite": "Send Timestamp Echo",
+      "to": "Timestamp Echo Sent",
+      "actions": [
+        "Include Timestamp Value"
+      ],
+      "response": "Timestamp Echo sent"
+    },
+    {
+      "from": "Timestamp Received",
+      "requisite": "Elapsed Time option received",
+      "to": "Elapsed Time Option Sent",
+      "actions": [
+        "Include Elapsed Time"
+      ],
+      "response": "Elapsed Time option sent"
+    },
+    {
+      "from": "Initial",
+      "requisite": "Connection Established",
+      "to": "Packet Size Check",
+      "actions": [
+        "Initialize PMTU",
+        "Initialize MPS"
+      ],
+      "response": "MPS set based on PMTU and CCMPS"
+    },
+    {
+      "from": "Packet Size Check",
+      "requisite": "Packet Size > MPS",
+      "to": "Error Handling",
+      "actions": [
+        "Return Error to Application"
+      ],
+      "response": "Packet size exceeds MPS"
+    },
+    {
+      "from": "Packet Size Check",
+      "requisite": "Packet Size <= MPS",
+      "to": "Initial",
+      "actions": [
+        "Send Packet"
+      ],
+      "response": "Packet sent successfully"
+    },
+    {
+      "from": "PMTU Decreased",
+      "requisite": "Application Requests Fragmentation",
+      "to": "Fragmentation Request",
+      "actions": [
+        "Allow Fragmentation"
+      ],
+      "response": "Fragmentation allowed for large packets"
+    },
+    {
+      "from": "Error Handling",
+      "requisite": "Application Queries MPS",
+      "to": "Initial",
+      "actions": [
+        "Query New MPS"
+      ],
+      "response": "New MPS value returned"
+    },
+    {
+      "from": "State 3",
+      "requisite": "Packet with Sequence Number S <= buf_ackno arrives",
+      "to": "State 0",
+      "actions": [
+        "Change byte's state"
+      ],
+      "response": "Packet is acknowledged"
+    },
+    {
+      "from": "State 0",
+      "requisite": "Packet with Sequence Number greater than buf_ackno arrives",
+      "to": "State 1",
+      "actions": [
+        "Update buf_head",
+        "Update buf_ackno",
+        "Possibly update buf_nonce"
+      ],
+      "response": "New packet processed"
+    },
+    {
+      "from": "State 1",
+      "requisite": "Packet with Sequence Number S <= buf_ackno arrives",
+      "to": "State 3",
+      "actions": [
+        "Scan table for byte corresponding to S"
+      ],
+      "response": "Check for duplicates"
+    }
+  ]
+}

@@ -2,137 +2,108 @@
   "states": [
     "CLOSED",
     "LISTEN",
-    "SYN-SENT",
-    "SYN-RECEIVED",
+    "SYN_SENT",
+    "SYN_RECEIVED",
     "ESTABLISHED",
-    "FIN-WAIT-1",
-    "FIN-WAIT-2",
-    "CLOSE-WAIT",
+    "FIN_WAIT_1",
+    "FIN_WAIT_2",
+    "CLOSE_WAIT",
     "CLOSING",
-    "LAST-ACK",
-    "TIME-WAIT"
+    "LAST_ACK",
+    "TIME_WAIT"
   ],
-  "initial_state": "CLOSE-WAIT",
+  "initial_state": "CLOSED",
   "final_states": [],
   "transitions": [
     {
       "from": "CLOSED",
-      "requisite": "active OPEN",
-      "to": "SYN-SENT",
-      "actions": [
-        "create TCB",
-        "snd SYN"
-      ],
-      "response": ""
+      "event": "cond active_open",
+      "action": "send SYN",
+      "to": "SYN_SENT"
     },
     {
       "from": "LISTEN",
-      "requisite": "rcv SYN",
-      "to": "SYN-RECEIVED",
-      "actions": [
-        "snd SYN-ACK"
-      ],
-      "response": ""
+      "event": "receive SYN",
+      "action": "send SYN_ACK",
+      "to": "SYN_RECEIVED"
     },
     {
-      "from": "SYN-SENT",
-      "requisite": "rcv SYN+ACK",
-      "to": "ESTABLISHED",
-      "actions": [
-        "snd ACK"
-      ],
-      "response": ""
+      "from": "SYN_SENT",
+      "event": "receive SYN_ACK",
+      "action": "send ACK",
+      "to": "ESTABLISHED"
     },
     {
-      "from": "SYN-RECEIVED",
-      "requisite": "rcv ACK",
-      "to": "ESTABLISHED",
-      "actions": [],
-      "response": ""
+      "from": "SYN_RECEIVED",
+      "event": "receive ACK",
+      "action": "log none",
+      "to": "ESTABLISHED"
     },
     {
       "from": "ESTABLISHED",
-      "requisite": "CLOSE call",
-      "to": "FIN-WAIT-1",
-      "actions": [
-        "snd FIN"
-      ],
-      "response": ""
+      "event": "send FIN",
+      "action": "send FIN",
+      "to": "FIN_WAIT_1"
     },
     {
-      "from": "FIN-WAIT-1",
-      "requisite": "rcv ACK",
-      "to": "FIN-WAIT-2",
-      "actions": [],
-      "response": ""
+      "from": "FIN_WAIT_1",
+      "event": "receive ACK",
+      "action": "log none",
+      "to": "FIN_WAIT_2"
     },
     {
-      "from": "FIN-WAIT-1",
-      "requisite": "rcv FIN",
-      "to": "CLOSING",
-      "actions": [
-        "snd ACK"
-      ],
-      "response": ""
+      "from": "FIN_WAIT_1",
+      "event": "receive FIN",
+      "action": "send ACK",
+      "to": "CLOSING"
     },
     {
-      "from": "FIN-WAIT-2",
-      "requisite": "rcv FIN",
-      "to": "TIME-WAIT",
-      "actions": [
-        "snd ACK"
-      ],
-      "response": ""
+      "from": "FIN_WAIT_2",
+      "event": "receive FIN",
+      "action": "send ACK",
+      "to": "TIME_WAIT"
     },
     {
-      "from": "CLOSE-WAIT",
-      "requisite": "CLOSE call",
-      "to": "LAST-ACK",
-      "actions": [
-        "snd FIN"
-      ],
-      "response": ""
+      "from": "ESTABLISHED",
+      "event": "receive FIN",
+      "action": "send ACK",
+      "to": "CLOSE_WAIT"
+    },
+    {
+      "from": "CLOSE_WAIT",
+      "event": "send FIN",
+      "action": "send FIN",
+      "to": "LAST_ACK"
     },
     {
       "from": "CLOSING",
-      "requisite": "rcv ACK",
-      "to": "TIME-WAIT",
-      "actions": [],
-      "response": ""
+      "event": "receive ACK",
+      "action": "log none",
+      "to": "TIME_WAIT"
     },
     {
-      "from": "LAST-ACK",
-      "requisite": "rcv ACK",
-      "to": "CLOSED",
-      "actions": [
-        "delete TCB"
-      ],
-      "response": ""
+      "from": "LAST_ACK",
+      "event": "receive ACK",
+      "action": "close TCB",
+      "to": "CLOSED"
     },
     {
-      "from": "TIME-WAIT",
-      "requisite": "timeout=2MSL",
-      "to": "CLOSED",
-      "actions": [
-        "delete TCB"
-      ],
-      "response": ""
+      "from": "TIME_WAIT",
+      "event": "timeout 2MSL",
+      "action": "close TCB",
+      "to": "CLOSED"
     },
     {
-      "from": "SYN-RECEIVED",
-      "requisite": "rcv RST (passive OPEN)",
-      "to": "LISTEN",
-      "actions": [],
-      "response": ""
+      "from": "SYN_RECEIVED",
+      "event": "receive RST",
+      "action": "set state LISTEN",
+      "to": "LISTEN"
     },
     {
-      "from": "SYN-RECEIVED",
-      "requisite": "rcv RST (active OPEN)",
-      "to": "CLOSED",
-      "actions": [
-        "delete TCB"
-      ],
-      "response": "connection refused"
+      "from": "SYN_SENT",
+      "event": "receive RST",
+      "action": "close TCB",
+      "to": "CLOSED"
     }
   ]
 }

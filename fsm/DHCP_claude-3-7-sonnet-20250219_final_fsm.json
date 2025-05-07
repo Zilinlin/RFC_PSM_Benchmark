@@ -1,224 +1,124 @@
 {
   "states": [
-    "INIT",
-    "SELECTING",
-    "REQUESTING",
-    "BOUND",
-    "RENEWING",
-    "REBINDING",
-    "INIT-REBOOT",
-    "REBOOTING"
+    "Init",
+    "InitReboot",
+    "Selecting",
+    "Requesting",
+    "Bound",
+    "Renewing",
+    "Rebinding",
+    "Rebooting"
   ],
-  "initial_state": "INIT",
-  "final_states": [
-    "INIT"
-  ],
+  "initial_state": "Init",
+  "final_states": [],
   "transitions": [
     {
-      "from": "INIT",
-      "requisite": "Client begins initialization",
-      "to": "SELECTING",
-      "actions": [
-        "Client broadcasts DHCPDISCOVER"
-      ],
-      "response": "Servers respond with DHCPOFFER"
+      "from": "Init",
+      "event": "send DHCPDISCOVER",
+      "action": "broadcast DHCPDISCOVER",
+      "to": "Selecting"
     },
     {
-      "from": "INIT",
-      "requisite": "-",
-      "to": "SELECTING",
-      "actions": [
-        "Send DHCPDISCOVER"
-      ],
-      "response": null
+      "from": "Selecting",
+      "event": "receive DHCPOFFER",
+      "action": "collect replies",
+      "to": "Selecting"
     },
     {
-      "from": "SELECTING",
-      "requisite": "Client receives one or more DHCPOFFERs",
-      "to": "REQUESTING",
-      "actions": [
-        "Client selects server",
-        "Client broadcasts DHCPREQUEST"
-      ],
-      "response": "Selected server responds with DHCPACK or DHCPNAK"
+      "from": "Selecting",
+      "event": "cond select_configuration",
+      "action": "broadcast DHCPREQUEST",
+      "to": "Requesting"
     },
     {
-      "from": "SELECTING",
-      "requisite": "DHCPOFFER received",
-      "to": "REQUESTING",
-      "actions": [
-        "Select offer",
-        "Send DHCPREQUEST"
-      ],
-      "response": null
+      "from": "Requesting",
+      "event": "receive DHCPACK",
+      "action": "record lease",
+      "to": "Bound"
     },
     {
-      "from": "SELECTING",
-      "requisite": "DHCPOFFER received",
-      "to": "SELECTING",
-      "actions": [
-        "Collect replies"
-      ],
-      "response": null
+      "from": "Requesting",
+      "event": "receive DHCPNAK",
+      "action": "restart configuration",
+      "to": "Init"
     },
     {
-      "from": "REQUESTING",
-      "requisite": "Client receives DHCPACK",
-      "to": "BOUND",
-      "actions": [
-        "Client performs final check",
-        "Client notes lease duration"
-      ],
-      "response": "Client is configured"
+      "from": "Requesting",
+      "event": "timeout DHCPREQUEST",
+      "action": "retransmit DHCPREQUEST",
+      "to": "Requesting"
     },
     {
-      "from": "REQUESTING",
-      "requisite": "DHCPACK received",
-      "to": "BOUND",
-      "actions": [
-        "Record lease",
-        "Set timers T1, T2"
-      ],
-      "response": null
+      "from": "Bound",
+      "event": "cond lease_expired",
+      "action": "send DHCPRELEASE",
+      "to": "Init"
     },
     {
-      "from": "REQUESTING",
-      "requisite": "Client receives DHCPNAK",
-      "to": "INIT",
-      "actions": [
-        "Client restarts configuration process"
-      ],
-      "response": "Client must request new address"
+      "from": "Bound",
+      "event": "cond address_in_use",
+      "action": "send DHCPDECLINE",
+      "to": "Init"
     },
     {
-      "from": "REQUESTING",
-      "requisite": "DHCPNAK received",
-      "to": "INIT",
-      "actions": [
-        "Discard offer"
-      ],
-      "response": null
+      "from": "Bound",
+      "event": "timeout T1",
+      "action": "send DHCPREQUEST",
+      "to": "Renewing"
     },
     {
-      "from": "REQUESTING",
-      "requisite": "Client detects address already in use",
-      "to": "INIT",
-      "actions": [
-        "Client sends DHCPDECLINE",
-        "Client restarts configuration process"
-      ],
-      "response": "Client must request new address"
+      "from": "Renewing",
+      "event": "receive DHCPACK",
+      "action": "record lease",
+      "to": "Bound"
     },
     {
-      "from": "INIT-REBOOT",
-      "requisite": "-",
-      "to": "REBOOTING",
-      "actions": [
-        "Send DHCPREQUEST"
-      ],
-      "response": null
+      "from": "Renewing",
+      "event": "receive DHCPNAK",
+      "action": "restart configuration",
+      "to": "Init"
     },
     {
-      "from": "REBOOTING",
-      "requisite": "DHCPACK received",
-      "to": "BOUND",
-      "actions": [
-        "Record lease",
-        "Set timers T1, T2"
-      ],
-      "response": null
+      "from": "Renewing",
+      "event": "timeout T2",
+      "action": "broadcast DHCPREQUEST",
+      "to": "Rebinding"
     },
     {
-      "from": "REBOOTING",
-      "requisite": "DHCPNAK received",
-      "to": "INIT",
-      "actions": [
-        "Restart"
-      ],
-      "response": null
+      "from": "Rebinding",
+      "event": "receive DHCPACK",
+      "action": "record lease",
+      "to": "Bound"
     },
     {
-      "from": "BOUND",
-      "requisite": "Client chooses to relinquish lease",
-      "to": "INIT",
-      "actions": [
-        "Client sends DHCPRELEASE"
-      ],
-      "response": "Server discards lease"
+      "from": "Rebinding",
+      "event": "receive DHCPNAK",
+      "action": "halt network",
+      "to": "Init"
     },
     {
-      "from": "BOUND",
-      "requisite": "T1 expires",
-      "to": "RENEWING",
-      "actions": [
-        "Send DHCPREQUEST to leasing server"
-      ],
-      "response": null
+      "from": "Rebinding",
+      "event": "lease expired",
+      "action": "halt network",
+      "to": "Init"
     },
     {
-      "from": "BOUND",
-      "requisite": "DHCPOFFER, DHCPACK, DHCPNAK received",
-      "to": "BOUND",
-      "actions": [
-        "Discard"
-      ],
-      "response": null
+      "from": "InitReboot",
+      "event": "send DHCPREQUEST",
+      "action": "verify address",
+      "to": "Rebooting"
     },
     {
-      "from": "RENEWING",
-      "requisite": "DHCPACK received",
-      "to": "BOUND",
-      "actions": [
-        "Record lease",
-        "Set timers T1, T2"
-      ],
-      "response": null
+      "from": "Rebooting",
+      "event": "receive DHCPACK",
+      "action": "record lease",
+      "to": "Bound"
     },
     {
-      "from": "RENEWING",
-      "requisite": "T2 expires",
-      "to": "REBINDING",
-      "actions": [
-        "Broadcast DHCPREQUEST"
-      ],
-      "response": null
-    },
-    {
-      "from": "RENEWING",
-      "requisite": "DHCPNAK received",
-      "to": "INIT",
-      "actions": [
-        "Halt network"
-      ],
-      "response": null
-    },
-    {
-      "from": "REBINDING",
-      "requisite": "DHCPACK received",
-      "to": "BOUND",
-      "actions": [
-        "Record lease",
-        "Set timers T1, T2"
-      ],
-      "response": null
-    },
-    {
-      "from": "REBINDING",
-      "requisite": "Lease expired",
-      "to": "INIT",
-      "actions": [
-        "Halt network"
-      ],
-      "response": null
-    },
-    {
-      "from": "REBINDING",
-      "requisite": "DHCPNAK received",
-      "to": "INIT",
-      "actions": [
-        "Halt network"
-      ],
-      "response": null
+      "from": "Rebooting",
+      "event": "receive DHCPNAK",
+      "action": "discard offer",
+      "to": "Init"
     }
   ]
 }

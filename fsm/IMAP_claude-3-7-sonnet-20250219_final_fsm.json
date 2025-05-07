@@ -1,133 +1,310 @@
 {
   "states": [
-    "Not Authenticated",
+    "Disconnected",
+    "Connected",
+    "NotAuthenticated",
+    "TLSNegotiation",
+    "AuthenticationInProgress",
     "Authenticated",
     "Selected",
+    "CommandInProgress",
+    "CommandContinuation",
     "Logout",
-    "Connection Established",
-    "Connection Closed"
+    "Terminated"
   ],
-  "initial_state": "Connection Established",
+  "initial_state": "Disconnected",
   "final_states": [
-    "Connection Closed"
+    "Logout",
+    "Terminated"
   ],
   "transitions": [
     {
-      "from": "Connection Established",
-      "requisite": "OK greeting",
-      "to": "Not Authenticated",
-      "actions": [
-        "server greeting"
-      ],
-      "response": "connection without pre-authentication"
+      "from": "Disconnected",
+      "event": "establish connection",
+      "action": "send greeting",
+      "to": "Connected"
     },
     {
-      "from": "Connection Established",
-      "requisite": "PREAUTH greeting",
-      "to": "Authenticated",
-      "actions": [
-        "server greeting"
-      ],
-      "response": "pre-authenticated connection"
+      "from": "Connected",
+      "event": "receive command",
+      "action": "parse command",
+      "to": "CommandInProgress"
     },
     {
-      "from": "Connection Established",
-      "requisite": "BYE greeting",
-      "to": "Logout",
-      "actions": [
-        "server greeting"
-      ],
-      "response": "rejected connection"
+      "from": "Connected",
+      "event": "cond server_data_available",
+      "action": "send *",
+      "to": "Connected"
     },
     {
-      "from": "Not Authenticated",
-      "requisite": "successful LOGIN or AUTHENTICATE command",
-      "to": "Authenticated",
-      "actions": [
-        "establish authentication"
-      ],
-      "response": "OK - authenticate/login completed"
+      "from": "CommandInProgress",
+      "event": "cond command_requires_continuation",
+      "action": "send +",
+      "to": "CommandContinuation"
     },
     {
-      "from": "Not Authenticated",
-      "requisite": "STARTTLS command",
-      "to": "Not Authenticated",
-      "actions": [
-        "begin TLS negotiation"
-      ],
-      "response": "OK - starttls completed"
+      "from": "CommandInProgress",
+      "event": "cond command_error",
+      "action": "reply BAD",
+      "to": "Connected"
+    },
+    {
+      "from": "CommandInProgress",
+      "event": "cond command_success",
+      "action": "reply OK",
+      "to": "Connected"
+    },
+    {
+      "from": "CommandInProgress",
+      "event": "cond command_failure",
+      "action": "reply NO",
+      "to": "Connected"
+    },
+    {
+      "from": "CommandContinuation",
+      "event": "receive continuation",
+      "action": "process continuation",
+      "to": "CommandInProgress"
+    },
+    {
+      "from": "Connected",
+      "event": "cond connection_established",
+      "action": "set state",
+      "to": "NotAuthenticated"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive CAPABILITY",
+      "action": "reply CAPABILITY",
+      "to": "NotAuthenticated"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive NOOP",
+      "action": "reply OK",
+      "to": "NotAuthenticated"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive LOGOUT",
+      "action": "reply BYE",
+      "to": "Logout"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive STARTTLS",
+      "action": "reply OK",
+      "to": "TLSNegotiation"
+    },
+    {
+      "from": "TLSNegotiation",
+      "event": "receive AUTHENTICATE",
+      "action": "reply Challenge",
+      "to": "AuthenticationInProgress"
+    },
+    {
+      "from": "AuthenticationInProgress",
+      "event": "receive AuthResponse",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive AUTHENTICATE",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive LOGIN",
+      "action": "reply OK",
+      "to": "Authenticated"
     },
     {
       "from": "Authenticated",
-      "requisite": "successful SELECT or EXAMINE command",
-      "to": "Selected",
-      "actions": [
-        "select mailbox"
-      ],
-      "response": "OK - select/examine completed"
-    },
-    {
-      "from": "Selected",
-      "requisite": "CLOSE command",
-      "to": "Authenticated",
-      "actions": [
-        "remove messages with \\Deleted flag"
-      ],
-      "response": "OK - close completed"
-    },
-    {
-      "from": "Selected",
-      "requisite": "UNSELECT command",
-      "to": "Authenticated",
-      "actions": [
-        "free resources associated with selected mailbox"
-      ],
-      "response": "OK - unselect completed"
-    },
-    {
-      "from": "Selected",
-      "requisite": "SELECT or EXAMINE command",
-      "to": "Selected",
-      "actions": [
-        "deselect current mailbox, select new mailbox"
-      ],
-      "response": "OK - select/examine completed"
-    },
-    {
-      "from": "Not Authenticated",
-      "requisite": "LOGOUT command, server shutdown, or connection closed",
-      "to": "Logout",
-      "actions": [
-        "close connection"
-      ],
-      "response": "BYE followed by OK"
+      "event": "receive CAPABILITY",
+      "action": "reply OK",
+      "to": "Authenticated"
     },
     {
       "from": "Authenticated",
-      "requisite": "LOGOUT command, server shutdown, or connection closed",
-      "to": "Logout",
-      "actions": [
-        "close connection"
-      ],
-      "response": "BYE followed by OK"
+      "event": "receive NOOP",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive LOGOUT",
+      "action": "reply BYE",
+      "to": "Logout"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive ENABLE",
+      "action": "reply ENABLED",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive SELECT",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive EXAMINE",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive CREATE",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive DELETE",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive RENAME",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive SUBSCRIBE",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive UNSUBSCRIBE",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive LIST",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive NAMESPACE",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive STATUS",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive APPEND",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive IDLE",
+      "action": "reply OK",
+      "to": "Authenticated"
     },
     {
       "from": "Selected",
-      "requisite": "LOGOUT command, server shutdown, or connection closed",
-      "to": "Logout",
-      "actions": [
-        "close connection"
-      ],
-      "response": "BYE followed by OK"
+      "event": "receive CAPABILITY",
+      "action": "reply OK",
+      "to": "Selected"
     },
     {
-      "from": "Logout",
-      "requisite": "",
-      "to": "Connection Closed",
-      "actions": [
-        "both sides close the connection"
-      ],
-      "response": ""
+      "from": "Selected",
+      "event": "receive NOOP",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Selected",
+      "event": "receive LOGOUT",
+      "action": "reply BYE",
+      "to": "Logout"
+    },
+    {
+      "from": "Selected",
+      "event": "receive SELECT",
+      "action": "reply CLOSED",
+      "to": "Selected"
+    },
+    {
+      "from": "Selected",
+      "event": "receive EXAMINE",
+      "action": "reply CLOSED",
+      "to": "Selected"
+    },
+    {
+      "from": "Selected",
+      "event": "receive CLOSE",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Selected",
+      "event": "receive UNSELECT",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Selected",
+      "event": "receive EXPUNGE",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Selected",
+      "event": "receive SEARCH",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Selected",
+      "event": "receive FETCH",
+      "action": "reply FETCH",
+      "to": "Selected"
+    },
+    {
+      "from": "Selected",
+      "event": "receive STORE",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Selected",
+      "event": "receive COPY",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Selected",
+      "event": "receive MOVE",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Selected",
+      "event": "receive UID",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Selected",
+      "event": "receive LOGOUT",
+      "action": "reply BYE",
+      "to": "Terminated"
     }
   ]
 }

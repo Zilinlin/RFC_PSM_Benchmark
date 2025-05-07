@@ -1,354 +1,370 @@
 {
   "states": [
-    "Initial Connection",
-    "Session Initiation",
-    "Client Initiation",
-    "Mail Transaction",
-    "Forwarding",
-    "Debugging",
-    "Session Termination",
-    "INITIAL",
-    "DATA_RECEIVED",
-    "FINAL_DELIVERY",
-    "Initial Lookup",
-    "MX Record Found",
-    "CNAME Record Found",
-    "No MX Records",
-    "Error State",
-    "Delivery Attempt",
-    "Message Accepted",
-    "Delivery Failure",
-    "Notification Sent",
-    "Loop Detected",
-    "Message Rejected",
-    "Message Delivered",
-    "Initial",
-    "Mail From",
-    "Recipient",
-    "Data",
-    "Quit"
+    "SMTP_Client",
+    "SMTP_Server",
+    "MailTransaction",
+    "WaitingForReply",
+    "MessageTransfer",
+    "SessionInitiation",
+    "ClientInitiation",
+    "MailTransactionInProgress",
+    "DataReceiving",
+    "TransactionAborted",
+    "TransactionCompleted",
+    "LocatingTargetHost",
+    "MXRecordFound",
+    "ErrorCondition",
+    "MessageQueued",
+    "DeliveryAttempt",
+    "RelayMessage",
+    "FinalDelivery",
+    "AddressResolution",
+    "MessageAccepted",
+    "DeliveryFailure",
+    "NotificationSent",
+    "InvalidReturnAddress",
+    "HostileContentDetected",
+    "LoopDetected",
+    "MessageRepaired",
+    "AwaitingCommand",
+    "VerifyingAddress",
+    "AddressValid",
+    "AddressInvalid",
+    "ClosingConnection",
+    "SendingResponse",
+    "ProcessingRequest",
+    "ServiceReady",
+    "MailFromCommand",
+    "RcptToCommand",
+    "ResetCommand",
+    "VrfyCommand",
+    "UserNotFound",
+    "DataInput",
+    "TransactionClosed"
   ],
-  "initial_state": "Initial Connection",
+  "initial_state": "ServiceReady",
   "final_states": [
-    "Session Termination",
-    "FINAL_DELIVERY",
-    "Error State",
-    "Message Delivered",
-    "Quit"
+    "TransactionClosed",
+    "FinalDelivery",
+    "ErrorCondition",
+    "InvalidReturnAddress",
+    "HostileContentDetected",
+    "LoopDetected",
+    "MessageRepaired",
+    "AddressInvalid"
   ],
   "transitions": [
     {
-      "from": "Initial Connection",
-      "requisite": "Client opens connection",
-      "to": "Session Initiation",
-      "actions": [
-        "Send greeting message"
-      ],
-      "response": "220 Service ready"
+      "from": "ServiceReady",
+      "event": "receive EHLO",
+      "action": "reply 250",
+      "to": "MailAccepted"
     },
     {
-      "from": "Session Initiation",
-      "requisite": "Client sends EHLO or HELO",
-      "to": "Client Initiation",
-      "actions": [
-        "Identify client"
-      ],
-      "response": "250 OK"
+      "from": "MailAccepted",
+      "event": "receive MAIL FROM",
+      "action": "reply 250",
+      "to": "MailFromCommand"
     },
     {
-      "from": "Client Initiation",
-      "requisite": "Client sends MAIL command",
-      "to": "Mail Transaction",
-      "actions": [
-        "Start mail transaction"
-      ],
-      "response": "250 OK"
+      "from": "MailFromCommand",
+      "event": "receive RCPT TO",
+      "action": "reply 250",
+      "to": "MailAccepted"
     },
     {
-      "from": "Mail Transaction",
-      "requisite": "Client sends RCPT command",
-      "to": "Mail Transaction",
-      "actions": [
-        "Add recipient"
-      ],
-      "response": "250 OK"
+      "from": "MailFromCommand",
+      "event": "receive RCPT TO",
+      "action": "reply 550",
+      "to": "UserNotFound"
     },
     {
-      "from": "Mail Transaction",
-      "requisite": "Client sends DATA command",
-      "to": "Mail Transaction",
-      "actions": [
-        "Receive mail data"
-      ],
-      "response": "354 Start mail input"
+      "from": "MailAccepted",
+      "event": "receive DATA",
+      "action": "reply 354",
+      "to": "DataInput"
     },
     {
-      "from": "Mail Transaction",
-      "requisite": "Client sends end of mail data",
-      "to": "Session Termination",
-      "actions": [
-        "Process mail data"
-      ],
-      "response": "250 OK"
+      "from": "DataInput",
+      "event": "receive message",
+      "action": "reply 250",
+      "to": "TransactionClosed"
     },
     {
-      "from": "Session Termination",
-      "requisite": "Client sends QUIT command",
-      "to": "Initial Connection",
-      "actions": [
-        "Close connection"
-      ],
-      "response": "221 Service closing transmission channel"
+      "from": "TransactionClosed",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "ServiceReady"
     },
     {
-      "from": "INITIAL",
-      "requisite": "EHLO or HELO command received",
-      "to": "MAIL_TRANSACTION",
-      "actions": [
-        "clear buffers",
-        "initialize transaction"
-      ],
-      "response": "250 OK"
+      "from": "MailAccepted",
+      "event": "receive RSET",
+      "action": "reply 250",
+      "to": "ServiceReady"
     },
     {
-      "from": "MAIL_TRANSACTION",
-      "requisite": "MAIL command received",
-      "to": "MAIL_TRANSACTION",
-      "actions": [
-        "clear forward-path buffer",
-        "insert reverse-path"
-      ],
-      "response": "250 OK"
+      "from": "MailAccepted",
+      "event": "receive VRFY",
+      "action": "reply 250",
+      "to": "VrfyCommand"
     },
     {
-      "from": "MAIL_TRANSACTION",
-      "requisite": "RCPT command received",
-      "to": "MAIL_TRANSACTION",
-      "actions": [
-        "append forward-path"
-      ],
-      "response": "250 OK"
+      "from": "SMTP_Client",
+      "event": "receive EHLO",
+      "action": "reply 250",
+      "to": "WaitingForReply"
     },
     {
-      "from": "MAIL_TRANSACTION",
-      "requisite": "DATA command received",
-      "to": "DATA_RECEIVED",
-      "actions": [
-        "start receiving mail data"
-      ],
-      "response": "354 Start mail input; end with <CRLF>.<CRLF>"
+      "from": "WaitingForReply",
+      "event": "receive MAIL",
+      "action": "reply 250",
+      "to": "MailTransaction"
     },
     {
-      "from": "DATA_RECEIVED",
-      "requisite": "End of mail data indication received",
-      "to": "FINAL_DELIVERY",
-      "actions": [
-        "process mail data",
-        "clear buffers"
-      ],
-      "response": "250 OK"
+      "from": "MailTransaction",
+      "event": "receive RCPT",
+      "action": "reply 250",
+      "to": "MailTransaction"
     },
     {
-      "from": "MAIL_TRANSACTION",
-      "requisite": "RSET command received",
-      "to": "INITIAL",
-      "actions": [
-        "clear all buffers"
-      ],
-      "response": "250 OK"
+      "from": "MailTransaction",
+      "event": "receive DATA",
+      "action": "reply 354",
+      "to": "MessageTransfer"
     },
     {
-      "from": "MAIL_TRANSACTION",
-      "requisite": "QUIT command received",
-      "to": "INITIAL",
-      "actions": [
-        "close connection"
-      ],
-      "response": "221 OK"
+      "from": "MessageTransfer",
+      "event": "receive END_DATA",
+      "action": "reply 250",
+      "to": "WaitingForReply"
     },
     {
-      "from": "Initial Lookup",
-      "requisite": "DNS lookup performed",
-      "to": "MX Record Found",
-      "actions": [
-        "Check for MX records"
-      ],
-      "response": "Proceed to check MX records"
+      "from": "SessionInitiation",
+      "event": "receive CONNECT",
+      "action": "reply 220",
+      "to": "ClientInitiation"
     },
     {
-      "from": "Initial Lookup",
-      "requisite": "CNAME record found",
-      "to": "CNAME Record Found",
-      "actions": [
-        "Process CNAME as initial name"
-      ],
-      "response": "Retry lookup with CNAME"
+      "from": "ClientInitiation",
+      "event": "receive EHLO",
+      "action": "reply 250",
+      "to": "MailTransaction"
     },
     {
-      "from": "MX Record Found",
-      "requisite": "MX records usable",
-      "to": "Delivery Attempt",
-      "actions": [
-        "Sort MX records",
-        "Attempt delivery"
-      ],
-      "response": "Delivery attempt initiated"
+      "from": "MailTransaction",
+      "event": "receive END_OF_DATA",
+      "action": "reply 250",
+      "to": "SessionInitiation"
     },
     {
-      "from": "MX Record Found",
-      "requisite": "No usable MX records",
-      "to": "Error State",
-      "actions": [
-        "Report error"
-      ],
-      "response": "Error reported: No usable MX records"
+      "from": "SessionInitiation",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "TerminatingSessions"
     },
     {
-      "from": "CNAME Record Found",
-      "requisite": "MX records found",
-      "to": "Delivery Attempt",
-      "actions": [
-        "Sort MX records",
-        "Attempt delivery"
-      ],
-      "response": "Delivery attempt initiated"
+      "from": "TerminatingSessions",
+      "event": "timeout 5s",
+      "action": "close connection",
+      "to": "SessionInitiation"
     },
     {
-      "from": "CNAME Record Found",
-      "requisite": "No MX records",
-      "to": "Error State",
-      "actions": [
-        "Report error"
-      ],
-      "response": "Error reported: No MX records"
+      "from": "InitialState",
+      "event": "receive EHLO",
+      "action": "reply 250",
+      "to": "WaitingForReply"
     },
     {
-      "from": "Error State",
-      "requisite": "Temporary error returned",
-      "to": "Initial Lookup",
-      "actions": [
-        "Queue message",
-        "Retry later"
-      ],
-      "response": "Message queued for retry"
+      "from": "InitialState",
+      "event": "receive HELO",
+      "action": "reply 250",
+      "to": "WaitingForReply"
     },
     {
-      "from": "Message Accepted",
-      "requisite": "Delivery Failure Occurs",
-      "to": "Delivery Failure",
-      "actions": [
-        "Formulate Notification"
-      ],
-      "response": "Notification Required"
+      "from": "WaitingForReply",
+      "event": "receive MAIL",
+      "action": "reply 250",
+      "to": "MailTransactionInProgress"
     },
     {
-      "from": "Delivery Failure",
-      "requisite": "Valid Return Path",
-      "to": "Notification Sent",
-      "actions": [
-        "Send Notification"
-      ],
-      "response": "Notification Sent"
+      "from": "MailTransactionInProgress",
+      "event": "receive RCPT",
+      "action": "reply 250",
+      "to": "MailTransactionInProgress"
     },
     {
-      "from": "Delivery Failure",
-      "requisite": "Null Return Path",
-      "to": "Message Delivered",
-      "actions": [
-        "Log Event"
-      ],
-      "response": "No Notification Sent"
+      "from": "MailTransactionInProgress",
+      "event": "receive DATA",
+      "action": "reply 354",
+      "to": "DataReceiving"
     },
     {
-      "from": "Message Accepted",
-      "requisite": "Loop Detected",
-      "to": "Loop Detected",
-      "actions": [
-        "Stop Processing"
-      ],
-      "response": "Loop Handling Initiated"
+      "from": "DataReceiving",
+      "event": "receive <CRLF>.<CRLF>",
+      "action": "reply 250",
+      "to": "TransactionCompleted"
     },
     {
-      "from": "Message Accepted",
-      "requisite": "Hostile Content Detected",
-      "to": "Message Rejected",
-      "actions": [
-        "Reject Message"
-      ],
-      "response": "Message Rejected"
+      "from": "MailTransactionInProgress",
+      "event": "receive RSET",
+      "action": "reply 250",
+      "to": "TransactionAborted"
     },
     {
-      "from": "Message Accepted",
-      "requisite": "Valid Message",
-      "to": "Message Delivered",
-      "actions": [
-        "Deliver Message"
-      ],
-      "response": "Message Delivered"
+      "from": "MailTransactionInProgress",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "InitialState"
     },
     {
-      "from": "Initial",
-      "requisite": "EHLO or HELO command",
-      "to": "Mail From",
-      "actions": [
-        "Send greeting",
-        "List capabilities"
-      ],
-      "response": "250 OK"
+      "from": "TransactionAborted",
+      "event": "receive EHLO",
+      "action": "reply 250",
+      "to": "WaitingForReply"
     },
     {
-      "from": "Mail From",
-      "requisite": "MAIL FROM command",
-      "to": "Recipient",
-      "actions": [
-        "Accept sender"
-      ],
-      "response": "250 OK"
+      "from": "TransactionCompleted",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "InitialState"
     },
     {
-      "from": "Recipient",
-      "requisite": "RCPT TO command",
-      "to": "Recipient",
-      "actions": [
-        "Check recipient"
-      ],
-      "response": "250 OK or 550 No such user here"
+      "from": "LocatingTargetHost",
+      "event": "receive DNS_LOOKUP",
+      "action": "set MXRecordFound",
+      "to": "MXRecordFound"
     },
     {
-      "from": "Recipient",
-      "requisite": "DATA command",
-      "to": "Data",
-      "actions": [
-        "Prepare to receive message"
-      ],
-      "response": "354 Start mail input; end with <CRLF>.<CRLF>"
+      "from": "MXRecordFound",
+      "event": "cond CNAME_FOUND",
+      "action": "set AddressResolution",
+      "to": "AddressResolution"
     },
     {
-      "from": "Data",
-      "requisite": "End of message",
-      "to": "Quit",
-      "actions": [
-        "Process message"
-      ],
-      "response": "250 OK"
+      "from": "MXRecordFound",
+      "event": "cond NON_EXISTENT_DOMAIN",
+      "action": "reply error",
+      "to": "ErrorCondition"
     },
     {
-      "from": "Any",
-      "requisite": "QUIT command",
-      "to": "Quit",
-      "actions": [
-        "Close connection"
-      ],
-      "response": "221 Service closing transmission channel"
+      "from": "MXRecordFound",
+      "event": "cond TEMPORARY_ERROR",
+      "action": "set MessageQueued",
+      "to": "MessageQueued"
     },
     {
-      "from": "Recipient",
-      "requisite": "RSET command",
-      "to": "Mail From",
-      "actions": [
-        "Reset transaction"
-      ],
-      "response": "250 OK"
+      "from": "MXRecordFound",
+      "event": "cond EMPTY_MX_LIST",
+      "action": "set DeliveryAttempt",
+      "to": "DeliveryAttempt"
+    },
+    {
+      "from": "DeliveryAttempt",
+      "event": "receive DELIVERY_SUCCESS",
+      "action": "send success",
+      "to": "FinalDelivery"
+    },
+    {
+      "from": "DeliveryAttempt",
+      "event": "cond MX_UNUSABLE",
+      "action": "reply error",
+      "to": "ErrorCondition"
+    },
+    {
+      "from": "RelayMessage",
+      "event": "receive RELAY_MESSAGE",
+      "action": "send success",
+      "to": "FinalDelivery"
+    },
+    {
+      "from": "RelayMessage",
+      "event": "cond NO_RECORDS_LEFT",
+      "action": "reply undeliverable",
+      "to": "ErrorCondition"
+    },
+    {
+      "from": "MessageAccepted",
+      "event": "receive DATA",
+      "action": "reply 250 OK",
+      "to": "DeliveryFailure"
+    },
+    {
+      "from": "DeliveryFailure",
+      "event": "cond delivery_failed",
+      "action": "send notification",
+      "to": "NotificationSent"
+    },
+    {
+      "from": "NotificationSent",
+      "event": "receive null address",
+      "action": "stop notification",
+      "to": "MessageAccepted"
+    },
+    {
+      "from": "DeliveryFailure",
+      "event": "cond invalid_return_address",
+      "action": "log invalid address",
+      "to": "InvalidReturnAddress"
+    },
+    {
+      "from": "DeliveryFailure",
+      "event": "cond hostile_content",
+      "action": "log hostile content",
+      "to": "HostileContentDetected"
+    },
+    {
+      "from": "MessageAccepted",
+      "event": "receive loop detected",
+      "action": "reply 550 Loop Detected",
+      "to": "LoopDetected"
+    },
+    {
+      "from": "MessageAccepted",
+      "event": "cond repair_needed",
+      "action": "set message repaired",
+      "to": "MessageRepaired"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive VRFY",
+      "action": "send 252",
+      "to": "VerifyingAddress"
+    },
+    {
+      "from": "VerifyingAddress",
+      "event": "receive ADDRESS",
+      "action": "reply 250",
+      "to": "AddressValid"
+    },
+    {
+      "from": "VerifyingAddress",
+      "event": "receive ADDRESS",
+      "action": "reply 550",
+      "to": "AddressInvalid"
+    },
+    {
+      "from": "AddressInvalid",
+      "event": "timeout",
+      "action": "close",
+      "to": "ClosingConnection"
+    },
+    {
+      "from": "AddressValid",
+      "event": "receive RCPT",
+      "action": "send 251",
+      "to": "MailAccepted"
+    },
+    {
+      "from": "MailRejected",
+      "event": "receive RCPT",
+      "action": "send 550",
+      "to": "ClosingConnection"
+    },
+    {
+      "from": "ProcessingRequest",
+      "event": "receive END",
+      "action": "send 250",
+      "to": "ClosingConnection"
     }
   ]
 }

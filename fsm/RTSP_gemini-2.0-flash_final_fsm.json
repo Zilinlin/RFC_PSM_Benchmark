@@ -1,324 +1,496 @@
 {
   "states": [
-    "Init",
+    "Initial",
     "Ready",
-    "Play",
-    "Client sends RTSP request with Accept-Credentials: User",
-    "Proxy sets up TLS session to next hop",
-    "Proxy extracts peer certificate chain",
-    "Proxy checks for matching identity and hash in Accept-Credentials header",
-    "Certificate Match",
-    "Certificate Mismatch",
-    "Proxy responds with 470 or 407 and Connection-Credentials header",
-    "Client receives 470 or 407 with Connection-Credentials",
-    "Client decides to accept certificate",
-    "Client decides to reject certificate",
-    "Client resends RTSP request with Accept-Credentials including certificate hash",
-    "Proxy forwards request to next hop"
+    "Playing",
+    "Paused",
+    "TeardownRequested",
+    "Terminated",
+    "AwaitingRequest",
+    "ProcessingRequest",
+    "SendingResponse",
+    "ClosingConnection",
+    "RtpDataSent",
+    "RtcpDataSent",
+    "ClientRequestSent",
+    "ClientEvaluateCertificate",
+    "ProxyEvaluateCertificate",
+    "ProxyForwardRequest",
+    "ConnectionAuthorized"
   ],
-  "initial_state": "Init",
+  "initial_state": "Initial",
   "final_states": [
-    "Certificate Match",
-    "Certificate Mismatch"
+    "Terminated",
+    "ClosingConnection"
   ],
   "transitions": [
     {
-      "from": "Init",
-      "requisite": "SETUP request",
-      "to": "Ready",
-      "actions": [
-        "Create RTSP session",
-        "Specify transport mechanism"
-      ],
-      "response": "200 OK (with Session header)"
-    },
-    {
-      "from": "Init",
-      "actions": ["SETUP"],
-      "requisite": "None",
-      "to": "Ready",
-      "response": "NRM=1, RP=0.0"
-    },
-    {
-      "from": "Init",
-      "actions": ["SETUP"],
-      "requisite": "Needs Redirect",
-      "to": "Init",
-      "response": "3rr Redirect"
+      "from": "Initial",
+      "event": "receive SETUP",
+      "action": "reply 200",
+      "to": "Ready"
     },
     {
       "from": "Ready",
-      "requisite": "SETUP request",
-      "to": "Ready",
-      "actions": [
-        "Change transport parameters"
-      ],
-      "response": "200 OK"
+      "event": "receive SETUP",
+      "action": "reply 200",
+      "to": "Ready"
     },
     {
       "from": "Ready",
-      "actions": ["SETUP"],
-      "requisite": "New URI",
-      "to": "Ready",
-      "response": "NRM +=1"
+      "event": "receive PLAY",
+      "action": "reply 200",
+      "to": "Playing"
+    },
+    {
+      "from": "Playing",
+      "event": "receive PAUSE",
+      "action": "reply 200",
+      "to": "Paused"
+    },
+    {
+      "from": "Paused",
+      "event": "receive PLAY",
+      "action": "reply 200",
+      "to": "Playing"
+    },
+    {
+      "from": "Playing",
+      "event": "receive PLAY_NOTIFY",
+      "action": "send stream_end",
+      "to": "Playing"
     },
     {
       "from": "Ready",
-      "actions": ["SETUP"],
-      "requisite": "URI Setup prior",
-      "to": "Ready",
-      "response": "Change transport param"
+      "event": "receive TEARDOWN",
+      "action": "reply 200",
+      "to": "Terminated"
+    },
+    {
+      "from": "Playing",
+      "event": "receive TEARDOWN",
+      "action": "reply 200",
+      "to": "Terminated"
+    },
+    {
+      "from": "Paused",
+      "event": "receive TEARDOWN",
+      "action": "reply 200",
+      "to": "Terminated"
     },
     {
       "from": "Ready",
-      "requisite": "PLAY request",
-      "to": "Play",
-      "actions": [
-        "Start sending data"
-      ],
-      "response": "200 OK (with Range and RTP-Info headers)"
+      "event": "timeout session_timeout",
+      "action": "send TEARDOWN",
+      "to": "Terminated"
+    },
+    {
+      "from": "Playing",
+      "event": "timeout session_timeout",
+      "action": "send TEARDOWN",
+      "to": "Terminated"
+    },
+    {
+      "from": "Paused",
+      "event": "timeout session_timeout",
+      "action": "send TEARDOWN",
+      "to": "Terminated"
     },
     {
       "from": "Ready",
-      "actions": ["PLAY"],
-      "requisite": "Prs URI, No range",
-      "to": "Play",
-      "response": "Play from RP"
+      "event": "receive REDIRECT",
+      "action": "reply 302",
+      "to": "TeardownRequested"
+    },
+    {
+      "from": "Playing",
+      "event": "receive REDIRECT",
+      "action": "reply 302",
+      "to": "TeardownRequested"
+    },
+    {
+      "from": "Paused",
+      "event": "receive REDIRECT",
+      "action": "reply 302",
+      "to": "TeardownRequested"
+    },
+    {
+      "from": "TeardownRequested",
+      "event": "timeout deadline",
+      "action": "send TEARDOWN",
+      "to": "Terminated"
+    },
+    {
+      "from": "AwaitingRequest",
+      "event": "cond RequestComplete",
+      "action": "process Request",
+      "to": "ProcessingRequest"
+    },
+    {
+      "from": "AwaitingRequest",
+      "event": "timeout IncompleteMessage",
+      "action": "close Connection",
+      "to": "ClosingConnection"
+    },
+    {
+      "from": "ProcessingRequest",
+      "event": "cond ResponseReady",
+      "action": "send Response",
+      "to": "SendingResponse"
+    },
+    {
+      "from": "ProcessingRequest",
+      "event": "cond Overload",
+      "action": "reply 503",
+      "to": "SendingResponse"
+    },
+    {
+      "from": "SendingResponse",
+      "event": "cond PersistentConnection",
+      "action": "reset Timeout",
+      "to": "AwaitingRequest"
+    },
+    {
+      "from": "SendingResponse",
+      "event": "receive Teardown",
+      "action": "reply 200",
+      "to": "AwaitingRequest"
+    },
+    {
+      "from": "SendingResponse",
+      "event": "timeout TeardownDelay",
+      "action": "close Connection",
+      "to": "ClosingConnection"
+    },
+    {
+      "from": "SendingResponse",
+      "event": "cond TransientConnection",
+      "action": "close Connection",
+      "to": "ClosingConnection"
+    },
+    {
+      "from": "AwaitingRequest",
+      "event": "cond SessionTimeout",
+      "action": "close Session",
+      "to": "AwaitingRequest"
+    },
+    {
+      "from": "RtpDataSent",
+      "event": "send RTP data",
+      "action": "send data",
+      "to": "RtpDataSent"
+    },
+    {
+      "from": "RtpDataSent",
+      "event": "send RTCP data",
+      "action": "send data",
+      "to": "RtcpDataSent"
+    },
+    {
+      "from": "RtcpDataSent",
+      "event": "send RTP data",
+      "action": "send data",
+      "to": "RtpDataSent"
+    },
+    {
+      "from": "RtcpDataSent",
+      "event": "send RTCP data",
+      "action": "send data",
+      "to": "RtcpDataSent"
+    },
+    {
+      "from": "Initial",
+      "event": "send RTSP request with Accept-Credentials: User",
+      "action": "collect certificate chain",
+      "to": "ClientRequestSent"
+    },
+    {
+      "from": "ClientRequestSent",
+      "event": "receive 470 or 407 with Connection-Credentials",
+      "action": "evaluate certificate",
+      "to": "ClientEvaluateCertificate"
+    },
+    {
+      "from": "ClientEvaluateCertificate",
+      "event": "cond certificate accepted",
+      "action": "send RTSP request with certificate hash",
+      "to": "ConnectionAuthorized"
+    },
+    {
+      "from": "ClientEvaluateCertificate",
+      "event": "cond certificate rejected",
+      "action": "close connection",
+      "to": "Initial"
+    },
+    {
+      "from": "Initial",
+      "event": "send RTSP request with Accept-Credentials: Proxy",
+      "action": "evaluate certificate",
+      "to": "ProxyEvaluateCertificate"
+    },
+    {
+      "from": "ProxyEvaluateCertificate",
+      "event": "cond certificate accepted",
+      "action": "forward RTSP request",
+      "to": "ProxyForwardRequest"
+    },
+    {
+      "from": "ProxyEvaluateCertificate",
+      "event": "cond certificate rejected",
+      "action": "reply 471",
+      "to": "Initial"
+    },
+    {
+      "from": "Initial",
+      "event": "send RTSP request with Accept-Credentials: Any",
+      "action": "forward RTSP request",
+      "to": "ProxyForwardRequest"
+    },
+    {
+      "from": "ConnectionAuthorized",
+      "event": "send RTSP request",
+      "action": "forward RTSP request",
+      "to": "ProxyForwardRequest"
+    },
+    {
+      "from": "Playing",
+      "event": "receive PLAY",
+      "action": "stop previous request",
+      "to": "Playing"
+    },
+    {
+      "from": "Initial",
+      "event": "receive RTSP 1.0 request",
+      "action": "reply 505",
+      "to": "Initial"
+    },
+    {
+      "from": "Initial",
+      "event": "receive RTSP 2.0 request",
+      "action": "reply RTSP/2.0",
+      "to": "Initial"
+    },
+    {
+      "from": "Initial",
+      "event": "receive OPTIONS",
+      "action": "reply 200",
+      "to": "Initial"
     },
     {
       "from": "Ready",
-      "actions": ["PLAY"],
-      "requisite": "Prs URI, Range",
-      "to": "Play",
-      "response": "According to range"
+      "event": "receive OPTIONS",
+      "action": "reply 200",
+      "to": "Ready"
+    },
+    {
+      "from": "Playing",
+      "event": "receive OPTIONS",
+      "action": "reply 200",
+      "to": "Playing"
+    },
+    {
+      "from": "Paused",
+      "event": "receive OPTIONS",
+      "action": "reply 200",
+      "to": "Paused"
+    },
+    {
+      "from": "Terminated",
+      "event": "receive OPTIONS",
+      "action": "reply 200",
+      "to": "Terminated"
+    },
+    {
+      "from": "Initial",
+      "event": "receive SETUP",
+      "action": "set NRM=1, RP=0.0",
+      "to": "Ready"
+    },
+    {
+      "from": "Initial",
+      "event": "receive SETUP",
+      "action": "reply 3rr Redirect",
+      "to": "Initial"
+    },
+    {
+      "from": "Initial",
+      "event": "receive S -> C: REDIRECT",
+      "action": "close all SES",
+      "to": "Initial"
     },
     {
       "from": "Ready",
-      "actions": ["PLAY"],
-      "requisite": "md URI, NRM=1, Range",
-      "to": "Play",
-      "response": "According to range"
+      "event": "receive SETUP",
+      "action": "set NRM +=1",
+      "to": "Ready"
     },
     {
       "from": "Ready",
-      "actions": ["PLAY"],
-      "requisite": "md URI, NRM=1",
-      "to": "Play",
-      "response": "Play from RP"
+      "event": "receive SETUP",
+      "action": "change transport param",
+      "to": "Ready"
     },
     {
       "from": "Ready",
-      "requisite": "PAUSE request",
-      "to": "Ready",
-      "actions": [
-        "Interrupt stream delivery",
-        "Set pause point"
-      ],
-      "response": "200 OK (with Range header)"
+      "event": "receive TEARDOWN",
+      "action": "set NRM = 0",
+      "to": "Initial"
     },
     {
       "from": "Ready",
-      "actions": ["PAUSE"],
-      "requisite": "Prs URI",
-      "to": "Ready",
-      "response": "Return PP"
+      "event": "receive TEARDOWN",
+      "action": "set NRM -= 1",
+      "to": "Ready"
     },
     {
       "from": "Ready",
-      "requisite": "TEARDOWN request",
-      "to": "Init",
-      "actions": [
-        "Stop stream delivery",
-        "Free resources",
-        "Destroy session state"
-      ],
-      "response": "200 OK (without Session header)"
+      "event": "receive PLAY",
+      "action": "play from RP",
+      "to": "Playing"
     },
     {
       "from": "Ready",
-      "actions": ["TEARDOWN"],
-      "requisite": "Prs URI, ",
-      "to": "Init",
-      "response": "No session hdr, NRM = 0"
+      "event": "receive PLAY",
+      "action": "according to range",
+      "to": "Playing"
     },
     {
       "from": "Ready",
-      "actions": ["TEARDOWN"],
-      "requisite": "md URI,NRM=1",
-      "to": "Init",
-      "response": "No Session hdr, NRM = 0"
+      "event": "receive PAUSE",
+      "action": "return PP",
+      "to": "Ready"
     },
     {
       "from": "Ready",
-      "actions": ["TEARDOWN"],
-      "requisite": "md URI,NRM>1",
-      "to": "Ready",
-      "response": "Session hdr, NRM -= 1"
+      "event": "receive SC:REDIRECT",
+      "action": "set RedP",
+      "to": "Ready"
     },
     {
-      "from": "Play",
-      "requisite": "PAUSE request",
-      "to": "Ready",
-      "actions": [
-        "Interrupt stream delivery",
-        "Set pause point"
-      ],
-      "response": "200 OK (with Range header)"
+      "from": "Ready",
+      "event": "receive SC:REDIRECT",
+      "action": "session is removed",
+      "to": "Initial"
     },
     {
-      "from": "Play",
-      "actions": ["PAUSE"],
-      "requisite": "Prs URI",
-      "to": "Ready",
-      "response": "Set RP to present point"
+      "from": "Ready",
+      "event": "timeout",
+      "action": "",
+      "to": "Initial"
     },
     {
-      "from": "Play",
-      "actions": ["End of media"],
-      "requisite": "All media",
-      "to": "Play",
-      "response": "Set RP = End of media"
+      "from": "Ready",
+      "event": "cond RedP reached",
+      "action": "TEARDOWN of session",
+      "to": "Initial"
     },
     {
-      "from": "Play",
-      "actions": ["End of range"],
-      "requisite": "None",
-      "to": "Play",
-      "response": "Set RP = End of range"
+      "from": "Playing",
+      "event": "receive PAUSE",
+      "action": "set RP to present point",
+      "to": "Ready"
     },
     {
-      "from": "Play",
-      "actions": ["PLAY"],
-      "requisite": "Prs URI, No range",
-      "to": "Play",
-      "response": "Play from present point"
+      "from": "Playing",
+      "event": "cond End of media",
+      "action": "set RP = End of media",
+      "to": "Playing"
     },
     {
-      "from": "Play",
-      "actions": ["PLAY"],
-      "requisite": "Prs URI, Range",
-      "to": "Play",
-      "response": "According to range"
+      "from": "Playing",
+      "event": "cond End of range",
+      "action": "set RP = End of range",
+      "to": "Playing"
     },
     {
-      "from": "Play",
-      "requisite": "TEARDOWN request",
-      "to": "Init",
-      "actions": [
-        "Stop stream delivery",
-        "Free resources",
-        "Destroy session state"
-      ],
-      "response": "200 OK (without Session header)"
+      "from": "Playing",
+      "event": "receive PLAY",
+      "action": "play from present point",
+      "to": "Playing"
     },
     {
-      "from": "Play",
-      "actions": ["TEARDOWN"],
-      "requisite": "Prs URI",
-      "to": "Init",
-      "response": "No session hdr"
+      "from": "Playing",
+      "event": "receive PLAY",
+      "action": "according to range",
+      "to": "Playing"
     },
     {
-      "from": "Play",
-      "actions": ["TEARDOWN"],
-      "requisite": "md URI,NRM=1",
-      "to": "Init",
-      "response": "No Session hdr, NRM=0"
+      "from": "Playing",
+      "event": "receive SC:PLAY_NOTIFY",
+      "action": "reply 200",
+      "to": "Playing"
     },
     {
-      "from": "Play",
-      "actions": ["Timeout"],
-      "requisite": "None",
-      "to": "Init",
-      "response": "Stop Media playout"
+      "from": "Playing",
+      "event": "receive SETUP",
+      "action": "reply 455",
+      "to": "Playing"
     },
     {
-      "from": "Client sends RTSP request with Accept-Credentials: User",
-      "requisite": "Always",
-      "to": "Proxy sets up TLS session to next hop",
-      "actions": [],
-      "response": null
+      "from": "Playing",
+      "event": "receive TEARDOWN",
+      "action": "set NRM=0",
+      "to": "Initial"
     },
     {
-      "from": "Proxy sets up TLS session to next hop",
-      "requisite": "Always",
-      "to": "Proxy extracts peer certificate chain",
-      "actions": [],
-      "response": null
+      "from": "Playing",
+      "event": "receive SC:REDIRECT",
+      "action": "set RedP",
+      "to": "Playing"
     },
     {
-      "from": "Proxy extracts peer certificate chain",
-      "requisite": "Always",
-      "to": "Proxy checks for matching identity and hash in Accept-Credentials header",
-      "actions": [],
-      "response": null
+      "from": "Playing",
+      "event": "receive SC:REDIRECT",
+      "action": "session is removed",
+      "to": "Initial"
     },
     {
-      "from": "Proxy checks for matching identity and hash in Accept-Credentials header",
-      "requisite": "Matching identity and hash found",
-      "to": "Certificate Match",
-      "actions": [],
-      "response": null
+      "from": "Playing",
+      "event": "cond RedP reached",
+      "action": "TEARDOWN of session",
+      "to": "Initial"
     },
     {
-      "from": "Proxy checks for matching identity and hash in Accept-Credentials header",
-      "requisite": "No matching identity and hash found",
-      "to": "Certificate Mismatch",
-      "actions": [],
-      "response": null
+      "from": "Playing",
+      "event": "timeout",
+      "action": "stop Media playout",
+      "to": "Initial"
     },
     {
-      "from": "Certificate Match",
-      "requisite": "Always",
-      "to": "Proxy forwards request to next hop",
-      "actions": [],
-      "response": null
+      "from": "AwaitingRequest",
+      "event": "receive Request",
+      "action": "collect Request",
+      "to": "AwaitingRequest"
     },
     {
-      "from": "Certificate Mismatch",
-      "requisite": "Always",
-      "to": "Proxy responds with 470 or 407 and Connection-Credentials header",
-      "actions": [
-        "Include Connection-Credentials header with next hop's identity and certificate"
-      ],
-      "response": "470 or 407"
+      "from": "Idle",
+      "event": "send RTP data",
+      "action": "send data",
+      "to": "RtpDataSent"
     },
     {
-      "from": "Proxy responds with 470 or 407 and Connection-Credentials header",
-      "requisite": "Always",
-      "to": "Client receives 470 or 407 with Connection-Credentials",
-      "actions": [],
-      "response": null
+      "from": "Idle",
+      "event": "send RTCP data",
+      "action": "send data",
+      "to": "RtcpDataSent"
     },
     {
-      "from": "Client receives 470 or 407 with Connection-Credentials",
-      "requisite": "Client decides to accept certificate",
-      "to": "Client decides to accept certificate",
-      "actions": [],
-      "response": null
+      "from": "Ready",
+      "event": "receive PLAY",
+      "action": "reply 457 Invalid Range",
+      "to": "Ready"
     },
     {
-      "from": "Client receives 470 or 407 with Connection-Credentials",
-      "requisite": "Client decides to reject certificate",
-      "to": "Client decides to reject certificate",
-      "actions": [],
-      "response": null
+      "from": "Playing",
+      "event": "cond delivery point beyond stop",
+      "action": "pause delivery",
+      "to": "Playing"
     },
     {
-      "from": "Client decides to accept certificate",
-      "requisite": "Always",
-      "to": "Client resends RTSP request with Accept-Credentials including certificate hash",
-      "actions": [
-        "Include hash over DER-encoded certificate for all trusted proxies"
-      ],
-      "response": null
-    },
-    {
-      "from": "Client resends RTSP request with Accept-Credentials including certificate hash",
-      "requisite": "Always",
-      "to": "Proxy sets up TLS session to next hop",
-      "actions": [],
-      "response": null
+      "from": "Ready",
+      "event": "receive PAUSE",
+      "action": "reply 200 OK",
+      "to": "Ready"
     }
   ]
 }

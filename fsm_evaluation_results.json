@@ -1,5 +1,25 @@
 {
-  "SMTP_claude-3-7-sonnet-20250219": {
+  "RTSP_deepseek-reasoner": {
+    "with_partial": {
+      "precision": 0.4634146228435458,
+      "recall": 0.5757575583103771,
+      "f1_score": 0.5135130054789271,
+      "matched": 19,
+      "fully_correct": 5,
+      "partially_correct": 14,
+      "unmatched": 14
+    },
+    "no_partial": {
+      "precision": 0.12195121653777521,
+      "recall": 0.15151514692378343,
+      "f1_score": 0.13513463732832254,
+      "matched": 5,
+      "fully_correct": 5,
+      "partially_correct": 0,
+      "unmatched": 28
+    }
+  },
+  "RTSP_gpt-4o-mini": {
     "with_partial": {
       "precision": 0.0,
       "recall": 0.0,
@@ -7,7 +27,7 @@
       "matched": 0,
       "fully_correct": 0,
       "partially_correct": 0,
-      "unmatched": 21
+      "unmatched": 33
     },
     "no_partial": {
       "precision": 0.0,
@@ -16,7 +36,207 @@
       "matched": 0,
       "fully_correct": 0,
       "partially_correct": 0,
+      "unmatched": 33
+    }
+  },
+  "RTSP_claude-3-7-sonnet-20250219": {
+    "with_partial": {
+      "precision": 0.21348314366872873,
+      "recall": 0.5757575583103771,
+      "f1_score": 0.3114750100784327,
+      "matched": 19,
+      "fully_correct": 17,
+      "partially_correct": 2,
+      "unmatched": 14
+    },
+    "no_partial": {
+      "precision": 0.19101123380886253,
+      "recall": 0.5151514995408637,
+      "f1_score": 0.2786881253700798,
+      "matched": 17,
+      "fully_correct": 17,
+      "partially_correct": 0,
+      "unmatched": 16
+    }
+  },
+  "RTSP_gemini-2.0-flash": {
+    "with_partial": {
+      "precision": 0.1538461518737673,
+      "recall": 0.36363635261708027,
+      "f1_score": 0.21621579449800446,
+      "matched": 12,
+      "fully_correct": 1,
+      "partially_correct": 11,
       "unmatched": 21
+    },
+    "no_partial": {
+      "precision": 0.012820512656147275,
+      "recall": 0.030303029384756687,
+      "f1_score": 0.018017599879826214,
+      "matched": 1,
+      "fully_correct": 1,
+      "partially_correct": 0,
+      "unmatched": 32
+    }
+  },
+  "SMTP_deepseek-reasoner": {
+    "with_partial": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "matched": 0,
+      "fully_correct": 0,
+      "partially_correct": 0,
+      "unmatched": 22
+    },
+    "no_partial": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "matched": 0,
+      "fully_correct": 0,
+      "partially_correct": 0,
+      "unmatched": 22
+    }
+  },
+  "SMTP_gpt-4o-mini": {
+    "with_partial": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "matched": 0,
+      "fully_correct": 0,
+      "partially_correct": 0,
+      "unmatched": 22
+    },
+    "no_partial": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "matched": 0,
+      "fully_correct": 0,
+      "partially_correct": 0,
+      "unmatched": 22
+    }
+  },
+  "SMTP_claude-3-7-sonnet-20250219": {
+    "with_partial": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "matched": 0,
+      "fully_correct": 0,
+      "partially_correct": 0,
+      "unmatched": 22
+    },
+    "no_partial": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "matched": 0,
+      "fully_correct": 0,
+      "partially_correct": 0,
+      "unmatched": 22
+    }
+  },
+  "SMTP_gemini-2.0-flash": {
+    "with_partial": {
+      "precision": 0.06249999804687507,
+      "recall": 0.09090908677685969,
+      "f1_score": 0.07407358848051256,
+      "matched": 2,
+      "fully_correct": 0,
+      "partially_correct": 2,
+      "unmatched": 20
+    },
+    "no_partial": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "matched": 0,
+      "fully_correct": 0,
+      "partially_correct": 0,
+      "unmatched": 22
+    }
+  },
+  "TCP_deepseek-reasoner": {
+    "with_partial": {
+      "precision": 0.7333332844444478,
+      "recall": 0.5499999725000013,
+      "f1_score": 0.6285709028575254,
+      "matched": 11,
+      "fully_correct": 6,
+      "partially_correct": 5,
+      "unmatched": 9
+    },
+    "no_partial": {
+      "precision": 0.39999997333333515,
+      "recall": 0.29999998500000075,
+      "f1_score": 0.34285663347008744,
+      "matched": 6,
+      "fully_correct": 6,
+      "partially_correct": 0,
+      "unmatched": 14
+    }
+  },
+  "TCP_gpt-4o-mini": {
+    "with_partial": {
+      "precision": 0.39999996000000404,
+      "recall": 0.1999999900000005,
+      "f1_score": 0.26666620444517897,
+      "matched": 4,
+      "fully_correct": 3,
+      "partially_correct": 1,
+      "unmatched": 16
+    },
+    "no_partial": {
+      "precision": 0.299999970000003,
+      "recall": 0.14999999250000037,
+      "f1_score": 0.19999954222320335,
+      "matched": 3,
+      "fully_correct": 3,
+      "partially_correct": 0,
+      "unmatched": 17
+    }
+  },
+  "TCP_claude-3-7-sonnet-20250219": {
+    "with_partial": {
+      "precision": 0.6499999675000016,
+      "recall": 0.6499999675000016,
+      "f1_score": 0.6499994675003863,
+      "matched": 13,
+      "fully_correct": 10,
+      "partially_correct": 3,
+      "unmatched": 7
+    },
+    "no_partial": {
+      "precision": 0.4999999750000012,
+      "recall": 0.4999999750000012,
+      "f1_score": 0.49999947500050124,
+      "matched": 10,
+      "fully_correct": 10,
+      "partially_correct": 0,
+      "unmatched": 10
+    }
+  },
+  "TCP_gemini-2.0-flash": {
+    "with_partial": {
+      "precision": 0.11111110864197538,
+      "recall": 0.2499999875000006,
+      "f1_score": 0.15384572307809846,
+      "matched": 5,
+      "fully_correct": 0,
+      "partially_correct": 5,
+      "unmatched": 15
+    },
+    "no_partial": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "matched": 0,
+      "fully_correct": 0,
+      "partially_correct": 0,
+      "unmatched": 20
     }
   }
 }

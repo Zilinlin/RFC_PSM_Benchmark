@@ -1,306 +1,260 @@
 {
   "states": [
-    "INITIAL",
-    "GREETING",
-    "MAIL",
-    "RCPT",
-    "DATA",
-    "DATA_TRANSMISSION",
-    "QUIT",
-    "CLOSED"
+    "Initial",
+    "Connected",
+    "WaitingForMail",
+    "WaitingForRecipient",
+    "ProcessingData",
+    "SessionEnded",
+    "UnderAttack",
+    "Authenticated",
+    "Unauthenticated",
+    "Verifying"
   ],
-  "initial_state": "INITIAL",
+  "initial_state": "Initial",
   "final_states": [
-    "CLOSED"
+    "SessionEnded"
   ],
   "transitions": [
     {
-      "from": "INITIAL",
-      "requisite": "Connection established",
-      "to": "GREETING",
-      "actions": [
-        "Server sends greeting"
-      ],
-      "response": "220 Service ready"
+      "from": "Initial",
+      "event": "connect",
+      "action": "reply 220",
+      "to": "Connected"
     },
     {
-      "from": "GREETING",
-      "requisite": "EHLO/HELO command",
-      "to": "MAIL",
-      "actions": [
-        "Server identifies client",
-        "Server lists supported extensions (for EHLO)",
-        "clear_buffers"
-      ],
-      "response": "250 OK"
+      "from": "Initial",
+      "event": "connection established",
+      "action": "reply 220",
+      "to": "WaitingForMail"
     },
     {
-      "from": "MAIL",
-      "requisite": "MAIL FROM command",
-      "to": "RCPT",
-      "actions": [
-        "Server resets state tables and buffers",
-        "Server records reverse-path",
-        "clear_buffers",
-        "store_reverse_path"
-      ],
-      "response": "250 OK"
+      "from": "Initial",
+      "event": "connection established",
+      "action": "reply 554",
+      "to": "WaitingForMail"
     },
     {
-      "from": "RCPT",
-      "requisite": "RCPT TO command",
-      "to": "RCPT",
-      "actions": [
-        "Server stores forward-path",
-        "append_forward_path"
-      ],
-      "response": "250 OK"
+      "from": "Initial",
+      "event": "receive EHLO",
+      "action": "reply 250",
+      "to": "WaitingForMail"
     },
     {
-      "from": "RCPT",
-      "requisite": "DATA command",
-      "to": "DATA",
-      "actions": [
-        "Server prepares to receive message content"
-      ],
-      "response": "354 Start mail input"
+      "from": "Initial",
+      "event": "receive HELO",
+      "action": "reply 250",
+      "to": "WaitingForMail"
     },
     {
-      "from": "DATA",
-      "requisite": "Message content",
-      "to": "DATA_TRANSMISSION",
-      "actions": [
-        "Server receives message content"
-      ],
-      "response": ""
+      "from": "Connected",
+      "event": "receive EHLO",
+      "action": "reply 250",
+      "to": "WaitingForMail"
     },
     {
-      "from": "DATA_TRANSMISSION",
-      "requisite": "End of mail data indicator ('.')",
-      "to": "MAIL",
-      "actions": [
-        "Server processes stored recipients and mail data",
-        "process_mail_transaction",
-        "clear_buffers"
-      ],
-      "response": "250 OK"
+      "from": "Connected",
+      "event": "receive HELO",
+      "action": "reply 250",
+      "to": "WaitingForMail"
     },
     {
-      "from": "MAIL",
-      "requisite": "QUIT command",
-      "to": "CLOSED",
-      "actions": [
-        "Server terminates session",
-        "close_connection"
-      ],
-      "response": "221 Service closing transmission channel"
+      "from": "Connected",
+      "event": "receive EHLO",
+      "action": "reply 250",
+      "to": "Connected"
     },
     {
-      "from": "RCPT",
-      "requisite": "QUIT command",
-      "to": "CLOSED",
-      "actions": [
-        "close_connection"
-      ],
-      "response": "221 Service closing"
+      "from": "Connected",
+      "event": "receive MAIL FROM",
+      "action": "reply 250",
+      "to": "WaitingForRecipient"
     },
     {
-      "from": "DATA",
-      "requisite": "QUIT command",
-      "to": "CLOSED",
-      "actions": [
-        "close_connection"
-      ],
-      "response": "221 Service closing"
+      "from": "Connected",
+      "event": "receive VRFY",
+      "action": "reply 250",
+      "to": "Verifying"
     },
     {
-      "from": "DATA_TRANSMISSION",
-      "requisite": "QUIT command",
-      "to": "CLOSED",
-      "actions": [
-        "close_connection"
-      ],
-      "response": "221 Service closing"
+      "from": "Connected",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "Initial"
     },
     {
-      "from": "GREETING",
-      "requisite": "QUIT command",
-      "to": "CLOSED",
-      "actions": [
-        "close_connection"
-      ],
-      "response": "221 Service closing"
+      "from": "WaitingForMail",
+      "event": "receive EHLO",
+      "action": "reply 250",
+      "to": "WaitingForMail"
     },
     {
-      "from": "MAIL",
-      "requisite": "RSET command",
-      "to": "MAIL",
-      "actions": [
-        "clear_buffers"
-      ],
-      "response": "250 OK"
+      "from": "WaitingForMail",
+      "event": "receive HELO",
+      "action": "reply 250",
+      "to": "WaitingForMail"
     },
     {
-      "from": "RCPT",
-      "requisite": "RSET command",
-      "to": "MAIL",
-      "actions": [
-        "clear_buffers"
-      ],
-      "response": "250 OK"
+      "from": "WaitingForMail",
+      "event": "receive MAIL",
+      "action": "reply 250",
+      "to": "WaitingForRecipient"
     },
     {
-      "from": "DATA",
-      "requisite": "RSET command",
-      "to": "MAIL",
-      "actions": [
-        "clear_buffers"
-      ],
-      "response": "250 OK"
+      "from": "WaitingForMail",
+      "event": "receive VRFY",
+      "action": "reply 250",
+      "to": "WaitingForMail"
     },
     {
-      "from": "DATA_TRANSMISSION",
-      "requisite": "RSET command",
-      "to": "MAIL",
-      "actions": [
-        "clear_buffers"
-      ],
-      "response": "250 OK"
+      "from": "WaitingForMail",
+      "event": "receive EXPN",
+      "action": "reply 250",
+      "to": "WaitingForMail"
     },
     {
-      "from": "MAIL",
-      "requisite": "NOOP command",
-      "to": "MAIL",
-      "actions": [],
-      "response": "250 OK"
+      "from": "WaitingForMail",
+      "event": "receive HELP",
+      "action": "reply 211",
+      "to": "WaitingForMail"
     },
     {
-      "from": "RCPT",
-      "requisite": "NOOP command",
-      "to": "RCPT",
-      "actions": [],
-      "response": "250 OK"
+      "from": "WaitingForMail",
+      "event": "receive NOOP",
+      "action": "reply 250",
+      "to": "WaitingForMail"
     },
     {
-      "from": "DATA",
-      "requisite": "NOOP command",
-      "to": "DATA",
-      "actions": [],
-      "response": "250 OK"
+      "from": "WaitingForMail",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "SessionEnded"
     },
     {
-      "from": "DATA_TRANSMISSION",
-      "requisite": "NOOP command",
-      "to": "DATA_TRANSMISSION",
-      "actions": [],
-      "response": "250 OK"
+      "from": "WaitingForMail",
+      "event": "timeout",
+      "action": "close connection",
+      "to": "SessionEnded"
     },
     {
-      "from": "GREETING",
-      "requisite": "NOOP command",
-      "to": "GREETING",
-      "actions": [],
-      "response": "250 OK"
+      "from": "WaitingForRecipient",
+      "event": "receive RCPT",
+      "action": "reply 250",
+      "to": "WaitingForRecipient"
     },
     {
-      "from": "MAIL",
-      "requisite": "VRFY command",
-      "to": "MAIL",
-      "actions": [
-        "verify_user"
-      ],
-      "response": "250/251/252 User information"
+      "from": "WaitingForRecipient",
+      "event": "receive RCPT TO",
+      "action": "reply 250",
+      "to": "WaitingForRecipient"
     },
     {
-      "from": "RCPT",
-      "requisite": "VRFY command",
-      "to": "RCPT",
-      "actions": [
-        "verify_user"
-      ],
-      "response": "250/251/252 User information"
+      "from": "WaitingForRecipient",
+      "event": "receive RCPT TO invalid",
+      "action": "reply 550",
+      "to": "WaitingForRecipient"
     },
     {
-      "from": "DATA",
-      "requisite": "VRFY command",
-      "to": "DATA",
-      "actions": [
-        "verify_user"
-      ],
-      "response": "250/251/252 User information"
+      "from": "WaitingForRecipient",
+      "event": "receive DATA",
+      "action": "reply 354",
+      "to": "ProcessingData"
     },
     {
-      "from": "GREETING",
-      "requisite": "VRFY command",
-      "to": "GREETING",
-      "actions": [
-        "verify_user"
-      ],
-      "response": "250/251/252 User information"
+      "from": "WaitingForRecipient",
+      "event": "receive RSET",
+      "action": "reply 250",
+      "to": "Connected"
     },
     {
-      "from": "MAIL",
-      "requisite": "EXPN command",
-      "to": "MAIL",
-      "actions": [
-        "expand_mailing_list"
-      ],
-      "response": "250 Mailing list information"
+      "from": "WaitingForRecipient",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "Initial"
     },
     {
-      "from": "RCPT",
-      "requisite": "EXPN command",
-      "to": "RCPT",
-      "actions": [
-        "expand_mailing_list"
-      ],
-      "response": "250 Mailing list information"
+      "from": "ProcessingData",
+      "event": "receive <CRLF>.<CRLF>",
+      "action": "reply 250",
+      "to": "WaitingForMail"
     },
     {
-      "from": "DATA",
-      "requisite": "EXPN command",
-      "to": "DATA",
-      "actions": [
-        "expand_mailing_list"
-      ],
-      "response": "250 Mailing list information"
+      "from": "ProcessingData",
+      "event": "receive end of data",
+      "action": "reply 250",
+      "to": "WaitingForMail"
     },
     {
-      "from": "GREETING",
-      "requisite": "EXPN command",
-      "to": "GREETING",
-      "actions": [
-        "expand_mailing_list"
-      ],
-      "response": "250 Mailing list information"
+      "from": "ProcessingData",
+      "event": "receive .",
+      "action": "reply 250",
+      "to": "Connected"
     },
     {
-      "from": "MAIL",
-      "requisite": "HELP command",
-      "to": "MAIL",
-      "actions": [],
-      "response": "211/214 Help information"
+      "from": "Normal",
+      "event": "receive VRFY",
+      "action": "reply 252",
+      "to": "Normal"
     },
     {
-      "from": "RCPT",
-      "requisite": "HELP command",
-      "to": "RCPT",
-      "actions": [],
-      "response": "211/214 Help information"
+      "from": "Normal",
+      "event": "receive EXPN",
+      "action": "reply 252",
+      "to": "Normal"
     },
     {
-      "from": "DATA",
-      "requisite": "HELP command",
-      "to": "DATA",
-      "actions": [],
-      "response": "211/214 Help information"
+      "from": "Normal",
+      "event": "cond many_invalid_RCPT",
+      "action": "reply 550",
+      "to": "UnderAttack"
     },
     {
-      "from": "GREETING",
-      "requisite": "HELP command",
-      "to": "GREETING",
-      "actions": [],
-      "response": "211/214 Help information"
+      "from": "UnderAttack",
+      "event": "cond attack_continues",
+      "action": "close connection",
+      "to": "Normal"
+    },
+    {
+      "from": "Unauthenticated",
+      "event": "receive EHLO",
+      "action": "reply 550",
+      "to": "Unauthenticated"
+    },
+    {
+      "from": "Unauthenticated",
+      "event": "receive HELO",
+      "action": "reply 550",
+      "to": "Unauthenticated"
+    },
+    {
+      "from": "Unauthenticated",
+      "event": "receive MAIL",
+      "action": "reply 550",
+      "to": "Unauthenticated"
+    },
+    {
+      "from": "Unauthenticated",
+      "event": "receive RCPT",
+      "action": "reply 550",
+      "to": "Unauthenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive VRFY",
+      "action": "reply 250",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive EXPN",
+      "action": "reply 250",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Verifying",
+      "event": "receive MAIL FROM",
+      "action": "reply 250",
+      "to": "WaitingForRecipient"
     }
   ]
 }

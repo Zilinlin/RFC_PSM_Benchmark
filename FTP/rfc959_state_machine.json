@@ -1,128 +1,47 @@
 {
-    "states": [
-      "Connection Established",
-      "Username Received",
-      "Password Received",
-      "Logged In",
-      "Rename From Pending",
-      "File Transfer Started",
-      "File Append/Store Pending",
-      "Session Termination"
-    ],
-    "initial_state": "Connection Established",
-    "final_states": ["Session Termination"],
-    "transitions": [
-      {
-        "from": "Connection Established",
-        "requisite": "",
-        "to": "Username Received",
-        "actions": ["USER *"],
-        "response": ""
-      },
-      {
-        "from": "Username Received",
-        "requisite": "",
-        "to": "Password Received",
-        "actions": ["PASS *"],
-        "response": ""
-      },
-      {
-        "from": "Password Received",
-        "requisite": "",
-        "to": "Logged In",
-        "actions": ["ACCT *"],
-        "response": ""
-      },
-      {
-        "from": "Username Received",
-        "requisite": "",
-        "to": "Logged In",
-        "actions": ["PASS *"],
-        "response": ""
-      },
-      {
-        "from": "Logged In",
-        "requisite": "",
-        "to": "Logged In",
-        "actions": ["LIST *", "CWD *", "PWD", "NOOP", "TYPE *", "MODE *", "STRU *", "SYST", "STAT", "HELP"],
-        "response": ""
-      },
-      {
-        "from": "Logged In",
-        "requisite": "",
-        "to": "Rename From Pending",
-        "actions": ["RNFR *"],
-        "response": ""
-      },
-      {
-        "from": "Rename From Pending",
-        "requisite": "",
-        "to": "Logged In",
-        "actions": ["RNTO *"],
-        "response": ""
-      },
-      {
-        "from": "Logged In",
-        "requisite": "",
-        "to": "Session Termination",
-        "actions": ["QUIT"],
-        "response": ""
-      },
-      {
-        "from": "Logged In",
-        "requisite": "",
-        "to": "File Transfer Started",
-        "actions": ["REST [0-9]+"],
-        "response": ""
-      },
-      {
-        "from": "File Transfer Started",
-        "requisite": "",
-        "to": "Logged In",
-        "actions": ["APPE *"],
-        "response": ""
-      },
-      {
-        "from": "File Transfer Started",
-        "requisite": "",
-        "to": "Logged In",
-        "actions": ["STOR *"],
-        "response": ""
-      },
-      {
-        "from": "File Transfer Started",
-        "requisite": "",
-        "to": "Logged In",
-        "actions": ["RETR *"],
-        "response": ""
-      },
-      {
-        "from": "Logged In",
-        "requisite": "",
-        "to": "File Append/Store Pending",
-        "actions": ["ALLO [0-9]+"],
-        "response": ""
-      },
-      {
-        "from": "File Append/Store Pending",
-        "requisite": "",
-        "to": "Logged In",
-        "actions": ["APPE *"],
-        "response": ""
-      },
-      {
-        "from": "File Append/Store Pending",
-        "requisite": "",
-        "to": "Logged In",
-        "actions": ["STOR *"],
-        "response": ""
-      },
-      {
-        "from": "Logged In",
-        "requisite": "",
-        "to": "Connection Established",
-        "actions": ["REIN"],
-        "response": ""
-      }
-    ]
-  }
+  "states": [
+    "BEGIN",
+    "WAIT_REPLY",
+    "SUCCESS",
+    "FAILURE",
+    "ERROR"
+  ],
+  "initial_state": "BEGIN",
+  "final_states": [
+    "SUCCESS",
+    "FAILURE",
+    "ERROR"
+  ],
+  "transitions": [
+    {
+      "from": "BEGIN",
+      "to": "WAIT_REPLY",
+      "event": "FTP command issued",
+      "action": "Send command"
+    },
+    {
+      "from": "WAIT_REPLY",
+      "to": "SUCCESS",
+      "event": "Reply code 2xx",
+      "action": "Process success"
+    },
+    {
+      "from": "WAIT_REPLY",
+      "to": "FAILURE",
+      "event": "Reply code 4xx or 5xx",
+      "action": "Handle failure"
+    },
+    {
+      "from": "WAIT_REPLY",
+      "to": "ERROR",
+      "event": "Unexpected reply (e.g., 1xx/3xx)",
+      "action": "Handle error"
+    },
+    {
+      "from": "WAIT_REPLY",
+      "to": "WAIT_REPLY",
+      "event": "Intermediate reply (1xx)",
+      "action": "Wait for final reply"
+    }
+  ]
+}

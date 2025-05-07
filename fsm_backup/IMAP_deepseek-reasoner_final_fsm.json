@@ -1,0 +1,80 @@
+{
+  "states": [
+    "Not Authenticated",
+    "Authenticated",
+    "Selected",
+    "Logout"
+  ],
+  "initial_state": "Not Authenticated",
+  "final_states": [
+    "Logout"
+  ],
+  "transitions": [
+    {
+      "from": "Not Authenticated",
+      "requisite": "successful LOGIN or AUTHENTICATE command",
+      "to": "Authenticated",
+      "actions": [
+        "LOGIN",
+        "AUTHENTICATE"
+      ],
+      "response": "resp-cond-auth (OK/PREAUTH)"
+    },
+    {
+      "from": "Authenticated",
+      "requisite": "successful SELECT or EXAMINE command",
+      "to": "Selected",
+      "actions": [
+        "SELECT",
+        "EXAMINE"
+      ],
+      "response": "resp-cond-state (OK)"
+    },
+    {
+      "from": "Selected",
+      "requisite": "CLOSE, UNSELECT, unsolicited CLOSED response, or failed SELECT/EXAMINE",
+      "to": "Authenticated",
+      "actions": [
+        "CLOSE",
+        "UNSELECT"
+      ],
+      "response": "resp-cond-state (OK)"
+    },
+    {
+      "from": "Not Authenticated",
+      "requisite": "LOGOUT command, server shutdown, or connection closed",
+      "to": "Logout",
+      "actions": [
+        "LOGOUT"
+      ],
+      "response": "untagged BYE + tagged OK"
+    },
+    {
+      "from": "Authenticated",
+      "requisite": "LOGOUT command, server shutdown, or connection closed",
+      "to": "Logout",
+      "actions": [
+        "LOGOUT"
+      ],
+      "response": "untagged BYE + tagged OK"
+    },
+    {
+      "from": "Selected",
+      "requisite": "LOGOUT command, server shutdown, or connection closed",
+      "to": "Logout",
+      "actions": [
+        "LOGOUT"
+      ],
+      "response": "untagged BYE + tagged OK"
+    },
+    {
+      "from": "Not Authenticated",
+      "requisite": "STARTTLS",
+      "to": "Not Authenticated",
+      "actions": [
+        "STARTTLS"
+      ],
+      "response": "resp-cond-state (OK)"
+    }
+  ]
+}

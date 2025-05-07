@@ -1,204 +1,260 @@
 {
   "states": [
-    "CLOSED",
-    "LISTEN",
-    "REQUEST",
-    "RESPOND",
-    "PARTOPEN",
-    "OPEN",
-    "CLOSEREQ",
-    "CLOSING",
-    "TIMEWAIT",
-    "STABLE",
-    "CHANGING",
-    "UNSTABLE"
+    "Closed",
+    "Listen",
+    "Request",
+    "Respond",
+    "PartOpen",
+    "Open",
+    "CloseReq",
+    "Closing",
+    "TimeWait",
+    "Stable",
+    "Changing",
+    "Unstable"
   ],
-  "initial_state": "CLOSED",
+  "initial_state": "Closed",
   "final_states": [],
   "transitions": [
     {
-      "from": "CLOSED",
-      "requisite": "passive open",
-      "to": "LISTEN",
-      "actions": [],
-      "response": ""
+      "from": "Closed",
+      "event": "cond passive_open",
+      "action": "transition",
+      "to": "Listen"
     },
     {
-      "from": "CLOSED",
-      "requisite": "active open",
-      "to": "REQUEST",
-      "actions": [
-        "send Request"
-      ],
-      "response": ""
+      "from": "Closed",
+      "event": "cond active_open",
+      "action": "send DCCP-Request",
+      "to": "Request"
     },
     {
-      "from": "LISTEN",
-      "requisite": "receive Request",
-      "to": "RESPOND",
-      "actions": [
-        "send Response"
-      ],
-      "response": ""
+      "from": "Closed",
+      "event": "send DCCP-Request",
+      "action": "set GSS ISS",
+      "to": "Request"
     },
     {
-      "from": "REQUEST",
-      "requisite": "receive Response",
-      "to": "PARTOPEN",
-      "actions": [
-        "send Ack"
-      ],
-      "response": ""
+      "from": "Listen",
+      "event": "recv DCCP-Request",
+      "action": "send DCCP-Response",
+      "to": "Respond"
     },
     {
-      "from": "RESPOND",
-      "requisite": "receive Ack/DataAck",
-      "to": "OPEN",
-      "actions": [],
-      "response": ""
+      "from": "Request",
+      "event": "recv DCCP-Response",
+      "action": "send DCCP-Ack",
+      "to": "PartOpen"
     },
     {
-      "from": "PARTOPEN",
-      "requisite": "receive packet (not Response/Sync)",
-      "to": "OPEN",
-      "actions": [],
-      "response": ""
+      "from": "Request",
+      "event": "recv DCCP-Sync",
+      "action": "send DCCP-Reset",
+      "to": "Request"
     },
     {
-      "from": "OPEN",
-      "requisite": "server active close",
-      "to": "CLOSEREQ",
-      "actions": [
-        "send CloseReq"
-      ],
-      "response": ""
+      "from": "Request",
+      "event": "recv Reset",
+      "action": "transition",
+      "to": "Closed"
     },
     {
-      "from": "OPEN",
-      "requisite": "active close or receive CloseReq",
-      "to": "CLOSING",
-      "actions": [
-        "send Close"
-      ],
-      "response": ""
+      "from": "Respond",
+      "event": "send DCCP-Response",
+      "action": "transition",
+      "to": "Open"
     },
     {
-      "from": "OPEN",
-      "requisite": "receive Close",
-      "to": "CLOSED",
-      "actions": [
-        "send Reset"
-      ],
-      "response": ""
+      "from": "Respond",
+      "event": "recv Ack",
+      "action": "transition",
+      "to": "Open"
     },
     {
-      "from": "CLOSEREQ",
-      "requisite": "receive Close",
-      "to": "CLOSED",
-      "actions": [
-        "send Reset"
-      ],
-      "response": ""
+      "from": "Respond",
+      "event": "recv DataAck",
+      "action": "transition",
+      "to": "Open"
     },
     {
-      "from": "CLOSING",
-      "requisite": "receive Reset",
-      "to": "TIMEWAIT",
-      "actions": [],
-      "response": ""
+      "from": "Respond",
+      "event": "recv Request",
+      "action": "send Response",
+      "to": "Respond"
     },
     {
-      "from": "TIMEWAIT",
-      "requisite": "2MSL timer expires",
-      "to": "CLOSED",
-      "actions": [],
-      "response": ""
+      "from": "PartOpen",
+      "event": "send DCCP-Ack",
+      "action": "transition",
+      "to": "Open"
     },
     {
-      "from": "*",
-      "requisite": "receive Reset",
-      "to": "TIMEWAIT",
-      "actions": [],
-      "response": ""
+      "from": "PartOpen",
+      "event": "recv packet",
+      "action": "transition",
+      "to": "Open"
     },
     {
-      "from": "STABLE",
-      "requisite": "application/protocol event",
-      "to": "CHANGING",
-      "actions": [
-        "send Change L"
-      ],
-      "response": ""
+      "from": "PartOpen",
+      "event": "recv Response",
+      "action": "send Ack",
+      "to": "PartOpen"
     },
     {
-      "from": "STABLE",
-      "requisite": "receive Change R",
-      "to": "STABLE",
-      "actions": [
-        "calculate new value",
-        "send Confirm L"
-      ],
-      "response": ""
+      "from": "Open",
+      "event": "cond server_active_close",
+      "action": "send CloseReq",
+      "to": "CloseReq"
     },
     {
-      "from": "CHANGING",
-      "requisite": "receive Confirm R",
-      "to": "STABLE",
-      "actions": [
-        "accept value"
-      ],
-      "response": ""
+      "from": "Open",
+      "event": "cond active_close",
+      "action": "send Close",
+      "to": "Closing"
     },
     {
-      "from": "CHANGING",
-      "requisite": "receive empty Confirm R",
-      "to": "STABLE",
-      "actions": [
-        "revert to old value"
-      ],
-      "response": ""
+      "from": "Open",
+      "event": "recv CloseReq",
+      "action": "send Close",
+      "to": "Closing"
     },
     {
-      "from": "CHANGING",
-      "requisite": "receive Change R",
-      "to": "STABLE",
-      "actions": [
-        "calculate new value",
-        "send Confirm L"
-      ],
-      "response": ""
+      "from": "Open",
+      "event": "recv Close",
+      "action": "send Reset",
+      "to": "Closed"
     },
     {
-      "from": "CHANGING",
-      "requisite": "timeout/receive non-ack",
-      "to": "CHANGING",
-      "actions": [
-        "send Change L"
-      ],
-      "response": ""
+      "from": "Open",
+      "event": "send DCCP-CloseReq",
+      "action": "transition",
+      "to": "CloseReq"
     },
     {
-      "from": "CHANGING",
-      "requisite": "preference list changes",
-      "to": "UNSTABLE",
-      "actions": [],
-      "response": ""
+      "from": "Open",
+      "event": "send DCCP-Close",
+      "action": "transition",
+      "to": "Closing"
     },
     {
-      "from": "UNSTABLE",
-      "requisite": "send Change L",
-      "to": "CHANGING",
-      "actions": [],
-      "response": ""
+      "from": "Open",
+      "event": "recv DCCP-CloseReq",
+      "action": "send DCCP-Reset",
+      "to": "Closed"
     },
     {
-      "from": "UNSTABLE",
-      "requisite": "receive Confirm R or Change R",
-      "to": "UNSTABLE",
-      "actions": [
-        "ignore"
-      ],
-      "response": ""
+      "from": "Open",
+      "event": "recv DCCP-Close",
+      "action": "send DCCP-Reset",
+      "to": "Closed"
+    },
+    {
+      "from": "Open",
+      "event": "recv DCCP-Reset",
+      "action": "transition",
+      "to": "Closed"
+    },
+    {
+      "from": "Open",
+      "event": "recv sequence-invalid",
+      "action": "send DCCP-Sync",
+      "to": "Open"
+    },
+    {
+      "from": "Open",
+      "event": "recv DCCP-Sync",
+      "action": "send DCCP-SyncAck",
+      "to": "Open"
+    },
+    {
+      "from": "CloseReq",
+      "event": "recv Close",
+      "action": "send Reset",
+      "to": "Closed"
+    },
+    {
+      "from": "CloseReq",
+      "event": "recv DCCP-Close",
+      "action": "send DCCP-Reset",
+      "to": "Closed"
+    },
+    {
+      "from": "Closing",
+      "event": "recv Reset",
+      "action": "transition",
+      "to": "TimeWait"
+    },
+    {
+      "from": "Closing",
+      "event": "recv DCCP-Reset",
+      "action": "transition",
+      "to": "Closed"
+    },
+    {
+      "from": "TimeWait",
+      "event": "timeout 2MSL",
+      "action": "transition",
+      "to": "Closed"
+    },
+    {
+      "from": "Stable",
+      "event": "recv Change_R",
+      "action": "send Confirm_L",
+      "to": "Stable"
+    },
+    {
+      "from": "Stable",
+      "event": "cond app_protocol_event",
+      "action": "send Change_L",
+      "to": "Changing"
+    },
+    {
+      "from": "Changing",
+      "event": "recv Confirm_R",
+      "action": "set accept_value",
+      "to": "Stable"
+    },
+    {
+      "from": "Changing",
+      "event": "recv empty_Confirm_R",
+      "action": "set revert_to_old_value",
+      "to": "Stable"
+    },
+    {
+      "from": "Changing",
+      "event": "cond pref_list_changes",
+      "action": "transition",
+      "to": "Unstable"
+    },
+    {
+      "from": "Changing",
+      "event": "timeout",
+      "action": "send Change_L",
+      "to": "Changing"
+    },
+    {
+      "from": "Changing",
+      "event": "recv non_ack",
+      "action": "send Change_L",
+      "to": "Changing"
+    },
+    {
+      "from": "Unstable",
+      "event": "send Change_L",
+      "action": "transition",
+      "to": "Changing"
+    },
+    {
+      "from": "Unstable",
+      "event": "recv Confirm_R",
+      "action": "set ignore",
+      "to": "Unstable"
+    },
+    {
+      "from": "Unstable",
+      "event": "recv Change_R",
+      "action": "set ignore",
+      "to": "Unstable"
     }
   ]
 }

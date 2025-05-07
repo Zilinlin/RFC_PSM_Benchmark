@@ -1,92 +1,81 @@
 {
-    "states": [
-      "Connection_Established",
-      "Not_Authenticated",
-      "Authenticated",
-      "Selected",
-      "Logout"
-    ],
-    "initial_state": "Connection_Established",
-    "final_states": [
-      "Logout"
-    ],
-    "transitions": [
-      {
-        "from": "Connection_Established",
-        "requisite": "Client connects without pre-authentication",
-        "to": "Not_Authenticated",
-        "actions": ["Send OK greeting"],
-        "response": "Client receives OK"
-      },
-      {
-        "from": "Connection_Established",
-        "requisite": "Client connects with pre-authentication",
-        "to": "Authenticated",
-        "actions": ["Send PREAUTH greeting"],
-        "response": "Client receives PREAUTH"
-      },
-      {
-        "from": "Connection_Established",
-        "requisite": "Connection rejected",
-        "to": "Logout",
-        "actions": ["Send BYE greeting"],
-        "response": "Client receives BYE"
-      },
-      {
-        "from": "Not_Authenticated",
-        "requisite": "Client sends valid LOGIN or AUTHENTICATE command",
-        "to": "Authenticated",
-        "actions": ["Authenticate client"],
-        "response": "OK"
-      },
-      {
-        "from": "Not_Authenticated",
-        "requisite": "Client sends LOGOUT or disconnects",
-        "to": "Logout",
-        "actions": ["Send BYE", "Close connection"],
-        "response": "BYE, OK"
-      },
-      {
-        "from": "Authenticated",
-        "requisite": "Client sends SELECT or EXAMINE command",
-        "to": "Selected",
-        "actions": ["Open mailbox"],
-        "response": "OK"
-      },
-      {
-        "from": "Authenticated",
-        "requisite": "Client sends LOGOUT or connection closed",
-        "to": "Logout",
-        "actions": ["Send BYE", "Close connection"],
-        "response": "BYE, OK"
-      },
-      {
-        "from": "Authenticated",
-        "requisite": "Client requests mailbox listing",
-        "to": "Authenticated",
-        "actions": ["List mailbox"],
-        "response": "List of mailboxes"
-      },
-      {
-        "from": "Selected",
-        "requisite": "Client sends CLOSE, UNSELECT, or SELECT/EXAMINE fails",
-        "to": "Authenticated",
-        "actions": ["Deselect mailbox"],
-        "response": "OK"
-      },
-      {
-        "from": "Selected",
-        "requisite": "Client manages messages",
-        "to": "Selected",
-        "actions": ["Read/write/delete messages"],
-        "response": "OK or relevant status"
-      },
-      {
-        "from": "Selected",
-        "requisite": "Client sends LOGOUT or connection closed",
-        "to": "Logout",
-        "actions": ["Send BYE", "Close connection"],
-        "response": "BYE, OK"
-      }
-    ]
-  }
+  "states": [
+    "Connection_Established_Server_Greeting",
+    "Not_Authenticated",
+    "Authenticated",
+    "Selected",
+    "Logout"
+  ],
+  "initial_state": "Connection_Established_Server_Greeting",
+  "final_states": [
+    "Logout"
+  ],
+  "transitions": [
+    {
+      "from": "Connection_Established_Server_Greeting",
+      "event": "connect without pre-authentication",
+      "action": "Send OK greeting",
+      "to": "Not_Authenticated"
+    },
+    {
+      "from": "Connection_Established_Server_Greeting",
+      "event": "Connects with pre-authentication",
+      "action": "Send PREAUTH greeting",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Connection_Established_Server_Greeting",
+      "event": "Connection reject",
+      "action": "Send BYE greeting",
+      "to": "Logout"
+    },
+    {
+      "from": "Not_Authenticated",
+      "event": "Sends LOGIN or AUTHENTICATE command",
+      "action": "Sends LOGIN or AUTHENTICATE command",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Not_Authenticated",
+      "event": "Sends LOGOUT or server shutdown",
+      "action": "Close connection",
+      "to": "Logout"
+    },
+    {
+      "from": "Authenticated",
+      "event": "Sends SELECT or EXAMINE command",
+      "action": "Sends SELECT or EXAMINE command",
+      "to": "Selected"
+    },
+    {
+      "from": "Authenticated",
+      "event": "Sends LOGOUT or server shutdown",
+      "action": "Close connection",
+      "to": "Logout"
+    },
+    {
+      "from": "Authenticated",
+      "event": "Send requests mailbox listing",
+      "action": "List mailbox",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Selected",
+      "event": "Sends CLOSE, UNSELECT, or SELECT/EXAMINE fails",
+      "action": "Sends CLOSE, UNSELECT, or SELECT/EXAMINE fails",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Selected",
+      "event": "Client manages messages",
+      "action": "Read/write/delete messages",
+      "to": "Selected"
+    },
+    {
+      "from": "Selected",
+      "event": "Sends LOGOUT or server shutdown",
+      "action": "Close connection",
+      "to": "Logout"
+    }
+  ]
+}

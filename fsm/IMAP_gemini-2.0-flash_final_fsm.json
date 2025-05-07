@@ -1,361 +1,562 @@
 {
   "states": [
-    "Client_Connected",
-    "Command_Sent",
-    "Waiting_For_Response",
-    "Command_Continuation",
-    "Finished",
-    "Not Authenticated",
+    "ClientConnected",
+    "NotAuthenticated",
     "Authenticated",
     "Selected",
-    "Logout"
+    "Logout",
+    "CommandInProgress",
+    "AwaitingLiteral",
+    "ErrorState",
+    "Idle",
+    "UidCommandInProgress",
+    "SearchInProgress",
+    "StartTLSNegotiation"
   ],
-  "initial_state": "Client_Connected",
+  "initial_state": "ClientConnected",
   "final_states": [
-    "Finished",
     "Logout"
   ],
   "transitions": [
     {
-      "from": "Client_Connected",
-      "requisite": "Client sends command",
-      "to": "Command_Sent",
-      "actions": [
-        "Generate unique tag"
-      ],
-      "response": "None"
+      "from": "ClientConnected",
+      "event": "receive client_command",
+      "action": "send greeting",
+      "to": "NotAuthenticated"
     },
     {
-      "from": "Command_Sent",
-      "requisite": "Server ready for octets or remainder of command",
-      "to": "Command_Continuation",
-      "actions": [],
-      "response": "Command continuation request (+)"
-    },
-    {
-      "from": "Command_Sent",
-      "requisite": "Server detects error",
-      "to": "Finished",
-      "actions": [],
-      "response": "BAD completion response"
-    },
-    {
-      "from": "Command_Sent",
-      "requisite": "Server processes command successfully",
-      "to": "Waiting_For_Response",
-      "actions": [],
-      "response": "None"
-    },
-    {
-      "from": "Command_Continuation",
-      "requisite": "Client sends octets or remainder of command",
-      "to": "Waiting_For_Response",
-      "actions": [],
-      "response": "None"
-    },
-    {
-      "from": "Waiting_For_Response",
-      "requisite": "Server sends untagged data",
-      "to": "Waiting_For_Response",
-      "actions": [
-        "Client remembers/caches data"
-      ],
-      "response": "Untagged response (*)"
-    },
-    {
-      "from": "Waiting_For_Response",
-      "requisite": "Server sends completion response (success)",
-      "to": "Finished",
-      "actions": [],
-      "response": "OK completion response"
-    },
-    {
-      "from": "Waiting_For_Response",
-      "requisite": "Server sends completion response (failure)",
-      "to": "Finished",
-      "actions": [],
-      "response": "NO completion response"
-    },
-    {
-      "from": "Waiting_For_Response",
-      "requisite": "Server sends completion response (protocol error)",
-      "to": "Finished",
-      "actions": [],
-      "response": "BAD completion response"
-    },
-    {
-      "from": "Finished",
-      "requisite": "Client initiates new command",
-      "to": "Command_Sent",
-      "actions": [
-        "Generate unique tag"
-      ],
-      "response": "None"
-    },
-    {
-      "from": "Not Authenticated",
-      "requisite": "successful LOGIN or AUTHENTICATE command",
-      "to": "Authenticated",
-      "actions": [],
-      "response": null
+      "from": "NotAuthenticated",
+      "event": "receive successful LOGIN or AUTHENTICATE",
+      "action": "none",
+      "to": "Authenticated"
     },
     {
       "from": "Authenticated",
-      "requisite": "successful SELECT or EXAMINE command",
-      "to": "Selected",
-      "actions": [],
-      "response": null
+      "event": "receive successful SELECT or EXAMINE",
+      "action": "none",
+      "to": "Selected"
     },
     {
       "from": "Selected",
-      "requisite": "CLOSE or UNSELECT command, unsolicited CLOSED response code, or failed SELECT or EXAMINE command",
-      "to": "Authenticated",
-      "actions": [],
-      "response": null
-    },
-    {
-      "from": "Not Authenticated",
-      "requisite": "LOGOUT command, server shutdown, or connection closed",
-      "to": "Logout",
-      "actions": [],
-      "response": null
-    },
-    {
-      "from": "Authenticated",
-      "requisite": "LOGOUT command, server shutdown, or connection closed",
-      "to": "Logout",
-      "actions": [],
-      "response": null
+      "event": "receive CLOSE or UNSELECT",
+      "action": "none",
+      "to": "Authenticated"
     },
     {
       "from": "Selected",
-      "requisite": "LOGOUT command, server shutdown, or connection closed",
-      "to": "Logout",
-      "actions": [],
-      "response": null
-    },
-    {
-      "from": "Not Authenticated",
-      "requisite": "STARTTLS",
-      "to": "Not Authenticated",
-      "actions": [
-        "begin TLS negotiation"
-      ],
-      "response": "no specific response"
-    },
-    {
-      "from": "Not Authenticated",
-      "requisite": "AUTHENTICATE",
-      "to": "Authenticated",
-      "actions": [
-        "authenticate"
-      ],
-      "response": "continuation data can be requested"
-    },
-    {
-      "from": "Not Authenticated",
-      "requisite": "LOGIN",
-      "to": "Authenticated",
-      "actions": [
-        "authenticate"
-      ],
-      "response": "no specific responses"
-    },
-    {
-      "from": "Authenticated",
-      "requisite": "ENABLE",
-      "to": "Authenticated",
-      "actions": [
-        "enable capabilities"
-      ],
-      "response": "no specific responses"
-    },
-    {
-      "from": "Authenticated",
-      "requisite": "SELECT",
-      "to": "Selected",
-      "actions": [
-        "select mailbox"
-      ],
-      "response": "FLAGS, EXISTS, LIST, PERMANENTFLAGS, UIDNEXT, UIDVALIDITY"
-    },
-    {
-      "from": "Authenticated",
-      "requisite": "EXAMINE",
-      "to": "Selected",
-      "actions": [
-        "examine mailbox"
-      ],
-      "response": "FLAGS, EXISTS, LIST, PERMANENTFLAGS, UIDNEXT, UIDVALIDITY"
-    },
-    {
-      "from": "Authenticated",
-      "requisite": "NAMESPACE",
-      "to": "Authenticated",
-      "actions": [],
-      "response": "NAMESPACE"
-    },
-    {
-      "from": "Authenticated",
-      "requisite": "CREATE",
-      "to": "Authenticated",
-      "actions": [
-        "create mailbox"
-      ],
-      "response": "OPTIONAL LIST"
-    },
-    {
-      "from": "Authenticated",
-      "requisite": "DELETE",
-      "to": "Authenticated",
-      "actions": [
-        "delete mailbox"
-      ],
-      "response": "OPTIONAL LIST"
-    },
-    {
-      "from": "Authenticated",
-      "requisite": "RENAME",
-      "to": "Authenticated",
-      "actions": [
-        "rename mailbox"
-      ],
-      "response": "OPTIONAL LIST"
-    },
-    {
-      "from": "Authenticated",
-      "requisite": "SUBSCRIBE",
-      "to": "Authenticated",
-      "actions": [
-        "subscribe to mailbox"
-      ],
-      "response": "no specific responses"
-    },
-    {
-      "from": "Authenticated",
-      "requisite": "UNSUBSCRIBE",
-      "to": "Authenticated",
-      "actions": [
-        "unsubscribe from mailbox"
-      ],
-      "response": "no specific responses"
-    },
-    {
-      "from": "Authenticated",
-      "requisite": "LIST",
-      "to": "Authenticated",
-      "actions": [
-        "list mailboxes"
-      ],
-      "response": "LIST"
-    },
-    {
-      "from": "Authenticated",
-      "requisite": "STATUS",
-      "to": "Authenticated",
-      "actions": [
-        "get mailbox status"
-      ],
-      "response": "STATUS"
-    },
-    {
-      "from": "Authenticated",
-      "requisite": "APPEND",
-      "to": "Authenticated",
-      "actions": [
-        "append message to mailbox"
-      ],
-      "response": "OPTIONAL LIST"
-    },
-    {
-      "from": "Authenticated",
-      "requisite": "IDLE",
-      "to": "Authenticated",
-      "actions": [
-        "wait for server updates"
-      ],
-      "response": "continuation data will be requested"
+      "event": "receive unsolicited CLOSED",
+      "action": "none",
+      "to": "Authenticated"
     },
     {
       "from": "Selected",
-      "requisite": "CLOSE",
-      "to": "Authenticated",
-      "actions": [
-        "remove deleted messages"
-      ],
-      "response": "no specific responses"
+      "event": "receive failed SELECT or EXAMINE",
+      "action": "none",
+      "to": "Authenticated"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive LOGOUT or server shutdown or connection closed",
+      "action": "none",
+      "to": "Logout"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive LOGOUT or server shutdown or connection closed",
+      "action": "none",
+      "to": "Logout"
     },
     {
       "from": "Selected",
-      "requisite": "UNSELECT",
-      "to": "Authenticated",
-      "actions": [
-        "free session resources"
-      ],
-      "response": "no specific responses"
+      "event": "receive LOGOUT or server shutdown or connection closed",
+      "action": "none",
+      "to": "Logout"
+    },
+    {
+      "from": "Idle",
+      "event": "receive COMMAND",
+      "action": "set CommandInProgress",
+      "to": "CommandInProgress"
+    },
+    {
+      "from": "CommandInProgress",
+      "event": "receive COMMAND",
+      "action": "execute commands sequentially",
+      "to": "CommandInProgress"
+    },
+    {
+      "from": "CommandInProgress",
+      "event": "send CompletionResult",
+      "action": "reset to Idle",
+      "to": "Idle"
+    },
+    {
+      "from": "CommandInProgress",
+      "event": "receive ContinuationRequest",
+      "action": "set AwaitingLiteral",
+      "to": "AwaitingLiteral"
+    },
+    {
+      "from": "AwaitingLiteral",
+      "event": "receive ContinuationData",
+      "action": "process data",
+      "to": "CommandInProgress"
+    },
+    {
+      "from": "CommandInProgress",
+      "event": "receive UID_COMMAND",
+      "action": "set UidCommandInProgress",
+      "to": "UidCommandInProgress"
+    },
+    {
+      "from": "UidCommandInProgress",
+      "event": "receive COMMAND",
+      "action": "execute commands sequentially",
+      "to": "UidCommandInProgress"
+    },
+    {
+      "from": "UidCommandInProgress",
+      "event": "send CompletionResult",
+      "action": "reset to Idle",
+      "to": "Idle"
+    },
+    {
+      "from": "CommandInProgress",
+      "event": "receive SEARCH",
+      "action": "set SearchInProgress",
+      "to": "SearchInProgress"
+    },
+    {
+      "from": "SearchInProgress",
+      "event": "receive COMMAND",
+      "action": "execute commands sequentially",
+      "to": "SearchInProgress"
+    },
+    {
+      "from": "SearchInProgress",
+      "event": "send CompletionResult",
+      "action": "reset to Idle",
+      "to": "Idle"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive CAPABILITY",
+      "action": "reply CAPABILITY",
+      "to": "NotAuthenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive CAPABILITY",
+      "action": "reply CAPABILITY",
+      "to": "Authenticated"
     },
     {
       "from": "Selected",
-      "requisite": "EXPUNGE",
-      "to": "Selected",
-      "actions": [
-        "permanently remove deleted messages"
-      ],
-      "response": "EXPUNGE"
+      "event": "receive CAPABILITY",
+      "action": "reply CAPABILITY",
+      "to": "Selected"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive NOOP",
+      "action": "reply OK",
+      "to": "NotAuthenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive NOOP",
+      "action": "reply OK",
+      "to": "Authenticated"
     },
     {
       "from": "Selected",
-      "requisite": "SEARCH",
-      "to": "Selected",
-      "actions": [
-        "search mailbox"
-      ],
-      "response": "OPTIONAL ESEARCH"
+      "event": "receive NOOP",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive STARTTLS",
+      "action": "reply OK",
+      "to": "StartTLSNegotiation"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive ENABLE",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive SELECT",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive EXAMINE",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive NAMESPACE",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive CREATE",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive DELETE",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive RENAME",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive SUBSCRIBE",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive UNSUBSCRIBE",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive LIST",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive STATUS",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive APPEND",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive IDLE",
+      "action": "reply idling",
+      "to": "Authenticated"
     },
     {
       "from": "Selected",
-      "requisite": "FETCH",
-      "to": "Selected",
-      "actions": [
-        "retrieve message data"
-      ],
-      "response": "FETCH"
+      "event": "receive CLOSE",
+      "action": "reply OK",
+      "to": "Authenticated"
     },
     {
       "from": "Selected",
-      "requisite": "STORE",
-      "to": "Selected",
-      "actions": [
-        "alter message data"
-      ],
-      "response": "FETCH"
+      "event": "receive UNSELECT",
+      "action": "reply OK",
+      "to": "Authenticated"
     },
     {
       "from": "Selected",
-      "requisite": "COPY",
-      "to": "Selected",
-      "actions": [
-        "copy messages to mailbox"
-      ],
-      "response": "no specific responses"
+      "event": "receive EXPUNGE",
+      "action": "reply OK",
+      "to": "Selected"
     },
     {
       "from": "Selected",
-      "requisite": "MOVE",
-      "to": "Selected",
-      "actions": [
-        "move messages to mailbox"
-      ],
-      "response": "no specific responses"
+      "event": "receive SEARCH",
+      "action": "reply OK",
+      "to": "Selected"
     },
     {
       "from": "Selected",
-      "requisite": "UID",
-      "to": "Selected",
-      "actions": [
-        "perform command using UIDs"
-      ],
-      "response": "FETCH, ESEARCH, EXPUNGE"
+      "event": "receive FETCH",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Selected",
+      "event": "receive STORE",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Selected",
+      "event": "receive COPY",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Selected",
+      "event": "receive MOVE",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Selected",
+      "event": "receive UID",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive LOGOUT",
+      "action": "reply BYE",
+      "to": "Logout"
+    },
+    {
+      "from": "Selected",
+      "event": "receive LOGOUT",
+      "action": "reply BYE",
+      "to": "Logout"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive login",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive authenticate",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive append",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive create",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive delete",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive enable",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive examine",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive list",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive namespace_command",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive rename",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive select",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive status",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive subscribe",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive unsubscribe",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive idle",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Selected",
+      "event": "receive copy",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Selected",
+      "event": "receive move",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Selected",
+      "event": "receive fetch",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Selected",
+      "event": "receive store",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Selected",
+      "event": "receive search",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Selected",
+      "event": "receive uid",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "StartTLSNegotiation",
+      "event": "TLS negotiation success",
+      "action": "continue authentication",
+      "to": "NotAuthenticated"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive AUTHENTICATE SCRAM-SHA-256",
+      "action": "send challenge",
+      "to": "NotAuthenticated"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive client-final-message",
+      "action": "send server-final-message",
+      "to": "NotAuthenticated"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive empty client-final-message",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Selected",
+      "event": "receive EXISTS",
+      "action": "update mailbox",
+      "to": "Selected"
+    },
+    {
+      "from": "Selected",
+      "event": "receive EXPUNGE",
+      "action": "update mailbox",
+      "to": "Selected"
+    },
+    {
+      "from": "AwaitingLiteral",
+      "event": "receive error",
+      "action": "reply BAD",
+      "to": "ErrorState"
+    },
+    {
+      "from": "CommandInProgress",
+      "event": "command completes_ok",
+      "action": "reply OK",
+      "to": "Idle"
+    },
+    {
+      "from": "CommandInProgress",
+      "event": "command completes_no",
+      "action": "reply NO",
+      "to": "Idle"
+    },
+    {
+      "from": "CommandInProgress",
+      "event": "command completes_bad",
+      "action": "reply BAD",
+      "to": "ErrorState"
+    },
+    {
+      "from": "CommandInProgress",
+      "event": "send untagged_data",
+      "action": "send data",
+      "to": "CommandInProgress"
+    },
+    {
+      "from": "CommandInProgress",
+      "event": "receive client_command",
+      "action": "queue command",
+      "to": "CommandInProgress"
+    },
+    {
+      "from": "ErrorState",
+      "event": "receive client_command",
+      "action": "reply BAD",
+      "to": "ErrorState"
+    },
+    {
+      "from": "AwaitingLiteral",
+      "event": "receive octets",
+      "action": "collect octets",
+      "to": "CommandInProgress"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive tagged_command",
+      "action": "parse command",
+      "to": "CommandInProgress"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive partial_command_literal",
+      "action": "send continuation_request",
+      "to": "AwaitingLiteral"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive partial_command_auth",
+      "action": "send continuation_request",
+      "to": "CommandInProgress"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive malformed_command",
+      "action": "reply BAD",
+      "to": "ErrorState"
     }
   ]
 }

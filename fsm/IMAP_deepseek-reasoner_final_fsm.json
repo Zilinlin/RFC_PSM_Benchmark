@@ -1,80 +1,230 @@
 {
   "states": [
-    "Not Authenticated",
+    "NotAuthenticated",
     "Authenticated",
     "Selected",
-    "Logout"
+    "Logout",
+    "Ready",
+    "ProcessingCommand",
+    "WaitingForContinuation",
+    "TlsNegotiation",
+    "ConnectionClosed"
   ],
-  "initial_state": "Not Authenticated",
+  "initial_state": "NotAuthenticated",
   "final_states": [
-    "Logout"
+    "Logout",
+    "ConnectionClosed"
   ],
   "transitions": [
     {
-      "from": "Not Authenticated",
-      "requisite": "successful LOGIN or AUTHENTICATE command",
-      "to": "Authenticated",
-      "actions": [
-        "LOGIN",
-        "AUTHENTICATE"
-      ],
-      "response": "resp-cond-auth (OK/PREAUTH)"
+      "from": "NotAuthenticated",
+      "event": "receive LOGIN",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive AUTHENTICATE",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive STARTTLS",
+      "action": "reply OK",
+      "to": "NotAuthenticated"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive LOGOUT",
+      "action": "reply BYE and OK",
+      "to": "Logout"
     },
     {
       "from": "Authenticated",
-      "requisite": "successful SELECT or EXAMINE command",
-      "to": "Selected",
-      "actions": [
-        "SELECT",
-        "EXAMINE"
-      ],
-      "response": "resp-cond-state (OK)"
-    },
-    {
-      "from": "Selected",
-      "requisite": "CLOSE, UNSELECT, unsolicited CLOSED response, or failed SELECT/EXAMINE",
-      "to": "Authenticated",
-      "actions": [
-        "CLOSE",
-        "UNSELECT"
-      ],
-      "response": "resp-cond-state (OK)"
-    },
-    {
-      "from": "Not Authenticated",
-      "requisite": "LOGOUT command, server shutdown, or connection closed",
-      "to": "Logout",
-      "actions": [
-        "LOGOUT"
-      ],
-      "response": "untagged BYE + tagged OK"
+      "event": "receive SELECT",
+      "action": "reply OK",
+      "to": "Selected"
     },
     {
       "from": "Authenticated",
-      "requisite": "LOGOUT command, server shutdown, or connection closed",
-      "to": "Logout",
-      "actions": [
-        "LOGOUT"
-      ],
-      "response": "untagged BYE + tagged OK"
+      "event": "receive EXAMINE",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive LOGOUT",
+      "action": "reply BYE and OK",
+      "to": "Logout"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive APPEND",
+      "action": "reply +",
+      "to": "WaitingForContinuation"
+    },
+    {
+      "from": "Authenticated",
+      "event": "timeout 30m",
+      "action": "close connection",
+      "to": "Logout"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive any command",
+      "action": "reset timer",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive ENABLE",
+      "action": "reply ENABLED OK",
+      "to": "Authenticated"
     },
     {
       "from": "Selected",
-      "requisite": "LOGOUT command, server shutdown, or connection closed",
-      "to": "Logout",
-      "actions": [
-        "LOGOUT"
-      ],
-      "response": "untagged BYE + tagged OK"
+      "event": "receive CLOSE",
+      "action": "reply OK",
+      "to": "Authenticated"
     },
     {
-      "from": "Not Authenticated",
-      "requisite": "STARTTLS",
-      "to": "Not Authenticated",
-      "actions": [
-        "STARTTLS"
-      ],
-      "response": "resp-cond-state (OK)"
+      "from": "Selected",
+      "event": "receive UNSELECT",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Selected",
+      "event": "receive LOGOUT",
+      "action": "reply BYE and OK",
+      "to": "Logout"
+    },
+    {
+      "from": "Selected",
+      "event": "receive FETCH",
+      "action": "reply FETCH OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Selected",
+      "event": "receive STORE",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Ready",
+      "event": "receive COMMAND",
+      "action": "process command",
+      "to": "ProcessingCommand"
+    },
+    {
+      "from": "Ready",
+      "event": "send_sync_literal",
+      "action": "send_literal_header",
+      "to": "WaitingForContinuation"
+    },
+    {
+      "from": "Ready",
+      "event": "receive STARTTLS",
+      "action": "reply OK Proceed",
+      "to": "TlsNegotiation"
+    },
+    {
+      "from": "ProcessingCommand",
+      "event": "send +",
+      "action": "reply +",
+      "to": "WaitingForContinuation"
+    },
+    {
+      "from": "ProcessingCommand",
+      "event": "send OK/NO/BAD",
+      "action": "reply tagged",
+      "to": "Ready"
+    },
+    {
+      "from": "WaitingForContinuation",
+      "event": "receive CONTINUATION",
+      "action": "process data",
+      "to": "ProcessingCommand"
+    },
+    {
+      "from": "WaitingForContinuation",
+      "event": "receive_continuation",
+      "action": "send_data",
+      "to": "Ready"
+    },
+    {
+      "from": "TlsNegotiation",
+      "event": "receive AUTHENTICATE",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "send BYE",
+      "action": "close connection",
+      "to": "ConnectionClosed"
+    },
+    {
+      "from": "Authenticated",
+      "event": "send BYE",
+      "action": "close connection",
+      "to": "ConnectionClosed"
+    },
+    {
+      "from": "Selected",
+      "event": "send BYE",
+      "action": "close connection",
+      "to": "ConnectionClosed"
+    },
+    {
+      "from": "Ready",
+      "event": "send BYE",
+      "action": "close connection",
+      "to": "ConnectionClosed"
+    },
+    {
+      "from": "ProcessingCommand",
+      "event": "send BYE",
+      "action": "close connection",
+      "to": "ConnectionClosed"
+    },
+    {
+      "from": "WaitingForContinuation",
+      "event": "send BYE",
+      "action": "close connection",
+      "to": "ConnectionClosed"
+    },
+    {
+      "from": "TlsNegotiation",
+      "event": "send BYE",
+      "action": "close connection",
+      "to": "ConnectionClosed"
+    },
+    {
+      "from": "Ready",
+      "event": "receive LOGOUT",
+      "action": "reply BYE",
+      "to": "Logout"
+    },
+    {
+      "from": "ProcessingCommand",
+      "event": "receive LOGOUT",
+      "action": "reply BYE",
+      "to": "Logout"
+    },
+    {
+      "from": "WaitingForContinuation",
+      "event": "receive LOGOUT",
+      "action": "reply BYE",
+      "to": "Logout"
+    },
+    {
+      "from": "TlsNegotiation",
+      "event": "receive LOGOUT",
+      "action": "reply BYE",
+      "to": "Logout"
     }
   ]
 }

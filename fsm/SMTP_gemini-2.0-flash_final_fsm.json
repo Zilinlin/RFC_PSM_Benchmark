@@ -1,291 +1,212 @@
 {
   "states": [
-    "Initial",
-    "ClientGreeted",
-    "MailTransactionStarted",
-    "RecipientAdded",
-    "DataReady",
+    "ConnectionEstablished",
+    "AwaitingEhloHelo",
+    "MailTransactionStart",
+    "WaitingForRcpt",
+    "DataTransfer",
+    "AwaitingQuit",
     "SessionEnd",
-    "EHLO/HELO Sent",
-    "Mail Transaction Open",
-    "Data Input",
-    "Quit Sent"
+    "VrfyExpnEnabled",
+    "VrfyExpnDisabled",
+    "AuthenticatedVrfyExpnEnabled"
   ],
-  "initial_state": "Initial",
+  "initial_state": "ConnectionEstablished",
   "final_states": [
-    "SessionEnd",
-    "Quit Sent"
+    "SessionEnd"
   ],
   "transitions": [
     {
-      "from": "Initial",
-      "requisite": "Client opens connection, server responds with 220",
-      "to": "ClientGreeted",
-      "actions": [],
-      "response": "220 Service ready"
+      "from": "ConnectionEstablished",
+      "event": "send 220 greeting",
+      "action": "reply 220",
+      "to": "AwaitingEhloHelo"
     },
     {
-      "from": "Initial",
-      "requisite": "Server rejects session",
-      "to": "Initial",
-      "actions": [
-        "Wait for QUIT"
-      ],
-      "response": "554 Transaction failed"
+      "from": "ConnectionEstablished",
+      "event": "send 554 rejection",
+      "action": "reply 554",
+      "to": "AwaitingQuit"
     },
     {
-      "from": "Initial",
-      "requisite": "Connection Established",
-      "to": "Initial",
-      "actions": [],
-      "response": "220 Service ready"
+      "from": "AwaitingEhloHelo",
+      "event": "receive EHLO",
+      "action": "reply 250",
+      "to": "MailTransactionStart"
     },
     {
-      "from": "Initial",
-      "requisite": "EHLO or HELO",
-      "to": "EHLO/HELO Sent",
-      "actions": [
-        "Clear buffers and state tables"
-      ],
-      "response": "250 OK"
+      "from": "AwaitingEhloHelo",
+      "event": "receive HELO",
+      "action": "reply 250",
+      "to": "MailTransactionStart"
     },
     {
-      "from": "Initial",
-      "requisite": "VRFY, EXPN, HELP, NOOP, RSET",
-      "to": "Initial",
-      "actions": [],
-      "response": "2xx"
+      "from": "AwaitingEhloHelo",
+      "event": "receive unrecognized command",
+      "action": "reply 500",
+      "to": "AwaitingEhloHelo"
     },
     {
-      "from": "ClientGreeted",
-      "requisite": "Client sends EHLO or HELO",
-      "to": "ClientGreeted",
-      "actions": [],
-      "response": "250 OK"
+      "from": "MailTransactionStart",
+      "event": "receive MAIL",
+      "action": "reply 250",
+      "to": "WaitingForRcpt"
     },
     {
-      "from": "ClientGreeted",
-      "requisite": "Client sends MAIL",
-      "to": "MailTransactionStarted",
-      "actions": [
-        "Reset state tables and buffers"
-      ],
-      "response": "250 OK"
+      "from": "MailTransactionStart",
+      "event": "receive other command",
+      "action": "reply 503",
+      "to": "MailTransactionStart"
     },
     {
-      "from": "EHLO/HELO Sent",
-      "requisite": "MAIL",
-      "to": "Mail Transaction Open",
-      "actions": [
-        "Clear reverse-path, forward-path, and mail data buffers",
-        "Insert reverse-path"
-      ],
-      "response": "250 OK"
+      "from": "WaitingForRcpt",
+      "event": "receive RCPT",
+      "action": "reply 250",
+      "to": "WaitingForRcpt"
     },
     {
-      "from": "EHLO/HELO Sent",
-      "requisite": "VRFY, EXPN, HELP, NOOP, RSET",
-      "to": "EHLO/HELO Sent",
-      "actions": [],
-      "response": "2xx"
+      "from": "WaitingForRcpt",
+      "event": "receive RCPT rejected",
+      "action": "reply 550",
+      "to": "WaitingForRcpt"
     },
     {
-      "from": "EHLO/HELO Sent",
-      "requisite": "QUIT",
-      "to": "Quit Sent",
-      "actions": [
-        "Close Transmission Channel"
-      ],
-      "response": "221 OK"
+      "from": "WaitingForRcpt",
+      "event": "receive DATA",
+      "action": "reply 354",
+      "to": "DataTransfer"
     },
     {
-      "from": "MailTransactionStarted",
-      "requisite": "Client sends RCPT",
-      "to": "RecipientAdded",
-      "actions": [
-        "Store forward-path"
-      ],
-      "response": "250 OK"
+      "from": "WaitingForRcpt",
+      "event": "receive DATA no_recipients",
+      "action": "reply 554",
+      "to": "MailTransactionStart"
     },
     {
-      "from": "RecipientAdded",
-      "requisite": "Client sends RCPT",
-      "to": "RecipientAdded",
-      "actions": [
-        "Store forward-path"
-      ],
-      "response": "250 OK"
+      "from": "WaitingForRcpt",
+      "event": "receive other command",
+      "action": "reply 503",
+      "to": "MailTransactionStart"
     },
     {
-      "from": "MailTransactionStarted",
-      "requisite": "Client sends DATA",
-      "to": "DataReady",
-      "actions": [],
-      "response": "354 Start mail input; end with <CRLF>.<CRLF>"
+      "from": "DataTransfer",
+      "event": "receive end_of_data",
+      "action": "reply 250",
+      "to": "MailTransactionStart"
     },
     {
-      "from": "RecipientAdded",
-      "requisite": "Client sends DATA",
-      "to": "DataReady",
-      "actions": [],
-      "response": "354 Start mail input; end with <CRLF>.<CRLF>"
+      "from": "DataTransfer",
+      "event": "receive end_of_data rejected",
+      "action": "reply 550",
+      "to": "MailTransactionStart"
     },
     {
-      "from": "DataReady",
-      "requisite": "Client sends end of mail data indicator",
-      "to": "ClientGreeted",
-      "actions": [
-        "Process stored recipients and mail data"
-      ],
-      "response": "250 OK"
+      "from": "MailTransactionStart",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "SessionEnd"
     },
     {
-      "from": "ClientGreeted",
-      "requisite": "Client sends QUIT",
-      "to": "SessionEnd",
-      "actions": [
-        "Close connection"
-      ],
-      "response": "221 Service closing transmission channel"
+      "from": "WaitingForRcpt",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "SessionEnd"
     },
     {
-      "from": "MailTransactionStarted",
-      "requisite": "Client sends QUIT",
-      "to": "SessionEnd",
-      "actions": [
-        "Close connection"
-      ],
-      "response": "221 Service closing transmission channel"
+      "from": "DataTransfer",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "SessionEnd"
     },
     {
-      "from": "RecipientAdded",
-      "requisite": "Client sends QUIT",
-      "to": "SessionEnd",
-      "actions": [
-        "Close connection"
-      ],
-      "response": "221 Service closing transmission channel"
+      "from": "AwaitingEhloHelo",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "SessionEnd"
     },
     {
-      "from": "DataReady",
-      "requisite": "Client sends QUIT",
-      "to": "SessionEnd",
-      "actions": [
-        "Close connection"
-      ],
-      "response": "221 Service closing transmission channel"
+      "from": "AwaitingQuit",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "SessionEnd"
     },
     {
-      "from": "MailTransactionStarted",
-      "requisite": "Client sends RCPT without MAIL",
-      "to": "ClientGreeted",
-      "actions": [],
-      "response": "503 Bad sequence of commands"
+      "from": "AwaitingQuit",
+      "event": "receive other command",
+      "action": "reply 503",
+      "to": "AwaitingQuit"
     },
     {
-      "from": "ClientGreeted",
-      "requisite": "Client sends DATA without MAIL or RCPT",
-      "to": "ClientGreeted",
-      "actions": [],
-      "response": "503 Bad sequence of commands"
+      "from": "ConnectionEstablished",
+      "event": "cond site_disables_VRFY_EXPN",
+      "action": "reply 252",
+      "to": "VrfyExpnDisabled"
     },
     {
-      "from": "MailTransactionStarted",
-      "requisite": "Client sends DATA without RCPT",
-      "to": "ClientGreeted",
-      "actions": [],
-      "response": "503 Bad sequence of commands"
+      "from": "ConnectionEstablished",
+      "event": "cond site_enables_VRFY_EXPN",
+      "action": "None",
+      "to": "VrfyExpnEnabled"
     },
     {
-      "from": "RecipientAdded",
-      "requisite": "Client sends MAIL",
-      "to": "MailTransactionStarted",
-      "actions": [
-        "Reset state tables and buffers"
-      ],
-      "response": "250 OK"
+      "from": "VrfyExpnEnabled",
+      "event": "receive VRFY_or_EXPN",
+      "action": "check address_validity",
+      "to": "VrfyExpnEnabled"
     },
     {
-      "from": "Mail Transaction Open",
-      "requisite": "RCPT",
-      "to": "Mail Transaction Open",
-      "actions": [
-        "Append forward-path"
-      ],
-      "response": "250 OK, 251 User not local"
+      "from": "VrfyExpnEnabled",
+      "event": "cond address_valid",
+      "action": "reply 250",
+      "to": "VrfyExpnEnabled"
     },
     {
-      "from": "Mail Transaction Open",
-      "requisite": "DATA",
-      "to": "Data Input",
-      "actions": [],
-      "response": "354 Start mail input"
+      "from": "VrfyExpnEnabled",
+      "event": "cond address_invalid",
+      "action": "reply 550",
+      "to": "VrfyExpnEnabled"
     },
     {
-      "from": "Mail Transaction Open",
-      "requisite": "RSET",
-      "to": "EHLO/HELO Sent",
-      "actions": [
-        "Discard sender, recipients, and mail data",
-        "Clear buffers and state tables"
-      ],
-      "response": "250 OK"
+      "from": "VrfyExpnDisabled",
+      "event": "receive VRFY_or_EXPN",
+      "action": "reply 252",
+      "to": "VrfyExpnDisabled"
     },
     {
-      "from": "Mail Transaction Open",
-      "requisite": "EHLO",
-      "to": "EHLO/HELO Sent",
-      "actions": [
-        "Clear buffers and state tables"
-      ],
-      "response": "250 OK"
+      "from": "ConnectionEstablished",
+      "event": "cond smtp_authentication_enabled",
+      "action": "None",
+      "to": "AuthenticatedVrfyExpnEnabled"
     },
     {
-      "from": "Mail Transaction Open",
-      "requisite": "QUIT",
-      "to": "Quit Sent",
-      "actions": [
-        "Abort transaction",
-        "Close Transmission Channel"
-      ],
-      "response": "221 OK"
+      "from": "AuthenticatedVrfyExpnEnabled",
+      "event": "receive VRFY_or_EXPN",
+      "action": "check authenticated_requestor",
+      "to": "AuthenticatedVrfyExpnEnabled"
     },
     {
-      "from": "Data Input",
-      "requisite": "<CRLF>.<CRLF>",
-      "to": "EHLO/HELO Sent",
-      "actions": [
-        "Process stored mail transaction information",
-        "Clear reverse-path, forward-path, and mail data buffers"
-      ],
-      "response": "250 OK"
+      "from": "AuthenticatedVrfyExpnEnabled",
+      "event": "cond authenticated",
+      "action": "check address_validity",
+      "to": "AuthenticatedVrfyExpnEnabled"
     },
     {
-      "from": "Data Input",
-      "requisite": "<CRLF>.<CRLF>",
-      "to": "EHLO/HELO Sent",
-      "actions": [
-        "Process stored mail transaction information",
-        "Clear reverse-path, forward-path, and mail data buffers"
-      ],
-      "response": "5yz, 4yz"
+      "from": "AuthenticatedVrfyExpnEnabled",
+      "event": "cond not_authenticated",
+      "action": "reply 550",
+      "to": "AuthenticatedVrfyExpnEnabled"
     },
     {
-      "from": "EHLO/HELO Sent",
-      "requisite": "MAIL (after DATA)",
-      "to": "Mail Transaction Open",
-      "actions": [
-        "Clear reverse-path, forward-path, and mail data buffers",
-        "Insert reverse-path"
-      ],
-      "response": "250 OK"
+      "from": "AuthenticatedVrfyExpnEnabled",
+      "event": "cond address_valid",
+      "action": "reply 250",
+      "to": "AuthenticatedVrfyExpnEnabled"
     },
     {
-      "from": "Quit Sent",
-      "requisite": "Connection Closed",
-      "to": "Initial",
-      "actions": [],
-      "response": ""
+      "from": "AuthenticatedVrfyExpnEnabled",
+      "event": "cond address_invalid",
+      "action": "reply 550",
+      "to": "AuthenticatedVrfyExpnEnabled"
     }
   ]
 }

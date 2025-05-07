@@ -1,178 +1,291 @@
 {
   "states": [
-    "CLOSED",
-    "LISTEN",
-    "SYN-SENT",
-    "SYN-RECEIVED",
-    "ESTABLISHED",
-    "FIN-WAIT-1",
-    "FIN-WAIT-2",
-    "CLOSE-WAIT",
-    "CLOSING",
-    "LAST-ACK",
-    "TIME-WAIT"
+    "Closed",
+    "Listen",
+    "SynSent",
+    "SynReceived",
+    "Established",
+    "FinWait1",
+    "FinWait2",
+    "CloseWait",
+    "Closing",
+    "LastAck",
+    "TimeWait"
   ],
-  "initial_state": "CLOSED",
+  "initial_state": "Closed",
   "final_states": [
-    "CLOSED",
-    "TIME-WAIT"
+    "Closed"
   ],
   "transitions": [
     {
-      "from": "CLOSED",
-      "requisite": "active OPEN",
-      "to": "SYN-SENT",
-      "actions": [
-        "create TCB",
-        "snd SYN"
-      ],
-      "response": ""
+      "from": "Closed",
+      "event": "receive SEGMENT_noRST",
+      "action": "send RST",
+      "to": "Closed"
     },
     {
-      "from": "CLOSED",
-      "requisite": "passive OPEN",
-      "to": "LISTEN",
-      "actions": [
-        "create TCB"
-      ],
-      "response": ""
+      "from": "Closed",
+      "event": "receive SEGMENT_RST",
+      "action": "discard data",
+      "to": "Closed"
     },
     {
-      "from": "LISTEN",
-      "requisite": "CLOSE",
-      "to": "CLOSED",
-      "actions": [
-        "delete TCB"
-      ],
-      "response": ""
+      "from": "Listen",
+      "event": "receive RST",
+      "action": "ignore RST",
+      "to": "Listen"
     },
     {
-      "from": "LISTEN",
-      "requisite": "rcv RST (note 1)",
-      "to": "LISTEN",
-      "actions": [],
-      "response": ""
+      "from": "Listen",
+      "event": "receive ACK",
+      "action": "send RST",
+      "to": "Listen"
     },
     {
-      "from": "LISTEN",
-      "requisite": "rcv SYN",
-      "to": "SYN-RECEIVED",
-      "actions": [
-        "snd SYN,ACK"
-      ],
-      "response": ""
+      "from": "Listen",
+      "event": "receive SYN_securityMismatch",
+      "action": "send RST",
+      "to": "Listen"
     },
     {
-      "from": "LISTEN",
-      "requisite": "SEND",
-      "to": "SYN-SENT",
-      "actions": [
-        "snd SYN"
-      ],
-      "response": ""
+      "from": "Listen",
+      "event": "receive SYN_securityMatch",
+      "action": "set RCV.NXT",
+      "to": "SynReceived"
     },
     {
-      "from": "SYN-RECEIVED",
-      "requisite": "rcv ACK of SYN",
-      "to": "ESTABLISHED",
-      "actions": [],
-      "response": ""
+      "from": "Listen",
+      "event": "receive other",
+      "action": "drop segment",
+      "to": "Listen"
     },
     {
-      "from": "SYN-SENT",
-      "requisite": "rcv SYN,ACK",
-      "to": "ESTABLISHED",
-      "actions": [
-        "snd ACK"
-      ],
-      "response": ""
+      "from": "SynSent",
+      "event": "receive ACK_invalid",
+      "action": "send RST",
+      "to": "SynSent"
     },
     {
-      "from": "SYN-SENT",
-      "requisite": "rcv SYN",
-      "to": "SYN-RECEIVED",
-      "actions": [
-        "snd SYN,ACK"
-      ],
-      "response": ""
+      "from": "SynSent",
+      "event": "receive RST_ACKacceptable",
+      "action": "signal error",
+      "to": "Closed"
     },
     {
-      "from": "ESTABLISHED",
-      "requisite": "CLOSE",
-      "to": "FIN-WAIT-1",
-      "actions": [
-        "snd FIN"
-      ],
-      "response": ""
+      "from": "SynSent",
+      "event": "receive RST_noACK",
+      "action": "drop segment",
+      "to": "SynSent"
     },
     {
-      "from": "ESTABLISHED",
-      "requisite": "rcv FIN",
-      "to": "CLOSE-WAIT",
-      "actions": [
-        "snd ACK"
-      ],
-      "response": ""
+      "from": "SynSent",
+      "event": "receive securityMismatch",
+      "action": "send RST",
+      "to": "SynSent"
     },
     {
-      "from": "FIN-WAIT-1",
-      "requisite": "rcv ACK of FIN",
-      "to": "FIN-WAIT-2",
-      "actions": [],
-      "response": ""
+      "from": "SynSent",
+      "event": "receive SYN_ACKok",
+      "action": "change state, form ACK, send ACK, queue data, set SND.WND",
+      "to": "Established"
     },
     {
-      "from": "FIN-WAIT-1",
-      "requisite": "rcv FIN",
-      "to": "CLOSING",
-      "actions": [
-        "snd ACK"
-      ],
-      "response": ""
+      "from": "SynSent",
+      "event": "receive other",
+      "action": "drop segment",
+      "to": "SynSent"
     },
     {
-      "from": "FIN-WAIT-2",
-      "requisite": "rcv FIN",
-      "to": "TIME-WAIT",
-      "actions": [
-        "snd ACK"
-      ],
-      "response": ""
+      "from": "SynReceived",
+      "event": "receive RST",
+      "action": "return to Listen, signal connection refused",
+      "to": "Listen"
     },
     {
-      "from": "CLOSING",
-      "requisite": "rcv ACK of FIN",
-      "to": "TIME-WAIT",
-      "actions": [],
-      "response": ""
+      "from": "Established",
+      "event": "receive RST",
+      "action": "signal reset",
+      "to": "Closed"
     },
     {
-      "from": "CLOSE-WAIT",
-      "requisite": "CLOSE",
-      "to": "LAST-ACK",
-      "actions": [
-        "snd FIN"
-      ],
-      "response": ""
+      "from": "FinWait1",
+      "event": "receive RST",
+      "action": "signal reset",
+      "to": "Closed"
     },
     {
-      "from": "LAST-ACK",
-      "requisite": "rcv ACK of FIN",
-      "to": "CLOSED",
-      "actions": [
-        "Timeout=2MSL",
-        "delete TCB"
-      ],
-      "response": ""
+      "from": "FinWait2",
+      "event": "receive RST",
+      "action": "signal reset",
+      "to": "Closed"
     },
     {
-      "from": "TIME-WAIT",
-      "requisite": "Timeout=2MSL",
-      "to": "CLOSED",
-      "actions": [
-        "delete TCB"
-      ],
-      "response": ""
+      "from": "CloseWait",
+      "event": "receive RST",
+      "action": "signal reset",
+      "to": "Closed"
+    },
+    {
+      "from": "Closing",
+      "event": "receive RST",
+      "action": "enter Closed",
+      "to": "Closed"
+    },
+    {
+      "from": "LastAck",
+      "event": "receive RST",
+      "action": "enter Closed",
+      "to": "Closed"
+    },
+    {
+      "from": "TimeWait",
+      "event": "receive RST",
+      "action": "enter Closed",
+      "to": "Closed"
+    },
+    {
+      "from": "SynReceived",
+      "event": "receive securityMismatch",
+      "action": "send RST",
+      "to": "SynReceived"
+    },
+    {
+      "from": "Established",
+      "event": "receive securityMismatch",
+      "action": "send RST",
+      "to": "Closed"
+    },
+    {
+      "from": "FinWait1",
+      "event": "receive securityMismatch",
+      "action": "send RST",
+      "to": "Closed"
+    },
+    {
+      "from": "FinWait2",
+      "event": "receive securityMismatch",
+      "action": "send RST",
+      "to": "Closed"
+    },
+    {
+      "from": "CloseWait",
+      "event": "receive securityMismatch",
+      "action": "send RST",
+      "to": "Closed"
+    },
+    {
+      "from": "Closing",
+      "event": "receive securityMismatch",
+      "action": "send RST",
+      "to": "Closed"
+    },
+    {
+      "from": "LastAck",
+      "event": "receive securityMismatch",
+      "action": "send RST",
+      "to": "Closed"
+    },
+    {
+      "from": "TimeWait",
+      "event": "receive securityMismatch",
+      "action": "send RST",
+      "to": "Closed"
+    },
+    {
+      "from": "SynReceived",
+      "event": "receive SYN",
+      "action": "return to Listen",
+      "to": "Listen"
+    },
+    {
+      "from": "Established",
+      "event": "receive SYN",
+      "action": "send challenge ACK",
+      "to": "Established"
+    },
+    {
+      "from": "FinWait1",
+      "event": "receive SYN",
+      "action": "send challenge ACK",
+      "to": "FinWait1"
+    },
+    {
+      "from": "FinWait2",
+      "event": "receive SYN",
+      "action": "send challenge ACK",
+      "to": "FinWait2"
+    },
+    {
+      "from": "CloseWait",
+      "event": "receive SYN",
+      "action": "send challenge ACK",
+      "to": "CloseWait"
+    },
+    {
+      "from": "Closing",
+      "event": "receive SYN",
+      "action": "send challenge ACK",
+      "to": "Closing"
+    },
+    {
+      "from": "LastAck",
+      "event": "receive SYN",
+      "action": "send challenge ACK",
+      "to": "LastAck"
+    },
+    {
+      "from": "TimeWait",
+      "event": "receive SYN",
+      "action": "send challenge ACK",
+      "to": "TimeWait"
+    },
+    {
+      "from": "SynReceived",
+      "event": "receive ACK",
+      "action": "enter Established",
+      "to": "Established"
+    },
+    {
+      "from": "FinWait1",
+      "event": "receive FIN",
+      "action": "enter Closing, enter TimeWait",
+      "to": "Closing"
+    },
+    {
+      "from": "FinWait2",
+      "event": "receive FIN",
+      "action": "enter TimeWait",
+      "to": "TimeWait"
+    },
+    {
+      "from": "Established",
+      "event": "receive FIN",
+      "action": "enter CloseWait",
+      "to": "CloseWait"
+    },
+    {
+      "from": "FinWait1",
+      "event": "receive ACK",
+      "action": "enter FinWait2",
+      "to": "FinWait2"
+    },
+    {
+      "from": "Closing",
+      "event": "receive ACK",
+      "action": "enter TimeWait",
+      "to": "TimeWait"
+    },
+    {
+      "from": "LastAck",
+      "event": "receive ACK",
+      "action": "enter Closed",
+      "to": "Closed"
+    },
+    {
+      "from": "SynSent",
+      "event": "receive SYN_ACKok",
+      "action": "form SYN,ACK, send SYN,ACK",
+      "to": "SynReceived"
     }
   ]
 }

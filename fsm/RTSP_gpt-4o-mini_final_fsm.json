@@ -1,323 +1,483 @@
 {
   "states": [
-    "Session Established",
-    "Media Delivery Control",
-    "Session Maintenance",
-    "Session Termination",
-    "Idle",
-    "Request Sent",
-    "Response Received",
-    "Connection Closed",
-    "Overload",
-    "Init",
-    "Ready",
-    "Play",
+    "SessionEstablished",
+    "MediaDeliveryControl",
+    "SessionMaintenance",
+    "SessionTermination",
+    "SessionParameterManipulations",
+    "ResponseReady",
+    "FinalResponseSent",
+    "InformationalResponseSent",
+    "WaitingForResponse",
+    "ConnectionClosed",
+    "ConnectionOpen",
+    "RequestSent",
+    "ResponseReceived",
+    "SessionTimedOut",
+    "OverloadDetected",
+    "Initial",
+    "MethodSupported",
+    "MethodNotSupported",
+    "FeatureTagSupported",
+    "FeatureTagNotSupported",
+    "ProcessingRequest",
+    "PipelinedRequest",
+    "WaitingForSetup",
+    "WaitingForPlay",
+    "SendingData",
+    "CacheValidating",
+    "CacheStale",
+    "CacheInvalid",
+    "Informational",
+    "Success",
+    "Redirection",
+    "ClientError",
+    "ServerError",
     "Client",
-    "Server",
     "Proxy",
-    "Cache Valid",
-    "Cache Stale",
-    "Cache Invalid",
-    "RTP/AVP/UDP",
-    "RTP/AVPF/UDP",
-    "RTP/SAVP/UDP",
-    "RTP/SAVPF/UDP",
-    "RTP over TCP",
-    "Interleaved RTP over TCP",
-    "RTP over Independent TCP",
-    "Aggregate Control Available",
-    "Aggregate Control Not Available",
-    "RTSP External SDP Delivery"
+    "Authenticated",
+    "ConnectionAuthorizationRequired",
+    "MediaSetup",
+    "Playing",
+    "Paused",
+    "Teardown",
+    "Error",
+    "PlayState",
+    "RTSP1_0",
+    "RTSP2_0",
+    "Init",
+    "Ready"
   ],
-  "initial_state": "Session Established",
+  "initial_state": "Init",
   "final_states": [
-    "Session Termination",
-    "Connection Closed",
-    "Cache Invalid",
-    "RTP over Independent TCP",
-    "RTSP External SDP Delivery"
+    "SessionTermination",
+    "FinalResponseSent",
+    "ConnectionClosed",
+    "CacheInvalid",
+    "ServerError",
+    "Error",
+    "Teardown"
   ],
   "transitions": [
     {
-      "from": "Session Established",
-      "requisite": "SETUP request received",
-      "to": "Media Delivery Control",
-      "actions": [
-        "Create RTSP session",
-        "Store parameters"
-      ],
-      "response": "SETUP response with session identifier"
+      "from": "SessionEstablished",
+      "event": "receive SETUP",
+      "action": "reply 200",
+      "to": "MediaDeliveryControl"
     },
     {
-      "from": "Media Delivery Control",
-      "requisite": "PLAY request received",
-      "to": "Media Delivery Control",
-      "actions": [
-        "Start media playback"
-      ],
-      "response": "PLAY response with media delivery information"
+      "from": "MediaDeliveryControl",
+      "event": "receive PLAY",
+      "action": "reply 200",
+      "to": "MediaDeliveryControl"
     },
     {
-      "from": "Media Delivery Control",
-      "requisite": "PAUSE request received",
-      "to": "Media Delivery Control",
-      "actions": [
-        "Suspend media playback"
-      ],
-      "response": "PAUSE response with current playback position"
+      "from": "MediaDeliveryControl",
+      "event": "receive PAUSE",
+      "action": "reply 200",
+      "to": "MediaDeliveryControl"
     },
     {
-      "from": "Media Delivery Control",
-      "requisite": "TEARDOWN request received",
-      "to": "Session Termination",
-      "actions": [
-        "Terminate session"
-      ],
-      "response": "TEARDOWN response confirming session termination"
+      "from": "MediaDeliveryControl",
+      "event": "receive TEARDOWN",
+      "action": "reply 200",
+      "to": "SessionTermination"
     },
     {
-      "from": "Session Maintenance",
-      "requisite": "No liveness detected",
-      "to": "Session Termination",
-      "actions": [
-        "Terminate session context"
-      ],
-      "response": "Session termination notification"
+      "from": "SessionMaintenance",
+      "event": "timeout 60s",
+      "action": "close session",
+      "to": "SessionTermination"
     },
     {
-      "from": "Idle",
-      "requisite": "Client sends request",
-      "to": "Request Sent",
-      "actions": [
-        "Open connection"
-      ],
-      "response": "Request is sent to server"
+      "from": "SessionParameterManipulations",
+      "event": "receive GET_PARAMETER",
+      "action": "reply 200",
+      "to": "SessionParameterManipulations"
     },
     {
-      "from": "Request Sent",
-      "requisite": "Response received from server",
-      "to": "Response Received",
-      "actions": [
-        "Process response"
-      ],
-      "response": "Response is processed"
+      "from": "SessionParameterManipulations",
+      "event": "receive SET_PARAMETER",
+      "action": "reply 200",
+      "to": "SessionParameterManipulations"
     },
     {
-      "from": "Response Received",
-      "requisite": "No outstanding requests",
-      "to": "Idle",
-      "actions": [
-        "Close connection"
-      ],
-      "response": "Connection is closed"
+      "from": "ResponseReady",
+      "event": "receive request",
+      "action": "reply 100",
+      "to": "InformationalResponseSent"
     },
     {
-      "from": "Request Sent",
-      "requisite": "Server overload",
-      "to": "Overload",
-      "actions": [
-        "Send 503 response"
-      ],
-      "response": "Notify client of overload"
+      "from": "InformationalResponseSent",
+      "event": "receive request",
+      "action": "reply 200",
+      "to": "FinalResponseSent"
     },
     {
-      "from": "Overload",
-      "requisite": "Retry after timeout",
-      "to": "Idle",
-      "actions": [
-        "Retry request"
-      ],
-      "response": "Request is retried"
+      "from": "ResponseReady",
+      "event": "receive request",
+      "action": "reply 200",
+      "to": "FinalResponseSent"
+    },
+    {
+      "from": "ResponseReady",
+      "event": "receive request",
+      "action": "reply 3rr",
+      "to": "FinalResponseSent"
+    },
+    {
+      "from": "ResponseReady",
+      "event": "receive request",
+      "action": "reply 4xx",
+      "to": "FinalResponseSent"
+    },
+    {
+      "from": "ResponseReady",
+      "event": "receive request",
+      "action": "reply 5xx",
+      "to": "FinalResponseSent"
+    },
+    {
+      "from": "ConnectionOpen",
+      "event": "receive request",
+      "action": "send response",
+      "to": "ResponseReceived"
+    },
+    {
+      "from": "ResponseReceived",
+      "event": "timeout 10s",
+      "action": "close connection",
+      "to": "ConnectionClosed"
+    },
+    {
+      "from": "ResponseReceived",
+      "event": "receive 100",
+      "action": "log continue",
+      "to": "WaitingForResponse"
+    },
+    {
+      "from": "WaitingForResponse",
+      "event": "timeout 5s",
+      "action": "send 100",
+      "to": "WaitingForResponse"
+    },
+    {
+      "from": "WaitingForResponse",
+      "event": "receive final response",
+      "action": "log success",
+      "to": "ConnectionOpen"
+    },
+    {
+      "from": "ConnectionOpen",
+      "event": "receive overload",
+      "action": "log overload",
+      "to": "OverloadDetected"
+    },
+    {
+      "from": "OverloadDetected",
+      "event": "timeout 5s",
+      "action": "send retry after",
+      "to": "ConnectionOpen"
+    },
+    {
+      "from": "ConnectionClosed",
+      "event": "receive new request",
+      "action": "open connection",
+      "to": "ConnectionOpen"
+    },
+    {
+      "from": "SessionTimedOut",
+      "event": "receive new request",
+      "action": "log session timeout",
+      "to": "ConnectionClosed"
+    },
+    {
+      "from": "Initial",
+      "event": "receive OPTIONS",
+      "action": "reply PublicHeader",
+      "to": "MethodSupported"
+    },
+    {
+      "from": "Initial",
+      "event": "receive COMMAND",
+      "action": "reply 501",
+      "to": "MethodNotSupported"
+    },
+    {
+      "from": "MethodSupported",
+      "event": "receive SupportedHeader",
+      "action": "set feature support",
+      "to": "FeatureTagSupported"
+    },
+    {
+      "from": "MethodNotSupported",
+      "event": "receive RequireHeader",
+      "action": "reply 551",
+      "to": "FeatureTagNotSupported"
+    },
+    {
+      "from": "FeatureTagSupported",
+      "event": "receive ProxySupportedHeader",
+      "action": "set proxy feature support",
+      "to": "FeatureTagSupported"
+    },
+    {
+      "from": "FeatureTagNotSupported",
+      "event": "receive UnsupportedHeader",
+      "action": "log unsupported features",
+      "to": "FeatureTagNotSupported"
+    },
+    {
+      "from": "WaitingForResponse",
+      "event": "receive REQUEST",
+      "action": "set ProcessingRequest true",
+      "to": "ProcessingRequest"
+    },
+    {
+      "from": "ProcessingRequest",
+      "event": "receive NEXT_REQUEST",
+      "action": "reply PROCESSING",
+      "to": "ProcessingRequest"
+    },
+    {
+      "from": "ProcessingRequest",
+      "event": "send RESPONSE",
+      "action": "set WaitingForResponse true",
+      "to": "WaitingForResponse"
+    },
+    {
+      "from": "ProcessingRequest",
+      "event": "receive PipelinedRequest",
+      "action": "set PipelinedRequest true",
+      "to": "ProcessingRequest"
+    },
+    {
+      "from": "WaitingForSetup",
+      "event": "receive SETUP",
+      "action": "reply 200 OK",
+      "to": "WaitingForPlay"
+    },
+    {
+      "from": "WaitingForPlay",
+      "event": "receive PLAY",
+      "action": "reply 200 OK",
+      "to": "SendingData"
+    },
+    {
+      "from": "SendingData",
+      "event": "send RTP",
+      "action": "send RTP packet",
+      "to": "SendingData"
+    },
+    {
+      "from": "SendingData",
+      "event": "send RTCP",
+      "action": "send RTCP packet",
+      "to": "SendingData"
+    },
+    {
+      "from": "CacheStale",
+      "event": "receive SETUP",
+      "action": "reply 304",
+      "to": "CacheValidating"
+    },
+    {
+      "from": "CacheValidating",
+      "event": "receive DESCRIBE",
+      "action": "reply 200",
+      "to": "CacheValidating"
+    },
+    {
+      "from": "CacheValidating",
+      "event": "receive SETUP",
+      "action": "reply 200",
+      "to": "CacheValidating"
+    },
+    {
+      "from": "CacheValidating",
+      "event": "receive PLAY",
+      "action": "reply 200",
+      "to": "CacheValidating"
+    },
+    {
+      "from": "CacheValidating",
+      "event": "receive PAUSE",
+      "action": "reply 200",
+      "to": "CacheValidating"
+    },
+    {
+      "from": "CacheInvalid",
+      "event": "receive DESCRIBE",
+      "action": "reply 200",
+      "to": "CacheValidating"
+    },
+    {
+      "from": "CacheInvalid",
+      "event": "receive SETUP",
+      "action": "reply 200",
+      "to": "CacheValidating"
+    },
+    {
+      "from": "Informational",
+      "event": "receive 100",
+      "action": "reply 100",
+      "to": "Informational"
+    },
+    {
+      "from": "Informational",
+      "event": "receive 200",
+      "action": "reply 200",
+      "to": "Success"
+    },
+    {
+      "from": "Success",
+      "event": "receive 3xx",
+      "action": "reply 3rr",
+      "to": "Redirection"
+    },
+    {
+      "from": "Redirection",
+      "event": "receive 400",
+      "action": "reply 400",
+      "to": "ClientError"
+    },
+    {
+      "from": "ClientError",
+      "event": "receive 500",
+      "action": "reply 500",
+      "to": "ServerError"
+    },
+    {
+      "from": "Client",
+      "event": "receive SETUP",
+      "action": "send 470",
+      "to": "ConnectionAuthorizationRequired"
+    },
+    {
+      "from": "ConnectionAuthorizationRequired",
+      "event": "receive Accept-Credentials",
+      "action": "send SETUP",
+      "to": "Proxy"
+    },
+    {
+      "from": "Proxy",
+      "event": "receive SETUP",
+      "action": "send 200",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Proxy",
+      "event": "receive 471",
+      "action": "log failure",
+      "to": "Client"
+    },
+    {
+      "from": "Authenticated",
+      "event": "timeout 5s",
+      "action": "reset",
+      "to": "Client"
+    },
+    {
+      "from": "WaitingForResponse",
+      "event": "receive DESCRIBE",
+      "action": "reply 200 OK",
+      "to": "MediaSetup"
+    },
+    {
+      "from": "MediaSetup",
+      "event": "receive SETUP",
+      "action": "reply 200 OK",
+      "to": "Playing"
+    },
+    {
+      "from": "Playing",
+      "event": "receive PLAY",
+      "action": "reply 200 OK",
+      "to": "Playing"
+    },
+    {
+      "from": "Playing",
+      "event": "receive PAUSE",
+      "action": "reply 200 OK",
+      "to": "Paused"
+    },
+    {
+      "from": "Paused",
+      "event": "receive PLAY",
+      "action": "reply 200 OK",
+      "to": "Playing"
+    },
+    {
+      "from": "Playing",
+      "event": "receive TEARDOWN",
+      "action": "reply 200 OK",
+      "to": "Teardown"
     },
     {
       "from": "Init",
-      "requisite": "SETUP request",
-      "to": "Ready",
-      "actions": [
-        "initialize session"
-      ],
-      "response": "200 OK"
+      "event": "receive SETUP",
+      "action": "reply 200 OK",
+      "to": "Ready"
     },
     {
       "from": "Ready",
-      "requisite": "PLAY request",
-      "to": "Play",
-      "actions": [
-        "start media delivery"
-      ],
-      "response": "200 OK"
+      "event": "receive PLAY",
+      "action": "reply 200 OK",
+      "to": "Play"
     },
     {
       "from": "Play",
-      "requisite": "PAUSE request",
-      "to": "Ready",
-      "actions": [
-        "halt media delivery"
-      ],
-      "response": "200 OK"
+      "event": "receive PAUSE",
+      "action": "reply 200 OK",
+      "to": "Ready"
     },
     {
       "from": "Play",
-      "requisite": "TEARDOWN request",
-      "to": "Init",
-      "actions": [
-        "destroy session"
-      ],
-      "response": "200 OK"
+      "event": "receive TEARDOWN",
+      "action": "reply 200 OK",
+      "to": "Init"
     },
     {
-      "from": "Client",
-      "requisite": "SETUP request",
-      "to": "Server",
-      "actions": [
-        "Send SETUP request with Transport header"
-      ],
-      "response": "200 OK with Transport parameters"
+      "from": "InitialState",
+      "event": "receive REQUEST",
+      "action": "reply ACK",
+      "to": "WaitingForAck"
     },
     {
-      "from": "Server",
-      "requisite": "PLAY request",
-      "to": "Client",
-      "actions": [
-        "Send PLAY response with RTP-Info"
-      ],
-      "response": "200 OK with RTP-Info and media data"
+      "from": "WaitingForAck",
+      "event": "timeout RTT",
+      "action": "set retransmit true",
+      "to": "Retransmitting"
     },
     {
-      "from": "Server",
-      "requisite": "Send RTP data",
-      "to": "Client",
-      "actions": [
-        "Send interleaved RTP packet"
-      ],
-      "response": "RTP data sent"
+      "from": "Retransmitting",
+      "event": "receive ACK",
+      "action": "set retransmit false",
+      "to": "WaitingForAck"
     },
     {
-      "from": "Server",
-      "requisite": "Send RTCP data",
-      "to": "Client",
-      "actions": [
-        "Send interleaved RTCP packet"
-      ],
-      "response": "RTCP data sent"
+      "from": "PlayState",
+      "event": "receive PLAY",
+      "action": "reply immediate",
+      "to": "PlayState"
     },
     {
-      "from": "Cache Stale",
-      "requisite": "Check with origin server",
-      "to": "Cache Valid",
-      "actions": [
-        "Validate cache entry"
-      ],
-      "response": "304 Not Modified"
+      "from": "RTSP1_0",
+      "event": "receive REQUEST",
+      "action": "reply 505",
+      "to": "RTSP1_0"
     },
     {
-      "from": "Cache Stale",
-      "requisite": "Cache entry is invalid",
-      "to": "Cache Invalid",
-      "actions": [
-        "Invalidate cache entry"
-      ],
-      "response": "Full response returned"
+      "from": "RTSP2_0",
+      "event": "receive OPTIONS",
+      "action": "reply RTSP1_0",
+      "to": "RTSP1_0"
     },
     {
-      "from": "Cache Valid",
-      "requisite": "Receive conditional request",
-      "to": "Cache Valid",
-      "actions": [
-        "Use cache entry"
-      ],
-      "response": "Return cached response"
-    },
-    {
-      "from": "Client",
-      "requisite": "Connect to Proxy",
-      "to": "Proxy",
-      "actions": [
-        "Send RTSP request"
-      ],
-      "response": "Proxy responds with 470 or 407"
-    },
-    {
-      "from": "Proxy",
-      "requisite": "Check Accept-Credentials",
-      "to": "Server",
-      "actions": [
-        "Forward RTSP request"
-      ],
-      "response": "Server processes request"
-    },
-    {
-      "from": "Proxy",
-      "requisite": "Reject Accept-Credentials",
-      "to": "Client",
-      "actions": [
-        "Send 471 response"
-      ],
-      "response": "Connection Credentials Not Accepted"
-    },
-    {
-      "from": "RTP/AVP/UDP",
-      "requisite": "client sends SETUP request",
-      "to": "RTP/AVPF/UDP",
-      "actions": [
-        "negotiate AVPF"
-      ],
-      "response": "AVPF profile accepted"
-    },
-    {
-      "from": "RTP/AVP/UDP",
-      "requisite": "client sends SETUP request with SAVP",
-      "to": "RTP/SAVP/UDP",
-      "actions": [
-        "negotiate SAVP"
-      ],
-      "response": "SAVP profile accepted"
-    },
-    {
-      "from": "RTP/AVP/UDP",
-      "requisite": "client sends SETUP request with SAVPF",
-      "to": "RTP/SAVPF/UDP",
-      "actions": [
-        "negotiate SAVPF"
-      ],
-      "response": "SAVPF profile accepted"
-    },
-    {
-      "from": "RTP over TCP",
-      "requisite": "client sends SETUP request for RTP/AVP/TCP",
-      "to": "Interleaved RTP over TCP",
-      "actions": [
-        "establish TCP connection"
-      ],
-      "response": "TCP connection established"
-    },
-    {
-      "from": "RTP over TCP",
-      "requisite": "client sends SETUP request for RTP/AVP/TCP without interleaved",
-      "to": "RTP over Independent TCP",
-      "actions": [
-        "establish independent TCP connections"
-      ],
-      "response": "Independent TCP connections established"
-    },
-    {
-      "from": "Aggregate Control Available",
-      "requisite": "Client requests media description",
-      "to": "RTSP External SDP Delivery",
-      "actions": [
-        "Provide absolute URIs",
-        "Include session availability information"
-      ],
-      "response": "SDP delivered with aggregate control"
-    },
-    {
-      "from": "Aggregate Control Not Available",
-      "requisite": "Client requests media description",
-      "to": "RTSP External SDP Delivery",
-      "actions": [
-        "Provide individual control URIs"
-      ],
-      "response": "SDP delivered without aggregate control"
+      "from": "RTSP2_0",
+      "event": "receive OPTIONS",
+      "action": "reply 505",
+      "to": "RTSP1_0"
     }
   ]
 }
