@@ -15,6 +15,8 @@ This table lists 15 common network protocols, their defining RFC documents, and 
 | POP3 (Post Office Protocol v3)| [RFC 1939](https://www.ietf.org/rfc/rfc1939.txt)| It's manually concluded from RFC file. |
 | NNTP (Network News Transfer Protocol)| [RFC 3977](https://datatracker.ietf.org/doc/html/rfc3977) | manually extracted from rfc specification file. |
 | MQTT  (Message Queuing Telemetry Transport) | [RFC 9431](https://datatracker.ietf.org/doc/html/rfc9431#name-reduced-protocol-interactio) |manually extracted from rfc specification file, section 2 to section 6|
+| PPTP (Point-to-Point Tunneling Protocol) | [RFC 2637](https://datatracker.ietf.org/doc/html/rfc2637#autoid-1) | manuall extracted from RFC psecification file, section 3|
+
 
 
 
