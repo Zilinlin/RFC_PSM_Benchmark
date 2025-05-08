@@ -1,0 +1,182 @@
+{
+    "states": [
+        "Initial",
+        "Starting",
+        "Closed",
+        "Stopped",
+        "Closing",
+        "Stopping",
+        "ReqSent",
+        "AckRcvd",
+        "AckSent",
+        "Opened"
+    ],
+    "initial_state": "Initial",
+    "final_states": [
+        "Initial"
+    ],
+    "transitions": [
+        {
+            "from": "Initial",
+            "to": "Closed",
+            "event": "receive lower layer up (Up)",
+            "action": "send This-Layer-Up (tlu)"
+        },
+        {
+            "from": "Initial",
+            "to": "Starting",
+            "event": "receive administrative Open (Open)",
+            "action": "send This-Layer-Started (tls)"
+        },
+        {
+            "from": "Starting",
+            "to": "ReqSent",
+            "event": "receive lower layer up (Up)",
+            "action": "send Initialize-Restart-Count (irc), send Configure-Request (scr)"
+        },
+        {
+            "from": "Closed",
+            "to": "Initial",
+            "event": "receive lower layer down (Down)",
+            "action": "send This-Layer-Finished (tlf)"
+        },
+        {
+            "from": "Closed",
+            "to": "ReqSent",
+            "event": "receive administrative Open (Open)",
+            "action": "send Initialize-Restart-Count (irc), send Configure-Request (scr)"
+        },
+        {
+            "from": "Closed",
+            "to": "Closed",
+            "event": "receive administrative Close (Close)",
+            "action": ""
+        },
+        {
+            "from": "Stopped",
+            "to": "Starting",
+            "event": "receive lower layer up (Up)",
+            "action": "send This-Layer-Started (tls)"
+        },
+        {
+            "from": "Stopped",
+            "to": "Closed",
+            "event": "receive administrative Close (Close)",
+            "action": "send This-Layer-Finished (tlf)"
+        },
+        {
+            "from": "ReqSent",
+            "to": "Closing",
+            "event": "receive administrative Close (Close)",
+            "action": "send Terminate-Request (str), send Initialize-Restart-Count (irc)"
+        },
+        {
+            "from": "ReqSent",
+            "to": "Stopping",
+            "event": "receive Terminate-Request (RTR)",
+            "action": "send Terminate-Request (str)"
+        },
+        {
+            "from": "ReqSent",
+            "to": "ReqSent",
+            "event": "timeout counter > 0 (TO+)",
+            "action": "send Configure-Request (scr)"
+        },
+        {
+            "from": "ReqSent",
+            "to": "Stopped",
+            "event": "timeout counter expired (TO-)",
+            "action": "send This-Layer-Finished (tlf)"
+        },
+        {
+            "from": "ReqSent",
+            "to": "AckRcvd",
+            "event": "receive Configure-Ack (RCA)",
+            "action": "send Initialize-Restart-Count (irc)"
+        },
+        {
+            "from": "ReqSent",
+            "to": "AckSent",
+            "event": "receive Configure-Request (RCR+)",
+            "action": "send Configure-Ack (sca)"
+        },
+        {
+            "from": "AckRcvd",
+            "to": "Closing",
+            "event": "receive administrative Close (Close)",
+            "action": "send Terminate-Request (str), send Initialize-Restart-Count (irc)"
+        },
+        {
+            "from": "AckRcvd",
+            "to": "Opened",
+            "event": "receive Configure-Request (RCR+)",
+            "action": "send Configure-Ack (sca), send This-Layer-Up (tlu)"
+        },
+        {
+            "from": "AckRcvd",
+            "to": "ReqSent",
+            "event": "receive Configure-Nak/Rej (RCN)",
+            "action": "send Configure-Request (scr)"
+        },
+        {
+            "from": "AckSent",
+            "to": "Closing",
+            "event": "receive administrative Close (Close)",
+            "action": "send Terminate-Request (str), send Initialize-Restart-Count (irc)"
+        },
+        {
+            "from": "AckSent",
+            "to": "Opened",
+            "event": "receive Configure-Ack (RCA)",
+            "action": "send This-Layer-Up (tlu)"
+        },
+        {
+            "from": "AckSent",
+            "to": "ReqSent",
+            "event": "receive Configure-Request (RCR-)",
+            "action": "send Configure-Request (scr)"
+        },
+        {
+            "from": "Opened",
+            "to": "Closing",
+            "event": "receive administrative Close (Close)",
+            "action": "send Terminate-Request (str), send Initialize-Restart-Count (irc)"
+        },
+        {
+            "from": "Opened",
+            "to": "Stopping",
+            "event": "receive Terminate-Request (RTR)",
+            "action": "send Terminate-Request (str)"
+        },
+        {
+            "from": "Stopping",
+            "to": "Stopped",
+            "event": "receive Terminate-Ack (RTA)",
+            "action": "send This-Layer-Finished (tlf)"
+        },
+        {
+            "from": "Stopping",
+            "to": "Stopping",
+            "event": "timeout counter > 0 (TO+)",
+            "action": "send Terminate-Request (str)"
+        },
+        {
+            "from": "Stopping",
+            "to": "Stopped",
+            "event": "timeout counter expired (TO-)",
+            "action": "send This-Layer-Finished (tlf)"
+        },
+        {
+            "from": "Closing",
+            "to": "Closed",
+            "event": "receive Terminate-Ack (RTA)",
+            "action": "send This-Layer-Finished (tlf)"
+        },
+        {
+            "from": "Closing",
+            "to": "Closed",
+            "event": "timeout counter expired (TO-)",
+            "action": "send This-Layer-Finished (tlf)"
+        }
+    ]
+}
