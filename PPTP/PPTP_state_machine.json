@@ -1,0 +1,133 @@
+{
+    "states": [
+        "Idle",
+        "Wait Control Reply",
+        "Collision Handling",
+        "Established",
+        "Wait Stop Reply",
+        "Wait Incoming Reply",
+        "Wait Outgoing Reply",
+        "Wait Connect",
+        "Wait Disconnect"
+    ],
+    "initial_state": "Idle",
+    "final_states": [
+        "Idle"
+    ],
+    "transitions": [
+        {
+            "from": "Established",
+            "to": "Wait Disconnect",
+            "event": "Local Terminate",
+            "action": "Send Call Clear Request"
+        },
+        {
+            "from": "Wait Disconnect",
+            "to": "Idle",
+            "event": "Timeout (60s)",
+            "action": "Close TCP and release resources"
+        },
+        {
+            "from": "Idle",
+            "to": "Wait Control Reply",
+            "event": "TCP Open Indication",
+            "action": "Send Start Control Connection Request"
+        },
+        {
+            "from": "Wait Control Reply",
+            "to": "Collision Handling",
+            "event": "Collision Detected",
+            "action": "Handle collision (higher IP wins)"
+        },
+        {
+            "from": "Collision Handling",
+            "to": "Wait Control Reply",
+            "event": "TCP Termination from loser",
+            "action": "Accept winner request"
+        },
+        {
+            "from": "Collision Handling",
+            "to": "Established",
+            "event": "Receive Start Control Connection Reply (Version OK)",
+            "action": "Accept winner connection"
+        },
+        {
+            "from": "Wait Control Reply",
+            "to": "Established",
+            "event": "Receive Start Control Connection Reply (Version OK)",
+            "action": "Establish control connection"
+        },
+        {
+            "from": "Wait Control Reply",
+            "to": "Wait Stop Reply",
+            "event": "Receive Start Control Connection Reply (Version Not OK)",
+            "action": "Send Stop Control Connection Request"
+        },
+        {
+            "from": "Wait Control Reply",
+            "to": "Idle",
+            "event": "Timeout (60s)",
+            "action": "Close TCP"
+        },
+        {
+            "from": "Established",
+            "to": "Wait Stop Reply",
+            "event": "Local Terminate",
+            "action": "Send Stop Control Connection Request"
+        },
+        {
+            "from": "Established",
+            "to": "Wait Stop Reply",
+            "event": "Receive Stop Control Connection Request",
+            "action": "Send Stop Control Connection Reply"
+        },
+        {
+            "from": "Wait Stop Reply",
+            "to": "Idle",
+            "event": "Receive Stop Control Connection Reply",
+            "action": "Close TCP, return to Idle"
+        },
+        {
+            "from": "Idle",
+            "to": "Wait Incoming Reply",
+            "event": "Receive Incoming Call Request",
+            "action": "Send Incoming Call Reply"
+        },
+        {
+            "from": "Wait Incoming Reply",
+            "to": "Wait Connect",
+            "event": "Receive Incoming Call Reply (Accept)",
+            "action": "Wait for Incoming Call Connected"
+        },
+        {
+            "from": "Wait Connect",
+            "to": "Established",
+            "event": "Receive Incoming Call Connected",
+            "action": "Confirm session establishment"
+        },
+        {
+            "from": "Wait Incoming Reply",
+            "to": "Idle",
+            "event": "Receive Incoming Call Reply (Reject)",
+            "action": "Return to Idle"
+        },
+        {
+            "from": "Idle",
+            "to": "Wait Outgoing Reply",
+            "event": "Send Outgoing Call Request",
+            "action": "Wait for PAC response"
+        },
+        {
+            "from": "Wait Outgoing Reply",
+            "to": "Established",
+            "event": "Receive Outgoing Call Reply (No Error)",
+            "action": "Establish call"
+        },
+        {
+            "from": "Wait Outgoing Reply",
+            "to": "Idle",
+            "event": "Receive Outgoing Call Reply (Error)",
+            "action": "Return to Idle"
+        }
+    ]
+}
