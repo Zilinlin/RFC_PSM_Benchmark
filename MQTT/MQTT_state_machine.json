@@ -1,0 +1,122 @@
+{
+    "states": [
+      "Disconnected",
+      "Waiting for Token",
+      "Token Requested",
+      "Token Received",
+      "Awaiting CONNACK",
+      "Authenticating",
+      "Token Validating",
+      "Connected",
+      "Session Resumed",
+      "Unauthorized",
+      "Reauthenticating",
+      "Session Terminated"
+    ],
+    "initial_state": "Disconnected",
+    "final_states": ["Session Terminated"],
+    "transitions": [
+      {
+        "from": "Disconnected",
+        "to": "Waiting for Token",
+        "event": "Client initiates connection",
+        "action": "Start TLS handshake"
+      },
+      {
+        "from": "Waiting for Token",
+        "to": "Token Requested",
+        "event": "Request token from AS",
+        "action": "Send token request (HTTPS/PSK/RPK)"
+      },
+      {
+        "from": "Token Requested",
+        "to": "Token Received",
+        "event": "Token received from AS",
+        "action": "Store JWT/CWT token"
+      },
+      {
+        "from": "Token Requested",
+        "to": "Disconnected",  
+        "event": "Token request timeout/error",
+        "action": "Retry or terminate"
+      },
+      {
+        "from": "Token Received",
+        "to": "Authenticating",
+        "event": "Send CONNECT/AUTH packet",
+        "action": "Include token in 'authz-info' topic"
+      },
+      {
+        "from": "Authenticating",
+        "to": "Awaiting CONNACK",  
+        "event": "Token uploaded",
+        "action": "Wait for broker response"
+      },
+      {
+        "from": "Awaiting CONNACK",
+        "to": "Token Validating",
+        "event": "Broker processes token",
+        "action": "Validate token (introspection)"
+      },
+      {
+        "from": "Token Validating",
+        "to": "Connected",
+        "event": "Token valid",
+        "action": "Send CONNACK(Success)"
+      },
+      {
+        "from": "Token Validating",
+        "to": "Unauthorized",
+        "event": "Token invalid/expired",
+        "action": "Send CONNACK(Not Authorized)"
+      },
+      {
+        "from": "Connected",
+        "to": "Session Resumed",
+        "event": "CONNECT(CleanSession=0)",
+        "action": "Resume prior session"
+      },
+      {
+        "from": "Session Resumed",
+        "to": "Connected",
+        "event": "Session validated",
+        "action": "Send CONNACK(Session Present=1)"
+      },
+      {
+        "from": "Session Resumed",
+        "to": "Session Terminated",
+        "event": "Session invalid",
+        "action": "Send DISCONNECT"
+      },
+      {
+        "from": "Connected",
+        "to": "Reauthenticating",
+        "event": "Token expired",
+        "action": "Send AUTH packet"
+      },
+      {
+        "from": "Reauthenticating",
+        "to": "Token Validating",
+        "event": "Broker validates new token",
+        "action": "Process AUTH/CONNACK"
+      },
+      {
+        "from": "Reauthenticating",
+        "to": "Unauthorized",
+        "event": "Reauthentication failed",
+        "action": "Send DISCONNECT"
+      },
+      {
+        "from": "Connected",
+        "to": "Session Terminated",
+        "event": "DISCONNECT received/sent",
+        "action": "Cleanup session"
+      },
+      {
+        "from": "Unauthorized",
+        "to": "Session Terminated",
+        "event": "DISCONNECT sent",
+        "action": "Close connection"
+      }
+    ]
+  }

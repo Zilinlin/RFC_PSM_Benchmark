@@ -1,90 +1,116 @@
 {
     "states": [
-        "Initial Connection",
-        "Authentication",
-        "Transaction",
-        "Quit"
+        "Initial_Connection",
+        "Service_Available",
+        "Connection_Closed",
+        "Posting_Allowed",
+        "Posting_Prohibited",
+        "Group_Selected",
+        "Article_Selected",
+        "Reading_Headers",
+        "Reading_Body",
+        "Posting_Article"
     ],
-    "initial_state": "Initial Connection",
+    "initial_state": "Initial_Connection",
     "final_states": [
-        "Quit"
+        "Connection_Closed"
     ],
     "transitions": [
         {
-            "from": "Initial Connection",
-            "requisite": "TCP connection established",
-            "to": "Authentication",
-            "actions": [
-                "server sends greeting"
-            ],
-            "response": ""
+            "from": "Initial_Connection",
+            "event": "Receive 200",
+            "action": "Set service available",
+            "to": "Service_Available"
         },
         {
-            "from": "Authentication",
-            "requisite": "Server requires authentication",
-            "to": "Transaction",
-            "actions": [
-                "AUTHINFO USER",
-                "AUTHINFO PASS"
-            ],
-            "response": ""
+            "from": "Initial_Connection",
+            "event": "Receive 201",
+            "action": "Set posting prohibited",
+            "to": "Posting_Prohibited"
         },
         {
-            "from": "Authentication",
-            "requisite": "Server does not require authentication",
-            "to": "Transaction",
-            "actions": [
-                "none"
-            ],
-            "response": ""
+            "from": "Initial_Connection",
+            "event": "Receive 502",
+            "action": "Close connection",
+            "to": "Connection_Closed"
         },
         {
-            "from": "Transaction",
-            "requisite": "Client sends GROUP command",
-            "to": "Transaction",
-            "actions": [
-                "GROUP <group-name>"
-            ],
-            "response": ""
+            "from": "Initial_Connection",
+            "event": "Receive 400",
+            "action": "Close connection",
+            "to": "Connection_Closed"
         },
         {
-            "from": "Transaction",
-            "requisite": "Client requests article",
-            "to": "Transaction",
-            "actions": [
-                "ARTICLE",
-                "HEAD",
-                "BODY",
-                "STAT"
-            ],
-            "response": ""
+            "from": "Service_Available",
+            "event": "MODE READER",
+            "action": "Switch to reader mode",
+            "to": "Posting_Allowed"
         },
         {
-            "from": "Transaction",
-            "requisite": "Client submits article",
-            "to": "Transaction",
-            "actions": [
-                "POST"
-            ],
-            "response": ""
+            "from": "Posting_Prohibited",
+            "event": "MODE READER",
+            "action": "Switch to reader mode",
+            "to": "Posting_Allowed"
         },
         {
-            "from": "Transaction",
-            "requisite": "Client ends session",
-            "to": "Quit",
-            "actions": [
-                "QUIT"
-            ],
-            "response": ""
+            "from": "Posting_Allowed",
+            "event": "GROUP <group_name>",
+            "action": "Select newsgroup",
+            "to": "Group_Selected"
         },
         {
-            "from": "Authentication",
-            "requisite": "Client ends session before authentication",
-            "to": "Quit",
-            "actions": [
-                "QUIT"
-            ],
-            "response": ""
+            "from": "Group_Selected",
+            "event": "ARTICLE <article_id>",
+            "action": "Fetch article",
+            "to": "Article_Selected"
+        },
+        {
+            "from": "Group_Selected",
+            "event": "POST",
+            "action": "Start article posting",
+            "to": "Posting_Article"
+        },
+        {
+            "from": "Article_Selected",
+            "event": "HEAD <article_id>",
+            "action": "Read headers",
+            "to": "Reading_Headers"
+        },
+        {
+            "from": "Article_Selected",
+            "event": "BODY <article_id>",
+            "action": "Read body",
+            "to": "Reading_Body"
+        },
+        {
+            "from": "Reading_Headers",
+            "event": "QUIT",
+            "action": "Close connection",
+            "to": "Connection_Closed"
+        },
+        {
+            "from": "Reading_Body",
+            "event": "QUIT",
+            "action": "Close connection",
+            "to": "Connection_Closed"
+        },
+        {
+            "from": "Posting_Article",
+            "event": "Receive 240",
+            "action": "Article posted successfully",
+            "to": "Group_Selected"
+        },
+        {
+            "from": "Posting_Article",
+            "event": "Receive 441",
+            "action": "Posting failed",
+            "to": "Group_Selected"
+        },
+        {
+            "from": "Group_Selected",
+            "event": "QUIT",
+            "action": "Close connection",
+            "to": "Connection_Closed"
         }
     ]
 }
