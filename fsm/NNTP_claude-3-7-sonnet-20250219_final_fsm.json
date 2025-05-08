@@ -1,0 +1,473 @@
+{
+  "states": [
+    "Initial",
+    "Connected",
+    "TransitMode",
+    "ReaderMode",
+    "GroupSelected",
+    "ArticleSelected",
+    "NoGroupSelected",
+    "WaitingForArticle",
+    "CommandSent",
+    "DataStreaming",
+    "AwaitingContinuation",
+    "ResponseReceived",
+    "Disconnected"
+  ],
+  "initial_state": "Initial",
+  "final_states": [
+    "Disconnected"
+  ],
+  "transitions": [
+    {
+      "from": "Initial",
+      "event": "connect",
+      "action": "send greeting",
+      "to": "Connected"
+    },
+    {
+      "from": "Initial",
+      "event": "connection established",
+      "action": "reply 200",
+      "to": "Connected"
+    },
+    {
+      "from": "Initial",
+      "event": "connection established",
+      "action": "reply 201",
+      "to": "Connected"
+    },
+    {
+      "from": "Initial",
+      "event": "connection established",
+      "action": "reply 400",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Initial",
+      "event": "connection established",
+      "action": "reply 502",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Initial",
+      "event": "receive OVER message-id",
+      "action": "reply 224",
+      "to": "Initial"
+    },
+    {
+      "from": "Initial",
+      "event": "receive OVER message-id",
+      "action": "reply 430",
+      "to": "Initial"
+    },
+    {
+      "from": "Initial",
+      "event": "receive OVER range",
+      "action": "reply 412",
+      "to": "Initial"
+    },
+    {
+      "from": "Initial",
+      "event": "receive OVER",
+      "action": "reply 412",
+      "to": "Initial"
+    },
+    {
+      "from": "Initial",
+      "event": "receive HDR field message-id",
+      "action": "reply 225",
+      "to": "Initial"
+    },
+    {
+      "from": "Initial",
+      "event": "receive HDR field message-id",
+      "action": "reply 430",
+      "to": "Initial"
+    },
+    {
+      "from": "Initial",
+      "event": "receive HDR field range",
+      "action": "reply 412",
+      "to": "Initial"
+    },
+    {
+      "from": "Initial",
+      "event": "receive HDR field",
+      "action": "reply 412",
+      "to": "Initial"
+    },
+    {
+      "from": "Initial",
+      "event": "receive LIST OVERVIEW.FMT",
+      "action": "reply 215",
+      "to": "Initial"
+    },
+    {
+      "from": "Initial",
+      "event": "receive LIST HEADERS",
+      "action": "reply 215",
+      "to": "Initial"
+    },
+    {
+      "from": "Initial",
+      "event": "send command-line",
+      "action": "send X-command",
+      "to": "CommandSent"
+    },
+    {
+      "from": "Connected",
+      "event": "receive CAPABILITIES",
+      "action": "reply 101",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "timeout",
+      "action": "close connection",
+      "to": "Initial"
+    },
+    {
+      "from": "Connected",
+      "event": "receive MODE READER",
+      "action": "reply 200",
+      "to": "ReaderMode"
+    },
+    {
+      "from": "Connected",
+      "event": "receive MODE READER",
+      "action": "reply 201",
+      "to": "ReaderMode"
+    },
+    {
+      "from": "Connected",
+      "event": "receive MODE READER",
+      "action": "reply 502",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Connected",
+      "event": "receive command",
+      "action": "reply 500",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "receive invalid_syntax",
+      "action": "reply 501",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "receive invalid_base64",
+      "action": "reply 504",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "cond internal_error",
+      "action": "reply 403",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "cond feature_unavailable",
+      "action": "reply 503",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "cond needs_new_connection",
+      "action": "reply 502",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "cond needs_authentication",
+      "action": "reply 480",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "cond needs_privacy",
+      "action": "reply 483",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "cond needs_capability",
+      "action": "reply 401",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "cond termination_required",
+      "action": "reply 400",
+      "to": "Initial"
+    },
+    {
+      "from": "Connected",
+      "event": "receive QUIT",
+      "action": "reply 205",
+      "to": "Disconnected"
+    },
+    {
+      "from": "TransitMode",
+      "event": "receive MODE READER",
+      "action": "reply 200",
+      "to": "ReaderMode"
+    },
+    {
+      "from": "ReaderMode",
+      "event": "receive CAPABILITIES",
+      "action": "reply 101",
+      "to": "ReaderMode"
+    },
+    {
+      "from": "ReaderMode",
+      "event": "receive QUIT",
+      "action": "reply 205",
+      "to": "Disconnected"
+    },
+    {
+      "from": "ReaderMode",
+      "event": "receive LIST OVERVIEW.FMT",
+      "action": "reply 215",
+      "to": "ReaderMode"
+    },
+    {
+      "from": "ReaderMode",
+      "event": "receive LIST HEADERS",
+      "action": "reply 215",
+      "to": "ReaderMode"
+    },
+    {
+      "from": "NoGroupSelected",
+      "event": "receive GROUP",
+      "action": "reply 211",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "NoGroupSelected",
+      "event": "receive LISTGROUP",
+      "action": "reply 211",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "NoGroupSelected",
+      "event": "receive ARTICLE",
+      "action": "reply 412",
+      "to": "NoGroupSelected"
+    },
+    {
+      "from": "NoGroupSelected",
+      "event": "receive HEAD",
+      "action": "reply 412",
+      "to": "NoGroupSelected"
+    },
+    {
+      "from": "NoGroupSelected",
+      "event": "receive BODY",
+      "action": "reply 412",
+      "to": "NoGroupSelected"
+    },
+    {
+      "from": "NoGroupSelected",
+      "event": "receive STAT",
+      "action": "reply 412",
+      "to": "NoGroupSelected"
+    },
+    {
+      "from": "NoGroupSelected",
+      "event": "receive LAST",
+      "action": "reply 412",
+      "to": "NoGroupSelected"
+    },
+    {
+      "from": "NoGroupSelected",
+      "event": "receive NEXT",
+      "action": "reply 412",
+      "to": "NoGroupSelected"
+    },
+    {
+      "from": "NoGroupSelected",
+      "event": "receive POST",
+      "action": "reply 340",
+      "to": "WaitingForArticle"
+    },
+    {
+      "from": "NoGroupSelected",
+      "event": "receive IHAVE",
+      "action": "reply 335",
+      "to": "WaitingForArticle"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive GROUP",
+      "action": "reply 211",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive ARTICLE",
+      "action": "reply 220",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive HEAD",
+      "action": "reply 221",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive BODY",
+      "action": "reply 222",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive STAT",
+      "action": "reply 223",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive LAST",
+      "action": "reply 223",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive NEXT",
+      "action": "reply 223",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive POST",
+      "action": "reply 340",
+      "to": "WaitingForArticle"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive IHAVE",
+      "action": "reply 335",
+      "to": "WaitingForArticle"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive OVER range",
+      "action": "reply 224",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive OVER range",
+      "action": "reply 423",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive OVER",
+      "action": "reply 420",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive HDR field range",
+      "action": "reply 225",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive HDR field range",
+      "action": "reply 423",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive HDR field",
+      "action": "reply 420",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive LIST OVERVIEW.FMT",
+      "action": "reply 215",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive LIST HEADERS",
+      "action": "reply 215",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "ArticleSelected",
+      "event": "receive OVER",
+      "action": "reply 224",
+      "to": "ArticleSelected"
+    },
+    {
+      "from": "ArticleSelected",
+      "event": "receive HDR field",
+      "action": "reply 225",
+      "to": "ArticleSelected"
+    },
+    {
+      "from": "ArticleSelected",
+      "event": "receive LIST OVERVIEW.FMT",
+      "action": "reply 215",
+      "to": "ArticleSelected"
+    },
+    {
+      "from": "ArticleSelected",
+      "event": "receive LIST HEADERS",
+      "action": "reply 215",
+      "to": "ArticleSelected"
+    },
+    {
+      "from": "WaitingForArticle",
+      "event": "receive article",
+      "action": "reply 240",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "WaitingForArticle",
+      "event": "receive article",
+      "action": "reply 235",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "CommandSent",
+      "event": "cond streams_data",
+      "action": "send command-datastream",
+      "to": "DataStreaming"
+    },
+    {
+      "from": "CommandSent",
+      "event": "receive response",
+      "action": "process initial-response-line",
+      "to": "ResponseReceived"
+    },
+    {
+      "from": "DataStreaming",
+      "event": "receive response",
+      "action": "process initial-response-line",
+      "to": "ResponseReceived"
+    },
+    {
+      "from": "ResponseReceived",
+      "event": "cond response_is_3xx",
+      "action": "send command-continuation",
+      "to": "AwaitingContinuation"
+    },
+    {
+      "from": "AwaitingContinuation",
+      "event": "receive response",
+      "action": "process initial-response-line",
+      "to": "ResponseReceived"
+    }
+  ]
+}

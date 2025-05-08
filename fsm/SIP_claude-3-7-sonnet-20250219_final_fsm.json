@@ -1,137 +1,1534 @@
 {
   "states": [
     "Initial",
-    "Trying",
+    "Calling",
     "Ringing",
-    "Forwarded",
-    "Queued",
-    "SessionProgress",
+    "Connected",
+    "Terminated",
+    "ClientTransaction",
+    "ServerTransaction",
+    "Authenticating",
+    "Processing",
+    "Redirecting",
+    "Completed",
+    "Failed",
+    "Idle",
+    "AwaitingResponse",
+    "Canceling",
+    "Registered",
+    "Unregistered",
+    "ProcessingOptions",
+    "Responding",
+    "Early",
+    "Confirmed",
+    "SessionEstablished",
+    "SessionTerminating",
+    "SessionTerminated",
+    "DialogTerminated",
+    "Validating",
+    "TargetDetermined",
+    "Forwarding",
+    "ResponseProcessing",
     "Success",
-    "Redirected",
-    "ClientError",
-    "ServerError",
-    "GlobalFailure"
+    "Provisional",
+    "Redirection",
+    "RequestFailure",
+    "ServerFailure",
+    "GlobalFailure",
+    "Challenged",
+    "Authenticated",
+    "Rejected",
+    "InviteInProgress",
+    "WaitingForRetry",
+    "InviteSent",
+    "Proceeding",
+    "MulticastListening"
+  ],
+  "initial_state": "Initial",
+  "final_states": [
+    "Terminated",
+    "Failed",
+    "Completed",
+    "Unregistered",
+    "Idle",
+    "SessionTerminated",
+    "DialogTerminated",
+    "GlobalFailure",
+    "Rejected"
   ],
   "transitions": [
     {
       "from": "Initial",
-      "event": "receive INVITE",
-      "action": "reply 100",
-      "to": "Trying"
+      "to": "Calling",
+      "requisite": "send INVITE",
+      "actions": [
+        "send INVITE"
+      ],
+      "response": ""
     },
     {
-      "from": "Trying",
-      "event": "cond ready_to_ring",
-      "action": "reply 180",
-      "to": "Ringing"
+      "from": "Calling",
+      "to": "Calling",
+      "requisite": "receive 100",
+      "actions": [
+        "log trying"
+      ],
+      "response": ""
     },
     {
-      "from": "Trying",
-      "event": "cond call_forwarded",
-      "action": "reply 181",
-      "to": "Forwarded"
-    },
-    {
-      "from": "Trying",
-      "event": "cond call_queued",
-      "action": "reply 182",
-      "to": "Queued"
-    },
-    {
-      "from": "Trying",
-      "event": "cond session_progress",
-      "action": "reply 183",
-      "to": "SessionProgress"
+      "from": "Calling",
+      "to": "Ringing",
+      "requisite": "receive 180",
+      "actions": [
+        "play ringback"
+      ],
+      "response": ""
     },
     {
       "from": "Ringing",
-      "event": "cond call_accepted",
-      "action": "reply 200",
-      "to": "Success"
+      "to": "Connected",
+      "requisite": "receive 200",
+      "actions": [
+        "send ACK"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Connected",
+      "to": "Terminated",
+      "requisite": "send BYE",
+      "actions": [
+        "send BYE"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Connected",
+      "to": "Terminated",
+      "requisite": "receive BYE",
+      "actions": [
+        "reply 200"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Connected",
+      "to": "Connected",
+      "requisite": "send re-INVITE",
+      "actions": [
+        "send INVITE"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Connected",
+      "to": "Connected",
+      "requisite": "receive re-INVITE",
+      "actions": [
+        "reply 200"
+      ],
+      "response": ""
+    },
+    {
+      "from": "ClientTransaction",
+      "to": "ServerTransaction",
+      "requisite": "send request",
+      "actions": [
+        "send request"
+      ],
+      "response": ""
+    },
+    {
+      "from": "ServerTransaction",
+      "to": "ClientTransaction",
+      "requisite": "process request",
+      "actions": [
+        "send response"
+      ],
+      "response": ""
+    },
+    {
+      "from": "ClientTransaction",
+      "to": "ClientTransaction",
+      "requisite": "receive CANCEL",
+      "actions": [
+        "stop processing"
+      ],
+      "response": ""
     },
     {
       "from": "Initial",
-      "event": "cond multiple_choices",
-      "action": "reply 300",
-      "to": "Redirected"
+      "to": "Processing",
+      "requisite": "receive request",
+      "actions": [
+        "send 100"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Processing",
+      "to": "Failed",
+      "requisite": "cond method_not_supported",
+      "actions": [
+        "reply 405"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Processing",
+      "to": "Failed",
+      "requisite": "cond unsupported_uri_scheme",
+      "actions": [
+        "reply 416"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Processing",
+      "to": "Failed",
+      "requisite": "cond invalid_address",
+      "actions": [
+        "reply 404"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Processing",
+      "to": "Failed",
+      "requisite": "cond loop_detected",
+      "actions": [
+        "reply 482"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Processing",
+      "to": "Failed",
+      "requisite": "cond unsupported_extension",
+      "actions": [
+        "reply 420"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Processing",
+      "to": "Failed",
+      "requisite": "cond unsupported_media",
+      "actions": [
+        "reply 415"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Processing",
+      "to": "Failed",
+      "requisite": "cond extension_required",
+      "actions": [
+        "reply 421"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Processing",
+      "to": "Authenticating",
+      "requisite": "cond need_authentication",
+      "actions": [
+        "reply 401"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Processing",
+      "to": "Authenticating",
+      "requisite": "cond need_proxy_authentication",
+      "actions": [
+        "reply 407"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Processing",
+      "to": "Redirecting",
+      "requisite": "cond redirect_request",
+      "actions": [
+        "reply 3xx"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Processing",
+      "to": "Completed",
+      "requisite": "cond request_valid",
+      "actions": [
+        "process request"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Authenticating",
+      "to": "Processing",
+      "requisite": "receive request_with_credentials",
+      "actions": [
+        "process request"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Completed",
+      "to": "Initial",
+      "requisite": "cond success",
+      "actions": [
+        "reply 2xx"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Failed",
+      "to": "Initial",
+      "requisite": "cond failure",
+      "actions": [
+        "reset transaction"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Redirecting",
+      "to": "Initial",
+      "requisite": "cond locations_available",
+      "actions": [
+        "send contact_locations"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Idle",
+      "to": "AwaitingResponse",
+      "requisite": "send INVITE",
+      "actions": [
+        "create transaction"
+      ],
+      "response": ""
+    },
+    {
+      "from": "AwaitingResponse",
+      "to": "AwaitingResponse",
+      "requisite": "receive provisional_response",
+      "actions": [
+        "process response"
+      ],
+      "response": ""
+    },
+    {
+      "from": "AwaitingResponse",
+      "to": "Canceling",
+      "requisite": "cond cancel_requested",
+      "actions": [
+        "send CANCEL"
+      ],
+      "response": ""
+    },
+    {
+      "from": "AwaitingResponse",
+      "to": "Completed",
+      "requisite": "receive final_response",
+      "actions": [
+        "process response"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Canceling",
+      "to": "Canceling",
+      "requisite": "receive 200_for_CANCEL",
+      "actions": [
+        "process response"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Canceling",
+      "to": "Completed",
+      "requisite": "receive 487_for_INVITE",
+      "actions": [
+        "process response"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Canceling",
+      "to": "Completed",
+      "requisite": "timeout 64*T1",
+      "actions": [
+        "destroy transaction"
+      ],
+      "response": ""
     },
     {
       "from": "Initial",
-      "event": "cond moved_permanently",
-      "action": "reply 301",
-      "to": "Redirected"
+      "to": "Registered",
+      "requisite": "send REGISTER",
+      "actions": [
+        "set bindings"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Registered",
+      "to": "Unregistered",
+      "requisite": "send REGISTER expires=0",
+      "actions": [
+        "remove bindings"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Registered",
+      "to": "Unregistered",
+      "requisite": "timeout registration",
+      "actions": [
+        "remove bindings"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Registered",
+      "to": "Registered",
+      "requisite": "send REGISTER refresh",
+      "actions": [
+        "update bindings"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Unregistered",
+      "to": "Registered",
+      "requisite": "send REGISTER",
+      "actions": [
+        "set bindings"
+      ],
+      "response": ""
     },
     {
       "from": "Initial",
-      "event": "cond moved_temporarily",
-      "action": "reply 302",
-      "to": "Redirected"
+      "to": "Initial",
+      "requisite": "receive 423",
+      "actions": [
+        "retry registration"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Idle",
+      "to": "ProcessingOptions",
+      "requisite": "receive OPTIONS",
+      "actions": [
+        "process request"
+      ],
+      "response": ""
+    },
+    {
+      "from": "ProcessingOptions",
+      "to": "Responding",
+      "requisite": "cond ready_to_accept_call",
+      "actions": [
+        "reply 200"
+      ],
+      "response": ""
+    },
+    {
+      "from": "ProcessingOptions",
+      "to": "Responding",
+      "requisite": "cond busy",
+      "actions": [
+        "reply 486"
+      ],
+      "response": ""
+    },
+    {
+      "from": "ProcessingOptions",
+      "to": "Responding",
+      "requisite": "cond within_dialog",
+      "actions": [
+        "reply 200"
+      ],
+      "response": ""
+    },
+    {
+      "from": "ProcessingOptions",
+      "to": "Responding",
+      "requisite": "cond is_proxy",
+      "actions": [
+        "reply 200"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Responding",
+      "to": "Idle",
+      "requisite": "cond response_complete",
+      "actions": [
+        "send capabilities"
+      ],
+      "response": ""
     },
     {
       "from": "Initial",
-      "event": "cond use_proxy",
-      "action": "reply 305",
-      "to": "Redirected"
+      "to": "Early",
+      "requisite": "receive 101-199 response with To tag",
+      "actions": [
+        "set dialog state"
+      ],
+      "response": ""
     },
     {
       "from": "Initial",
-      "event": "cond alternative_service",
-      "action": "reply 380",
-      "to": "Redirected"
+      "to": "Confirmed",
+      "requisite": "receive 2xx response with To tag",
+      "actions": [
+        "set dialog state"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Early",
+      "to": "Confirmed",
+      "requisite": "receive 2xx response",
+      "actions": [
+        "update dialog state"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Early",
+      "to": "Terminated",
+      "requisite": "receive non-2xx final response",
+      "actions": [
+        "terminate dialog"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Early",
+      "to": "Terminated",
+      "requisite": "timeout no response",
+      "actions": [
+        "terminate dialog"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Confirmed",
+      "to": "Terminated",
+      "requisite": "receive BYE",
+      "actions": [
+        "terminate dialog"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Confirmed",
+      "to": "Terminated",
+      "requisite": "receive 481 response",
+      "actions": [
+        "terminate dialog"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Confirmed",
+      "to": "Terminated",
+      "requisite": "receive 408 response",
+      "actions": [
+        "terminate dialog"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Confirmed",
+      "to": "Terminated",
+      "requisite": "timeout no response",
+      "actions": [
+        "terminate dialog"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Confirmed",
+      "to": "Confirmed",
+      "requisite": "receive target refresh request",
+      "actions": [
+        "update remote target URI"
+      ],
+      "response": ""
     },
     {
       "from": "Initial",
-      "event": "cond bad_request",
-      "action": "reply 400",
-      "to": "ClientError"
+      "to": "Inviting",
+      "requisite": "send INVITE",
+      "actions": [
+        "set transaction started"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Inviting",
+      "to": "EarlyDialog",
+      "requisite": "receive 1xx",
+      "actions": [
+        "create early dialog"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Inviting",
+      "to": "Confirmed",
+      "requisite": "receive 2xx",
+      "actions": [
+        "send ACK"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Inviting",
+      "to": "Terminated",
+      "requisite": "receive 3xx",
+      "actions": [
+        "send ACK"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Inviting",
+      "to": "Terminated",
+      "requisite": "receive 4xx",
+      "actions": [
+        "send ACK"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Inviting",
+      "to": "Terminated",
+      "requisite": "receive 5xx",
+      "actions": [
+        "send ACK"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Inviting",
+      "to": "Terminated",
+      "requisite": "receive 6xx",
+      "actions": [
+        "send ACK"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Inviting",
+      "to": "Terminated",
+      "requisite": "timeout",
+      "actions": [
+        "treat as 408"
+      ],
+      "response": ""
+    },
+    {
+      "from": "EarlyDialog",
+      "to": "Confirmed",
+      "requisite": "receive 2xx",
+      "actions": [
+        "send ACK"
+      ],
+      "response": ""
+    },
+    {
+      "from": "EarlyDialog",
+      "to": "Terminated",
+      "requisite": "receive non-2xx",
+      "actions": [
+        "terminate early dialog"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Confirmed",
+      "to": "Terminated",
+      "requisite": "send BYE",
+      "actions": [
+        "close session"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Confirmed",
+      "to": "Terminated",
+      "requisite": "timeout 64*T1",
+      "actions": [
+        "send BYE"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Idle",
+      "to": "InviteInProgress",
+      "requisite": "send re-INVITE",
+      "actions": [
+        "set InviteTransaction started"
+      ],
+      "response": ""
+    },
+    {
+      "from": "InviteInProgress",
+      "to": "Idle",
+      "requisite": "receive 2xx",
+      "actions": [
+        "send ACK"
+      ],
+      "response": ""
+    },
+    {
+      "from": "InviteInProgress",
+      "to": "WaitingForRetry",
+      "requisite": "receive 491",
+      "actions": [
+        "start timer"
+      ],
+      "response": ""
+    },
+    {
+      "from": "InviteInProgress",
+      "to": "Idle",
+      "requisite": "receive non-2xx",
+      "actions": [
+        "keep session unchanged"
+      ],
+      "response": ""
+    },
+    {
+      "from": "WaitingForRetry",
+      "to": "InviteInProgress",
+      "requisite": "timeout timer",
+      "actions": [
+        "send re-INVITE"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Idle",
+      "to": "Idle",
+      "requisite": "receive re-INVITE",
+      "actions": [
+        "process session modification"
+      ],
+      "response": ""
+    },
+    {
+      "from": "InviteInProgress",
+      "to": "InviteInProgress",
+      "requisite": "receive re-INVITE",
+      "actions": [
+        "reply 491"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Idle",
+      "to": "Idle",
+      "requisite": "receive re-INVITE with lower CSeq",
+      "actions": [
+        "reply 500"
+      ],
+      "response": ""
+    },
+    {
+      "from": "SessionEstablished",
+      "to": "SessionTerminating",
+      "requisite": "send BYE",
+      "actions": [
+        "stop media"
+      ],
+      "response": ""
+    },
+    {
+      "from": "SessionTerminating",
+      "to": "SessionTerminated",
+      "requisite": "receive 2xx",
+      "actions": [
+        "set SessionTerminated"
+      ],
+      "response": ""
+    },
+    {
+      "from": "SessionTerminating",
+      "to": "DialogTerminated",
+      "requisite": "receive 481",
+      "actions": [
+        "set DialogTerminated"
+      ],
+      "response": ""
+    },
+    {
+      "from": "SessionTerminating",
+      "to": "DialogTerminated",
+      "requisite": "receive 408",
+      "actions": [
+        "set DialogTerminated"
+      ],
+      "response": ""
+    },
+    {
+      "from": "SessionTerminating",
+      "to": "DialogTerminated",
+      "requisite": "timeout",
+      "actions": [
+        "set DialogTerminated"
+      ],
+      "response": ""
+    },
+    {
+      "from": "SessionEstablished",
+      "to": "SessionTerminating",
+      "requisite": "receive BYE",
+      "actions": [
+        "stop media"
+      ],
+      "response": ""
+    },
+    {
+      "from": "SessionTerminating",
+      "to": "SessionTerminated",
+      "requisite": "cond BYE_matches_dialog",
+      "actions": [
+        "reply 2xx"
+      ],
+      "response": ""
+    },
+    {
+      "from": "SessionTerminating",
+      "to": "SessionEstablished",
+      "requisite": "cond BYE_no_match_dialog",
+      "actions": [
+        "reply 481"
+      ],
+      "response": ""
     },
     {
       "from": "Initial",
-      "event": "cond unauthorized",
-      "action": "reply 401",
-      "to": "ClientError"
+      "to": "Validating",
+      "requisite": "receive request",
+      "actions": [
+        "validate request"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Validating",
+      "to": "Completed",
+      "requisite": "cond validation_failed",
+      "actions": [
+        "reply error_code"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Validating",
+      "to": "TargetDetermined",
+      "requisite": "cond validation_passed",
+      "actions": [
+        "preprocess routing"
+      ],
+      "response": ""
+    },
+    {
+      "from": "TargetDetermined",
+      "to": "Completed",
+      "requisite": "cond target_set_empty",
+      "actions": [
+        "reply 480"
+      ],
+      "response": ""
+    },
+    {
+      "from": "TargetDetermined",
+      "to": "Forwarding",
+      "requisite": "cond target_set_nonempty",
+      "actions": [
+        "forward request"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Forwarding",
+      "to": "ResponseProcessing",
+      "requisite": "receive response",
+      "actions": [
+        "process response"
+      ],
+      "response": ""
+    },
+    {
+      "from": "ResponseProcessing",
+      "to": "Forwarding",
+      "requisite": "cond provisional_response",
+      "actions": [
+        "forward response"
+      ],
+      "response": ""
+    },
+    {
+      "from": "ResponseProcessing",
+      "to": "Completed",
+      "requisite": "cond final_response",
+      "actions": [
+        "forward response"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Forwarding",
+      "to": "Completed",
+      "requisite": "timeout timer_C",
+      "actions": [
+        "send CANCEL"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Forwarding",
+      "to": "Completed",
+      "requisite": "receive CANCEL",
+      "actions": ""
     },
     {
       "from": "Initial",
-      "event": "cond payment_required",
-      "action": "reply 402",
-      "to": "ClientError"
+      "to": "Provisional",
+      "requisite": "receive INVITE",
+      "actions": [
+        "reply 100"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Provisional",
+      "to": "Provisional",
+      "requisite": "cond alerting_user",
+      "actions": [
+        "reply 180"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Provisional",
+      "to": "Provisional",
+      "requisite": "cond call_forwarded",
+      "actions": [
+        "reply 181"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Provisional",
+      "to": "Provisional",
+      "requisite": "cond call_queued",
+      "actions": [
+        "reply 182"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Provisional",
+      "to": "Provisional",
+      "requisite": "cond session_progress",
+      "actions": [
+        "reply 183"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Provisional",
+      "to": "Success",
+      "requisite": "cond request_succeeded",
+      "actions": [
+        "reply 200"
+      ],
+      "response": ""
     },
     {
       "from": "Initial",
-      "event": "cond forbidden",
-      "action": "reply 403",
-      "to": "ClientError"
+      "to": "Redirection",
+      "requisite": "cond multiple_choices",
+      "actions": [
+        "reply 300"
+      ],
+      "response": ""
     },
     {
       "from": "Initial",
-      "event": "cond not_found",
-      "action": "reply 404",
-      "to": "ClientError"
+      "to": "Redirection",
+      "requisite": "cond moved_permanently",
+      "actions": [
+        "reply 301"
+      ],
+      "response": ""
     },
     {
       "from": "Initial",
-      "event": "cond internal_error",
-      "action": "reply 500",
-      "to": "ServerError"
+      "to": "Redirection",
+      "requisite": "cond moved_temporarily",
+      "actions": [
+        "reply 302"
+      ],
+      "response": ""
     },
     {
       "from": "Initial",
-      "event": "cond busy_everywhere",
-      "action": "reply 600",
-      "to": "GlobalFailure"
+      "to": "Redirection",
+      "requisite": "cond use_proxy",
+      "actions": [
+        "reply 305"
+      ],
+      "response": ""
     },
     {
       "from": "Initial",
-      "event": "receive BYE",
-      "action": "reply 200",
-      "to": "Initial"
+      "to": "Redirection",
+      "requisite": "cond alternative_service",
+      "actions": [
+        "reply 380"
+      ],
+      "response": ""
     },
     {
-      "from": "Success",
-      "event": "receive BYE",
-      "action": "reply 200",
-      "to": "Initial"
+      "from": "Initial",
+      "to": "RequestFailure",
+      "requisite": "cond bad_request",
+      "actions": [
+        "reply 400"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Initial",
+      "to": "RequestFailure",
+      "requisite": "cond unauthorized",
+      "actions": [
+        "reply 401"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Initial",
+      "to": "RequestFailure",
+      "requisite": "cond forbidden",
+      "actions": [
+        "reply 403"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Initial",
+      "to": "RequestFailure",
+      "requisite": "cond not_found",
+      "actions": [
+        "reply 404"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Initial",
+      "to": "RequestFailure",
+      "requisite": "cond method_not_allowed",
+      "actions": [
+        "reply 405"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Initial",
+      "to": "RequestFailure",
+      "requisite": "cond proxy_auth_required",
+      "actions": [
+        "reply 407"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Initial",
+      "to": "RequestFailure",
+      "requisite": "timeout request",
+      "actions": [
+        "reply 408"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Initial",
+      "to": "RequestFailure",
+      "requisite": "cond temporarily_unavailable",
+      "actions": [
+        "reply 480"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Initial",
+      "to": "RequestFailure",
+      "requisite": "cond busy_here",
+      "actions": [
+        "reply 486"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Initial",
+      "to": "RequestFailure",
+      "requisite": "receive CANCEL",
+      "actions": [
+        "reply 487"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Initial",
+      "to": "ServerFailure",
+      "requisite": "cond server_error",
+      "actions": [
+        "reply 500"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Initial",
+      "to": "ServerFailure",
+      "requisite": "cond not_implemented",
+      "actions": [
+        "reply 501"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Initial",
+      "to": "ServerFailure",
+      "requisite": "cond bad_gateway",
+      "actions": [
+        "reply 502"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Initial",
+      "to": "ServerFailure",
+      "requisite": "cond service_unavailable",
+      "actions": [
+        "reply 503"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Initial",
+      "to": "ServerFailure",
+      "requisite": "timeout server",
+      "actions": [
+        "reply 504"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Initial",
+      "to": "GlobalFailure",
+      "requisite": "cond busy_everywhere",
+      "actions": [
+        "reply 600"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Initial",
+      "to": "GlobalFailure",
+      "requisite": "cond decline",
+      "actions": [
+        "reply 603"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Initial",
+      "to": "GlobalFailure",
+      "requisite": "cond not_exist_anywhere",
+      "actions": [
+        "reply 604"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Initial",
+      "to": "GlobalFailure",
+      "requisite": "cond not_acceptable",
+      "actions": [
+        "reply 606"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Initial",
+      "to": "Challenged",
+      "requisite": "receive request",
+      "actions": [
+        "reply 401"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Initial",
+      "to": "Challenged",
+      "requisite": "receive request_with_proxy",
+      "actions": [
+        "reply 407"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Challenged",
+      "to": "Authenticated",
+      "requisite": "receive request_with_credentials",
+      "actions": [
+        "set authenticated true"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Challenged",
+      "to": "Rejected",
+      "requisite": "receive request_with_invalid_credentials",
+      "actions": [
+        "reply 403"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Challenged",
+      "to": "Challenged",
+      "requisite": "receive request_with_stale_nonce",
+      "actions": [
+        "reply 401"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Initial",
+      "to": "Initial",
+      "requisite": "receive ACK",
+      "actions": [
+        "accept request"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Initial",
+      "to": "Initial",
+      "requisite": "receive CANCEL",
+      "actions": [
+        "accept request"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Idle",
+      "to": "Registering",
+      "requisite": "send REGISTER",
+      "actions": [
+        "send registration request"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Registering",
+      "to": "Registered",
+      "requisite": "receive 200 OK",
+      "actions": [
+        "record registration"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Idle",
+      "to": "Inviting",
+      "requisite": "send INVITE",
+      "actions": [
+        "send invite request"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Inviting",
+      "to": "Inviting",
+      "requisite": "receive 100 Trying",
+      "actions": [
+        "wait for response"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Inviting",
+      "to": "Ringing",
+      "requisite": "receive 180 Ringing",
+      "actions": [
+        "notify user"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Ringing",
+      "to": "Connected",
+      "requisite": "receive 200 OK",
+      "actions": [
+        "send ACK"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Connected",
+      "to": "Terminating",
+      "requisite": "send BYE",
+      "actions": [
+        "terminate session"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Connected",
+      "to": "Idle",
+      "requisite": "receive BYE",
+      "actions": [
+        "reply 200 OK"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Terminating",
+      "to": "Idle",
+      "requisite": "receive 200 OK",
+      "actions": [
+        "close session"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Calling",
+      "to": "Calling",
+      "requisite": "timer A fires",
+      "actions": [
+        "send request"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Calling",
+      "to": "Proceeding",
+      "requisite": "receive 1xx",
+      "actions": [
+        "send to TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Calling",
+      "to": "Terminated",
+      "requisite": "receive 2xx",
+      "actions": [
+        "send to TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Calling",
+      "to": "Completed",
+      "requisite": "receive 300-699",
+      "actions": [
+        "send ACK"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Calling",
+      "to": "Terminated",
+      "requisite": "timer B fires",
+      "actions": [
+        "inform TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Proceeding",
+      "to": "Proceeding",
+      "requisite": "receive 1xx",
+      "actions": [
+        "send to TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Proceeding",
+      "to": "Terminated",
+      "requisite": "receive 2xx",
+      "actions": [
+        "send to TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Proceeding",
+      "to": "Completed",
+      "requisite": "receive 300-699",
+      "actions": [
+        "send ACK"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Completed",
+      "to": "Completed",
+      "requisite": "receive response retransmission",
+      "actions": [
+        "send ACK"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Completed",
+      "to": "Terminated",
+      "requisite": "timer D fires",
+      "actions": [
+        "reset timer"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Trying",
+      "to": "Trying",
+      "requisite": "timer E fires",
+      "actions": [
+        "send request"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Trying",
+      "to": "Proceeding",
+      "requisite": "receive 1xx",
+      "actions": [
+        "send to TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Trying",
+      "to": "Completed",
+      "requisite": "receive 200-699",
+      "actions": [
+        "send to TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Trying",
+      "to": "Terminated",
+      "requisite": "timer F fires",
+      "actions": [
+        "inform TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Proceeding",
+      "to": "Proceeding",
+      "requisite": "timer E fires",
+      "actions": [
+        "send request"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Proceeding",
+      "to": "Completed",
+      "requisite": "receive 200-699",
+      "actions": [
+        "send to TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Proceeding",
+      "to": "Terminated",
+      "requisite": "timer F fires",
+      "actions": [
+        "inform TU"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Completed",
+      "to": "Terminated",
+      "requisite": "timer K fires",
+      "actions": [
+        "reset timer"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Idle",
+      "to": "ConnectionOpen",
+      "requisite": "send request",
+      "actions": [
+        "open connection"
+      ],
+      "response": ""
+    },
+    {
+      "from": "ConnectionOpen",
+      "to": "RequestSent",
+      "requisite": "connection established",
+      "actions": [
+        "send request"
+      ],
+      "response": ""
+    },
+    {
+      "from": "RequestSent",
+      "to": "ResponseReceived",
+      "requisite": "receive response",
+      "actions": [
+        "process response"
+      ],
+      "response": ""
+    },
+    {
+      "from": "Idle",
+      "to": "MulticastListening",
+      "requisite": "send multicast request",
+      "actions": [
+        "join multicast group"
+      ],
+      "response": ""
+    },
+    {
+      "from": "MulticastListening",
+      "to": "ResponseReceived",
+      "requisite": "receive response",
+      "actions": [
+        "process first response"
+      ],
+      "response": ""
+    },
+    {
+      "from": "ResponseReceived",
+      "to": "Idle",
+      "requisite": "cond transaction_complete",
+      "actions": [
+        "close connection"
+      ],
+      "response": ""
     }
   ]
 }

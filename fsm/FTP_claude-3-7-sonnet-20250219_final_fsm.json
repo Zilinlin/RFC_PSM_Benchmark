@@ -1,0 +1,302 @@
+{
+  "states": [
+    "Initial",
+    "AwaitingLogin",
+    "AwaitingPassword",
+    "AwaitingAccount",
+    "Authenticated",
+    "PassiveMode",
+    "PortSpecified",
+    "DataTransferInitiated",
+    "TransferInProgress",
+    "DataTransferComplete",
+    "RenameFromReceived",
+    "DirectoryCreated",
+    "DirectoryRemoved",
+    "ParentDirectory"
+  ],
+  "initial_state": "Initial",
+  "final_states": [
+    "DirectoryCreated",
+    "DirectoryRemoved",
+    "ParentDirectory"
+  ],
+  "transitions": [
+    {
+      "from": "Initial",
+      "event": "receive connect",
+      "action": "reply 220",
+      "to": "AwaitingLogin"
+    },
+    {
+      "from": "Initial",
+      "event": "receive connect",
+      "action": "reply 120",
+      "to": "Initial"
+    },
+    {
+      "from": "Initial",
+      "event": "cond ready",
+      "action": "reply 220",
+      "to": "AwaitingLogin"
+    },
+    {
+      "from": "AwaitingLogin",
+      "event": "receive USER",
+      "action": "reply 331",
+      "to": "AwaitingPassword"
+    },
+    {
+      "from": "AwaitingLogin",
+      "event": "receive USER",
+      "action": "reply 230",
+      "to": "Authenticated"
+    },
+    {
+      "from": "AwaitingLogin",
+      "event": "receive PASS",
+      "action": "reply 230",
+      "to": "Authenticated"
+    },
+    {
+      "from": "AwaitingLogin",
+      "event": "receive ACCT",
+      "action": "reply 230",
+      "to": "Authenticated"
+    },
+    {
+      "from": "AwaitingPassword",
+      "event": "receive PASS",
+      "action": "reply 230",
+      "to": "Authenticated"
+    },
+    {
+      "from": "AwaitingPassword",
+      "event": "receive PASS",
+      "action": "reply 332",
+      "to": "AwaitingAccount"
+    },
+    {
+      "from": "AwaitingAccount",
+      "event": "receive ACCT",
+      "action": "reply 230",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive PASV",
+      "action": "reply 227",
+      "to": "PassiveMode"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive PORT",
+      "action": "reply 200",
+      "to": "PortSpecified"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive PASV",
+      "action": "set server_data_port",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive PORT",
+      "action": "set data_port",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive transfer_request",
+      "action": "initiate data_connection",
+      "to": "DataTransferInitiated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive RETR",
+      "action": "reply 150",
+      "to": "TransferInProgress"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive STOR",
+      "action": "reply 150",
+      "to": "TransferInProgress"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive STOU",
+      "action": "reply 150",
+      "to": "TransferInProgress"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive APPE",
+      "action": "reply 150",
+      "to": "TransferInProgress"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive LIST",
+      "action": "reply 150",
+      "to": "TransferInProgress"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive NLST",
+      "action": "reply 150",
+      "to": "TransferInProgress"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive STOR",
+      "action": "reply 550",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive TYPE",
+      "action": "reply 200",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive RNFR",
+      "action": "reply 350",
+      "to": "RenameFromReceived"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "Initial"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive REIN",
+      "action": "reply 220",
+      "to": "AwaitingLogin"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive MKD",
+      "action": "reply 257",
+      "to": "DirectoryCreated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive MKD",
+      "action": "reply 521",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive RMD",
+      "action": "reply DELE_codes",
+      "to": "DirectoryRemoved"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive PWD",
+      "action": "reply 257",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive CDUP",
+      "action": "reply CWD_codes",
+      "to": "ParentDirectory"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive CWD",
+      "action": "reply 200",
+      "to": "Authenticated"
+    },
+    {
+      "from": "DataTransferInitiated",
+      "event": "cond connection_established",
+      "action": "send confirming_reply",
+      "to": "TransferInProgress"
+    },
+    {
+      "from": "TransferInProgress",
+      "event": "cond transfer_complete",
+      "action": "reply 226",
+      "to": "Authenticated"
+    },
+    {
+      "from": "TransferInProgress",
+      "event": "cond transfer_complete",
+      "action": "reply 250",
+      "to": "Authenticated"
+    },
+    {
+      "from": "TransferInProgress",
+      "event": "cond transfer_complete",
+      "action": "close data_connection",
+      "to": "DataTransferComplete"
+    },
+    {
+      "from": "TransferInProgress",
+      "event": "receive ABOR",
+      "action": "reply 226",
+      "to": "Authenticated"
+    },
+    {
+      "from": "TransferInProgress",
+      "event": "receive ABOR",
+      "action": "reply 426",
+      "to": "Authenticated"
+    },
+    {
+      "from": "TransferInProgress",
+      "event": "receive ABORT",
+      "action": "close data_connection",
+      "to": "Authenticated"
+    },
+    {
+      "from": "TransferInProgress",
+      "event": "receive port_change",
+      "action": "close data_connection",
+      "to": "Authenticated"
+    },
+    {
+      "from": "TransferInProgress",
+      "event": "cond control_connection_closed",
+      "action": "close data_connection",
+      "to": "Authenticated"
+    },
+    {
+      "from": "TransferInProgress",
+      "event": "cond error_condition",
+      "action": "close data_connection",
+      "to": "Authenticated"
+    },
+    {
+      "from": "DataTransferComplete",
+      "event": "cond server_option",
+      "action": "reply 250",
+      "to": "Authenticated"
+    },
+    {
+      "from": "DataTransferComplete",
+      "event": "cond server_option",
+      "action": "reply 226",
+      "to": "Authenticated"
+    },
+    {
+      "from": "RenameFromReceived",
+      "event": "receive RNTO",
+      "action": "reply 250",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive QUIT",
+      "action": "close connections",
+      "to": "Initial"
+    }
+  ]
+}

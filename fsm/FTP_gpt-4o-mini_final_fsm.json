@@ -1,0 +1,381 @@
+{
+  "states": [
+    "UserInterface",
+    "UserPI",
+    "ServerPI",
+    "ServerDTP",
+    "UserDTP",
+    "DataTransfer",
+    "DataConnectionManagement",
+    "DataConnectionEstablished",
+    "DataConnectionClosed",
+    "DataTransferInProgress",
+    "DataTransferCompleted",
+    "ErrorRecovery",
+    "WaitingForUser",
+    "WaitingForPassword",
+    "Authenticated",
+    "TransferInProgress",
+    "WaitingForCommand",
+    "DataConnectionOpen",
+    "TransferCompleted",
+    "TransferAborted",
+    "FileDeleted",
+    "DirectoryRemoved",
+    "DirectoryCreated",
+    "StatusReported",
+    "HelpSent",
+    "NoOperation",
+    "ConnectionEstablished",
+    "LoggedIn",
+    "TransferParameters",
+    "FileAction",
+    "InformationalCommands",
+    "MiscellaneousCommands",
+    "WaitingForReply",
+    "Begin",
+    "Success",
+    "Error",
+    "Failure",
+    "AccessDenied",
+    "Idle",
+    "WorkingDirectoryChanged",
+    "ConnectionClosed"
+  ],
+  "initial_state": "UserPI",
+  "final_states": [
+    "TransferCompleted",
+    "TransferAborted",
+    "FileDeleted",
+    "DirectoryRemoved",
+    "DirectoryCreated",
+    "StatusReported",
+    "HelpSent",
+    "NoOperation",
+    "Success",
+    "Error",
+    "Failure",
+    "AccessDenied",
+    "ConnectionClosed"
+  ],
+  "transitions": [
+    {
+      "from": "UserPI",
+      "event": "receive FTP_COMMAND",
+      "action": "send FTP_REPLY",
+      "to": "ServerPI"
+    },
+    {
+      "from": "ServerPI",
+      "event": "receive FTP_REPLY",
+      "action": "send FTP_COMMAND",
+      "to": "UserPI"
+    },
+    {
+      "from": "UserDTP",
+      "event": "receive DATA_CONNECTION",
+      "action": "set active",
+      "to": "ServerDTP"
+    },
+    {
+      "from": "ServerDTP",
+      "event": "send DATA_TRANSFER",
+      "action": "reply transfer_complete",
+      "to": "UserDTP"
+    },
+    {
+      "from": "DataTransfer",
+      "event": "receive PORT",
+      "action": "set non_default_port",
+      "to": "DataConnectionManagement"
+    },
+    {
+      "from": "DataConnectionManagement",
+      "event": "receive PASV",
+      "action": "set non_default_server_port",
+      "to": "DataConnectionEstablished"
+    },
+    {
+      "from": "DataConnectionEstablished",
+      "event": "send transfer request",
+      "action": "open data connection",
+      "to": "DataTransferInProgress"
+    },
+    {
+      "from": "DataTransferInProgress",
+      "event": "send EOF",
+      "action": "close data connection",
+      "to": "DataConnectionClosed"
+    },
+    {
+      "from": "DataConnectionClosed",
+      "event": "receive ABORT",
+      "action": "close data connection",
+      "to": "DataTransfer"
+    },
+    {
+      "from": "DataTransferInProgress",
+      "event": "timeout",
+      "action": "log failure",
+      "to": "ErrorRecovery"
+    },
+    {
+      "from": "ErrorRecovery",
+      "event": "receive restart command",
+      "action": "set restart_marker",
+      "to": "DataTransferInProgress"
+    },
+    {
+      "from": "WaitingForUser",
+      "event": "receive USER",
+      "action": "reply 331",
+      "to": "WaitingForPassword"
+    },
+    {
+      "from": "WaitingForPassword",
+      "event": "receive PASS",
+      "action": "reply 230",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive CWD",
+      "action": "reply 250",
+      "to": "WaitingForCommand"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive STOR",
+      "action": "set TransferInProgress",
+      "to": "DataConnectionOpen"
+    },
+    {
+      "from": "DataConnectionOpen",
+      "event": "send 226",
+      "action": "set TransferCompleted",
+      "to": "WaitingForCommand"
+    },
+    {
+      "from": "DataConnectionOpen",
+      "event": "receive ABOR",
+      "action": "set TransferAborted",
+      "to": "WaitingForCommand"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive DELE",
+      "action": "reply 250",
+      "to": "FileDeleted"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive RMD",
+      "action": "reply 250",
+      "to": "DirectoryRemoved"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive MKD",
+      "action": "reply 257",
+      "to": "DirectoryCreated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive STAT",
+      "action": "reply 211",
+      "to": "StatusReported"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive HELP",
+      "action": "reply 214",
+      "to": "HelpSent"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive NOOP",
+      "action": "reply 200",
+      "to": "NoOperation"
+    },
+    {
+      "from": "ConnectionEstablished",
+      "event": "receive USER",
+      "action": "reply 230",
+      "to": "LoggedIn"
+    },
+    {
+      "from": "ConnectionEstablished",
+      "event": "receive PASS",
+      "action": "reply 230",
+      "to": "LoggedIn"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive PORT",
+      "action": "reply 200",
+      "to": "TransferParameters"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive PASV",
+      "action": "reply 227",
+      "to": "TransferParameters"
+    },
+    {
+      "from": "TransferParameters",
+      "event": "receive TYPE",
+      "action": "reply 200",
+      "to": "TransferParameters"
+    },
+    {
+      "from": "TransferParameters",
+      "event": "receive MODE",
+      "action": "reply 200",
+      "to": "TransferParameters"
+    },
+    {
+      "from": "TransferParameters",
+      "event": "receive STRU",
+      "action": "reply 200",
+      "to": "TransferParameters"
+    },
+    {
+      "from": "TransferParameters",
+      "event": "receive STOR",
+      "action": "reply 125",
+      "to": "FileAction"
+    },
+    {
+      "from": "FileAction",
+      "event": "receive RETR",
+      "action": "reply 125",
+      "to": "FileAction"
+    },
+    {
+      "from": "FileAction",
+      "event": "receive DELE",
+      "action": "reply 250",
+      "to": "FileAction"
+    },
+    {
+      "from": "FileAction",
+      "event": "receive MKD",
+      "action": "reply 257",
+      "to": "FileAction"
+    },
+    {
+      "from": "FileAction",
+      "event": "receive PWD",
+      "action": "reply 257",
+      "to": "FileAction"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive SYST",
+      "action": "reply 215",
+      "to": "InformationalCommands"
+    },
+    {
+      "from": "InformationalCommands",
+      "event": "receive STAT",
+      "action": "reply 211",
+      "to": "InformationalCommands"
+    },
+    {
+      "from": "InformationalCommands",
+      "event": "receive HELP",
+      "action": "reply 211",
+      "to": "InformationalCommands"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive NOOP",
+      "action": "reply 200",
+      "to": "WaitingForReply"
+    },
+    {
+      "from": "WaitingForReply",
+      "event": "timeout 5s",
+      "action": "log timeout",
+      "to": "WaitingForReply"
+    },
+    {
+      "from": "Begin",
+      "event": "receive cmd",
+      "action": "wait for reply",
+      "to": "WaitingForReply"
+    },
+    {
+      "from": "WaitingForReply",
+      "event": "receive 2",
+      "action": "reply Success",
+      "to": "Success"
+    },
+    {
+      "from": "WaitingForReply",
+      "event": "receive 1,3",
+      "action": "reply Error",
+      "to": "Error"
+    },
+    {
+      "from": "WaitingForReply",
+      "event": "receive 4,5",
+      "action": "reply Failure",
+      "to": "Failure"
+    },
+    {
+      "from": "WaitingForReply",
+      "event": "receive 4,5",
+      "action": "reply Failure",
+      "to": "Failure"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive ACCT",
+      "action": "wait for reply",
+      "to": "WaitingForReply"
+    },
+    {
+      "from": "Idle",
+      "event": "receive MKD",
+      "action": "reply 257",
+      "to": "DirectoryCreated"
+    },
+    {
+      "from": "Idle",
+      "event": "receive RMD",
+      "action": "reply 250",
+      "to": "DirectoryRemoved"
+    },
+    {
+      "from": "Idle",
+      "event": "receive PWD",
+      "action": "reply 257",
+      "to": "WorkingDirectoryChanged"
+    },
+    {
+      "from": "Idle",
+      "event": "receive CDUP",
+      "action": "reply 200",
+      "to": "WorkingDirectoryChanged"
+    },
+    {
+      "from": "DirectoryCreated",
+      "event": "receive CWD",
+      "action": "reply 200",
+      "to": "WorkingDirectoryChanged"
+    },
+    {
+      "from": "DirectoryCreated",
+      "event": "receive MKD",
+      "action": "reply 521",
+      "to": "AccessDenied"
+    },
+    {
+      "from": "AccessDenied",
+      "event": "receive MKD",
+      "action": "reply 521",
+      "to": "AccessDenied"
+    }
+  ]
+}

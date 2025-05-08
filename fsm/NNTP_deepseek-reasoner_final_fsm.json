@@ -1,0 +1,460 @@
+{
+  "states": [
+    "Start",
+    "Connected",
+    "Closed",
+    "Reading",
+    "no_group_selected",
+    "group_selected",
+    "awaiting_post_data",
+    "awaiting_ihave_data",
+    "Encrypted",
+    "AwaitingArticleTransfer",
+    "Ready",
+    "AwaitingContinuation"
+  ],
+  "initial_state": "Start",
+  "final_states": [
+    "Closed"
+  ],
+  "transitions": [
+    {
+      "from": "Transit",
+      "event": "recv MODE READER",
+      "action": "reply 200",
+      "to": "Reading"
+    },
+    {
+      "from": "Transit",
+      "event": "timeout autologout",
+      "action": "close connection",
+      "to": "Closed"
+    },
+    {
+      "from": "Reading",
+      "event": "timeout autologout",
+      "action": "close connection",
+      "to": "Closed"
+    },
+    {
+      "from": "Transit",
+      "event": "recv any",
+      "action": "reply 400",
+      "to": "Closed"
+    },
+    {
+      "from": "Reading",
+      "event": "recv any",
+      "action": "reply 400",
+      "to": "Closed"
+    },
+    {
+      "from": "Start",
+      "event": "connection established",
+      "action": "reply 200",
+      "to": "Connected"
+    },
+    {
+      "from": "Start",
+      "event": "connection established",
+      "action": "reply 201",
+      "to": "Connected"
+    },
+    {
+      "from": "Start",
+      "event": "connection established",
+      "action": "reply 400",
+      "to": "Closed"
+    },
+    {
+      "from": "Start",
+      "event": "connection established",
+      "action": "reply 502",
+      "to": "Closed"
+    },
+    {
+      "from": "Connected",
+      "event": "receive QUIT",
+      "action": "reply 205",
+      "to": "Closed"
+    },
+    {
+      "from": "Connected",
+      "event": "receive CAPABILITIES",
+      "action": "reply 101",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "receive MODE READER",
+      "action": "reply 200",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "receive MODE READER",
+      "action": "reply 201",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "receive MODE READER",
+      "action": "reply 502",
+      "to": "Closed"
+    },
+    {
+      "from": "no_group_selected",
+      "event": "recv GROUP",
+      "action": "reply 211",
+      "to": "group_selected"
+    },
+    {
+      "from": "no_group_selected",
+      "event": "recv GROUP",
+      "action": "reply 411",
+      "to": "no_group_selected"
+    },
+    {
+      "from": "group_selected",
+      "event": "recv GROUP",
+      "action": "reply 211",
+      "to": "group_selected"
+    },
+    {
+      "from": "no_group_selected",
+      "event": "recv POST",
+      "action": "reply 340",
+      "to": "awaiting_post_data"
+    },
+    {
+      "from": "no_group_selected",
+      "event": "recv POST",
+      "action": "reply 440",
+      "to": "no_group_selected"
+    },
+    {
+      "from": "group_selected",
+      "event": "recv POST",
+      "action": "reply 340",
+      "to": "awaiting_post_data"
+    },
+    {
+      "from": "group_selected",
+      "event": "recv POST",
+      "action": "reply 440",
+      "to": "group_selected"
+    },
+    {
+      "from": "awaiting_post_data",
+      "event": "recv article_data",
+      "action": "reply 240",
+      "to": "no_group_selected"
+    },
+    {
+      "from": "awaiting_post_data",
+      "event": "recv article_data",
+      "action": "reply 441",
+      "to": "no_group_selected"
+    },
+    {
+      "from": "no_group_selected",
+      "event": "recv IHAVE",
+      "action": "reply 335",
+      "to": "awaiting_ihave_data"
+    },
+    {
+      "from": "no_group_selected",
+      "event": "recv IHAVE",
+      "action": "reply 435",
+      "to": "no_group_selected"
+    },
+    {
+      "from": "no_group_selected",
+      "event": "recv IHAVE",
+      "action": "reply 436",
+      "to": "no_group_selected"
+    },
+    {
+      "from": "group_selected",
+      "event": "recv IHAVE",
+      "action": "reply 335",
+      "to": "awaiting_ihave_data"
+    },
+    {
+      "from": "group_selected",
+      "event": "recv IHAVE",
+      "action": "reply 435",
+      "to": "group_selected"
+    },
+    {
+      "from": "group_selected",
+      "event": "recv IHAVE",
+      "action": "reply 436",
+      "to": "group_selected"
+    },
+    {
+      "from": "awaiting_ihave_data",
+      "event": "recv article_data",
+      "action": "reply 235",
+      "to": "no_group_selected"
+    },
+    {
+      "from": "awaiting_ihave_data",
+      "event": "recv article_data",
+      "action": "reply 436",
+      "to": "no_group_selected"
+    },
+    {
+      "from": "awaiting_ihave_data",
+      "event": "recv article_data",
+      "action": "reply 437",
+      "to": "no_group_selected"
+    },
+    {
+      "from": "no_group_selected",
+      "event": "recv ARTICLE",
+      "action": "reply 412",
+      "to": "no_group_selected"
+    },
+    {
+      "from": "group_selected",
+      "event": "recv ARTICLE",
+      "action": "reply 220",
+      "to": "group_selected"
+    },
+    {
+      "from": "group_selected",
+      "event": "recv ARTICLE",
+      "action": "reply 423",
+      "to": "group_selected"
+    },
+    {
+      "from": "no_group_selected",
+      "event": "receive OVER range",
+      "action": "reply 412",
+      "to": "no_group_selected"
+    },
+    {
+      "from": "no_group_selected",
+      "event": "receive OVER",
+      "action": "reply 412",
+      "to": "no_group_selected"
+    },
+    {
+      "from": "group_selected",
+      "event": "receive OVER range",
+      "action": "reply 224",
+      "to": "group_selected"
+    },
+    {
+      "from": "group_selected",
+      "event": "receive OVER range",
+      "action": "reply 423",
+      "to": "group_selected"
+    },
+    {
+      "from": "group_selected",
+      "event": "receive OVER",
+      "action": "reply 224",
+      "to": "group_selected"
+    },
+    {
+      "from": "group_selected",
+      "event": "receive OVER",
+      "action": "reply 420",
+      "to": "group_selected"
+    },
+    {
+      "from": "no_group_selected",
+      "event": "receive HDR range",
+      "action": "reply 412",
+      "to": "no_group_selected"
+    },
+    {
+      "from": "no_group_selected",
+      "event": "receive HDR",
+      "action": "reply 412",
+      "to": "no_group_selected"
+    },
+    {
+      "from": "group_selected",
+      "event": "receive HDR range",
+      "action": "reply 225",
+      "to": "group_selected"
+    },
+    {
+      "from": "group_selected",
+      "event": "receive HDR range",
+      "action": "reply 423",
+      "to": "group_selected"
+    },
+    {
+      "from": "group_selected",
+      "event": "receive HDR",
+      "action": "reply 225",
+      "to": "group_selected"
+    },
+    {
+      "from": "group_selected",
+      "event": "receive HDR",
+      "action": "reply 420",
+      "to": "group_selected"
+    },
+    {
+      "from": "no_group_selected",
+      "event": "receive OVER message-id",
+      "action": "reply 224",
+      "to": "no_group_selected"
+    },
+    {
+      "from": "no_group_selected",
+      "event": "receive OVER message-id",
+      "action": "reply 430",
+      "to": "no_group_selected"
+    },
+    {
+      "from": "no_group_selected",
+      "event": "receive OVER message-id",
+      "action": "reply 503",
+      "to": "no_group_selected"
+    },
+    {
+      "from": "group_selected",
+      "event": "receive OVER message-id",
+      "action": "reply 224",
+      "to": "group_selected"
+    },
+    {
+      "from": "group_selected",
+      "event": "receive OVER message-id",
+      "action": "reply 430",
+      "to": "group_selected"
+    },
+    {
+      "from": "group_selected",
+      "event": "receive OVER message-id",
+      "action": "reply 503",
+      "to": "group_selected"
+    },
+    {
+      "from": "no_group_selected",
+      "event": "receive HDR message-id",
+      "action": "reply 225",
+      "to": "no_group_selected"
+    },
+    {
+      "from": "no_group_selected",
+      "event": "receive HDR message-id",
+      "action": "reply 430",
+      "to": "no_group_selected"
+    },
+    {
+      "from": "group_selected",
+      "event": "receive HDR message-id",
+      "action": "reply 225",
+      "to": "group_selected"
+    },
+    {
+      "from": "group_selected",
+      "event": "receive HDR message-id",
+      "action": "reply 430",
+      "to": "group_selected"
+    },
+    {
+      "from": "no_group_selected",
+      "event": "receive LIST OVERVIEW.FMT",
+      "action": "reply 215",
+      "to": "no_group_selected"
+    },
+    {
+      "from": "group_selected",
+      "event": "receive LIST OVERVIEW.FMT",
+      "action": "reply 215",
+      "to": "group_selected"
+    },
+    {
+      "from": "no_group_selected",
+      "event": "receive LIST HEADERS",
+      "action": "reply 215",
+      "to": "no_group_selected"
+    },
+    {
+      "from": "group_selected",
+      "event": "receive LIST HEADERS",
+      "action": "reply 215",
+      "to": "group_selected"
+    },
+    {
+      "from": "Ready",
+      "event": "recv IHAVE",
+      "action": "reply 335",
+      "to": "AwaitingContinuation"
+    },
+    {
+      "from": "Ready",
+      "event": "recv POST",
+      "action": "reply 340",
+      "to": "AwaitingContinuation"
+    },
+    {
+      "from": "AwaitingContinuation",
+      "event": "recv encoded-article",
+      "action": "reply CODE",
+      "to": "Ready"
+    },
+    {
+      "from": "Connected",
+      "event": "receive XENCRYPT",
+      "action": "reply 283",
+      "to": "Encrypted"
+    },
+    {
+      "from": "Connected",
+      "event": "receive XSECRET",
+      "action": "reply 483",
+      "to": "Connected"
+    },
+    {
+      "from": "Encrypted",
+      "event": "receive XSECRET",
+      "action": "reply 290",
+      "to": "Encrypted"
+    },
+    {
+      "from": "Connected",
+      "event": "receive invalid_utf8",
+      "action": "reply 501",
+      "to": "Closed"
+    },
+    {
+      "from": "Connected",
+      "event": "receive POST",
+      "action": "reply 340",
+      "to": "AwaitingArticleTransfer"
+    },
+    {
+      "from": "AwaitingArticleTransfer",
+      "event": "receive article_data",
+      "action": "reply 240",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "receive IHAVE",
+      "action": "reply 335",
+      "to": "AwaitingArticleTransfer"
+    },
+    {
+      "from": "AwaitingArticleTransfer",
+      "event": "receive article_data",
+      "action": "reply 235",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "receive QUIT",
+      "action": "reply 205",
+      "to": "Connected"
+    }
+  ]
+}

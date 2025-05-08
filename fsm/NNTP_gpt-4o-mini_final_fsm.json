@@ -1,0 +1,478 @@
+{
+  "states": [
+    "InitialConnection",
+    "WaitingForCommand",
+    "ProcessingCommand",
+    "SendingResponse",
+    "InactivityTimeout",
+    "MultiLineDataBlock",
+    "ReaderMode",
+    "TransitMode",
+    "ConnectionClosed",
+    "WaitingForGroupSelection",
+    "GroupSelected",
+    "ArticleRetrieved",
+    "PostingAllowed",
+    "PostingNotAllowed",
+    "ArticleTransferRequested",
+    "ArticleTransferFailed",
+    "ArticleTransferRejected",
+    "OverviewInformation",
+    "NoNewsgroupSelected",
+    "NoArticlesInRange",
+    "CurrentArticleInvalid",
+    "HeadersFollow",
+    "ReceivingContinuation",
+    "ServiceAvailable",
+    "ServiceProhibited",
+    "ConnectionClosing",
+    "ArticleExists",
+    "InvalidArticleNumber",
+    "NoNextArticle",
+    "NoPreviousArticle",
+    "NoArticleWithNumber",
+    "NoArticleWithMessageId",
+    "TransferNotWanted",
+    "TransferNotPossible",
+    "PostingFailed",
+    "CommandUnavailable",
+    "UnknownCommand",
+    "SyntaxError",
+    "CommandNotPermitted",
+    "FeatureNotSupported"
+  ],
+  "initial_state": "InitialConnection",
+  "final_states": [
+    "ConnectionClosed",
+    "InactivityTimeout",
+    "ArticleRetrieved",
+    "PostingAllowed",
+    "PostingNotAllowed",
+    "ArticleTransferFailed",
+    "ArticleTransferRejected",
+    "NoNewsgroupSelected",
+    "NoArticlesInRange",
+    "CurrentArticleInvalid",
+    "HeadersFollow",
+    "ReceivingContinuation",
+    "ServiceProhibited",
+    "TransferNotWanted",
+    "TransferNotPossible",
+    "PostingFailed",
+    "CommandUnavailable",
+    "UnknownCommand",
+    "SyntaxError",
+    "CommandNotPermitted",
+    "FeatureNotSupported"
+  ],
+  "transitions": [
+    {
+      "from": "InitialConnection",
+      "event": "receive GREETING",
+      "action": "send greeting",
+      "to": "WaitingForCommand"
+    },
+    {
+      "from": "InitialConnection",
+      "event": "receive INITIAL_CONNECTION",
+      "action": "reply 200",
+      "to": "ReaderMode"
+    },
+    {
+      "from": "InitialConnection",
+      "event": "receive INITIAL_CONNECTION",
+      "action": "reply 201",
+      "to": "ReaderMode"
+    },
+    {
+      "from": "InitialConnection",
+      "event": "receive INITIAL_CONNECTION",
+      "action": "reply 400",
+      "to": "ConnectionClosed"
+    },
+    {
+      "from": "InitialConnection",
+      "event": "receive INITIAL_CONNECTION",
+      "action": "reply 502",
+      "to": "ConnectionClosed"
+    },
+    {
+      "from": "WaitingForCommand",
+      "event": "receive COMMAND",
+      "action": "process command",
+      "to": "ProcessingCommand"
+    },
+    {
+      "from": "ProcessingCommand",
+      "event": "send RESPONSE",
+      "action": "reply CODE",
+      "to": "SendingResponse"
+    },
+    {
+      "from": "SendingResponse",
+      "event": "timeout 3m",
+      "action": "close connection",
+      "to": "InitialConnection"
+    },
+    {
+      "from": "ProcessingCommand",
+      "event": "receive MULTI-LINE DATA",
+      "action": "collect data",
+      "to": "MultiLineDataBlock"
+    },
+    {
+      "from": "MultiLineDataBlock",
+      "event": "send TERMINATION",
+      "action": "send termination line",
+      "to": "WaitingForCommand"
+    },
+    {
+      "from": "ReaderMode",
+      "event": "receive MODE_READER",
+      "action": "reply 200",
+      "to": "ReaderMode"
+    },
+    {
+      "from": "ReaderMode",
+      "event": "receive MODE_READER",
+      "action": "reply 201",
+      "to": "ReaderMode"
+    },
+    {
+      "from": "ReaderMode",
+      "event": "receive MODE_READER",
+      "action": "reply 502",
+      "to": "ConnectionClosed"
+    },
+    {
+      "from": "TransitMode",
+      "event": "receive MODE_READER",
+      "action": "reply 502",
+      "to": "ConnectionClosed"
+    },
+    {
+      "from": "ReaderMode",
+      "event": "receive QUIT",
+      "action": "reply 205",
+      "to": "ConnectionClosed"
+    },
+    {
+      "from": "WaitingForGroupSelection",
+      "event": "receive GROUP group",
+      "action": "reply 211",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "WaitingForGroupSelection",
+      "event": "receive GROUP group",
+      "action": "reply 411",
+      "to": "WaitingForGroupSelection"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive LAST",
+      "action": "reply 223",
+      "to": "ArticleRetrieved"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive LAST",
+      "action": "reply 412",
+      "to": "WaitingForGroupSelection"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive LAST",
+      "action": "reply 420",
+      "to": "WaitingForGroupSelection"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive NEXT",
+      "action": "reply 223",
+      "to": "ArticleRetrieved"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive NEXT",
+      "action": "reply 412",
+      "to": "WaitingForGroupSelection"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive NEXT",
+      "action": "reply 421",
+      "to": "WaitingForGroupSelection"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive ARTICLE",
+      "action": "reply 220",
+      "to": "ArticleRetrieved"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive ARTICLE",
+      "action": "reply 412",
+      "to": "WaitingForGroupSelection"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive ARTICLE",
+      "action": "reply 423",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive POST",
+      "action": "reply 340",
+      "to": "PostingAllowed"
+    },
+    {
+      "from": "PostingAllowed",
+      "event": "send article",
+      "action": "reply 240",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "PostingAllowed",
+      "event": "send article",
+      "action": "reply 441",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "WaitingForGroupSelection",
+      "event": "receive POST",
+      "action": "reply 440",
+      "to": "WaitingForGroupSelection"
+    },
+    {
+      "from": "WaitingForGroupSelection",
+      "event": "receive IHAVE message-id",
+      "action": "reply 335",
+      "to": "ArticleTransferRequested"
+    },
+    {
+      "from": "ArticleTransferRequested",
+      "event": "send article",
+      "action": "reply 235",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "ArticleTransferRequested",
+      "event": "send article",
+      "action": "reply 436",
+      "to": "ArticleTransferRequested"
+    },
+    {
+      "from": "ArticleTransferRequested",
+      "event": "send article",
+      "action": "reply 437",
+      "to": "WaitingForGroupSelection"
+    },
+    {
+      "from": "Initial",
+      "event": "receive DATE",
+      "action": "reply 111",
+      "to": "SendingResponse"
+    },
+    {
+      "from": "Initial",
+      "event": "receive HELP",
+      "action": "reply 100",
+      "to": "SendingResponse"
+    },
+    {
+      "from": "Initial",
+      "event": "receive NEWGROUPS",
+      "action": "reply 231",
+      "to": "SendingResponse"
+    },
+    {
+      "from": "Initial",
+      "event": "receive NEWNEWS",
+      "action": "reply 230",
+      "to": "SendingResponse"
+    },
+    {
+      "from": "WaitingForCommand",
+      "event": "receive OVER message-id",
+      "action": "reply 224",
+      "to": "OverviewInformation"
+    },
+    {
+      "from": "WaitingForCommand",
+      "event": "receive OVER message-id",
+      "action": "reply 430",
+      "to": "WaitingForCommand"
+    },
+    {
+      "from": "WaitingForCommand",
+      "event": "receive OVER range",
+      "action": "reply 224",
+      "to": "OverviewInformation"
+    },
+    {
+      "from": "WaitingForCommand",
+      "event": "receive OVER range",
+      "action": "reply 412",
+      "to": "NoNewsgroupSelected"
+    },
+    {
+      "from": "WaitingForCommand",
+      "event": "receive OVER range",
+      "action": "reply 423",
+      "to": "NoArticlesInRange"
+    },
+    {
+      "from": "WaitingForCommand",
+      "event": "receive OVER",
+      "action": "reply 224",
+      "to": "OverviewInformation"
+    },
+    {
+      "from": "WaitingForCommand",
+      "event": "receive OVER",
+      "action": "reply 412",
+      "to": "NoNewsgroupSelected"
+    },
+    {
+      "from": "WaitingForCommand",
+      "event": "receive OVER",
+      "action": "reply 420",
+      "to": "CurrentArticleInvalid"
+    },
+    {
+      "from": "OverviewInformation",
+      "event": "send overview data",
+      "action": "send multi-line data",
+      "to": "HeadersFollow"
+    },
+    {
+      "from": "HeadersFollow",
+      "event": "send end of data",
+      "action": "send .",
+      "to": "WaitingForCommand"
+    },
+    {
+      "from": "WaitingForCommand",
+      "event": "receive COMMAND",
+      "action": "send RESPONSE",
+      "to": "SendingResponse"
+    },
+    {
+      "from": "SendingResponse",
+      "event": "receive CONTINUATION",
+      "action": "send RESPONSE",
+      "to": "ReceivingContinuation"
+    },
+    {
+      "from": "ReceivingContinuation",
+      "event": "receive COMMAND",
+      "action": "send RESPONSE",
+      "to": "SendingResponse"
+    },
+    {
+      "from": "ServiceAvailable",
+      "event": "receive QUIT",
+      "action": "send 205",
+      "to": "ConnectionClosing"
+    },
+    {
+      "from": "ServiceAvailable",
+      "event": "receive GROUP",
+      "action": "send 211",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive ARTICLE",
+      "action": "send 223",
+      "to": "ArticleExists"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive ARTICLE",
+      "action": "send 412",
+      "to": "NoNewsgroupSelected"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive NEXT",
+      "action": "send 421",
+      "to": "NoNextArticle"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive LAST",
+      "action": "send 422",
+      "to": "NoPreviousArticle"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive ARTICLE",
+      "action": "send 423",
+      "to": "NoArticleWithNumber"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive ARTICLE",
+      "action": "send 430",
+      "to": "NoArticleWithMessageId"
+    },
+    {
+      "from": "InitialConnection",
+      "event": "receive IHAVE",
+      "action": "send 435",
+      "to": "TransferNotWanted"
+    },
+    {
+      "from": "InitialConnection",
+      "event": "receive IHAVE",
+      "action": "send 436",
+      "to": "TransferNotPossible"
+    },
+    {
+      "from": "InitialConnection",
+      "event": "receive POST",
+      "action": "send 440",
+      "to": "PostingNotPermitted"
+    },
+    {
+      "from": "InitialConnection",
+      "event": "receive POST",
+      "action": "send 441",
+      "to": "PostingFailed"
+    },
+    {
+      "from": "InitialConnection",
+      "event": "receive COMMAND",
+      "action": "send 480",
+      "to": "CommandUnavailable"
+    },
+    {
+      "from": "InitialConnection",
+      "event": "receive COMMAND",
+      "action": "send 500",
+      "to": "UnknownCommand"
+    },
+    {
+      "from": "InitialConnection",
+      "event": "receive COMMAND",
+      "action": "send 501",
+      "to": "SyntaxError"
+    },
+    {
+      "from": "InitialConnection",
+      "event": "receive COMMAND",
+      "action": "send 502",
+      "to": "CommandNotPermitted"
+    },
+    {
+      "from": "InitialConnection",
+      "event": "receive COMMAND",
+      "action": "send 503",
+      "to": "FeatureNotSupported"
+    }
+  ]
+}

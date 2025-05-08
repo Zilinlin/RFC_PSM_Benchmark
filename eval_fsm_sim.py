@@ -97,10 +97,11 @@ def batch_evaluate_fsm_similarity():
     # "IMAP", 
     # "POP3" has bugs
     #protocols = ["IMAP", "POP3"]
-    protocols = ["POP3"] # check for testing
+    protocols = ["NNTP","SIP","FTP"] # check for testing
     #protocols = ["SIP", "RTSP", "DCCP", "DHCP", "FTP", "NNTP", "SMTP", "TCP"]
     # close_models = ["claude-3-7-sonnet-20250219"]
-    close_models = ["deepseek-reasoner", "gpt-4o-mini", "claude-3-7-sonnet-20250219", "gemini-2.0-flash"]
+    # , "gemini-2.0-flash"
+    close_models = ["deepseek-reasoner", "gpt-4o-mini", "claude-3-7-sonnet-20250219"]
     fsm_dir = "fsm"
     results = {}
 

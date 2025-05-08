@@ -3,7 +3,8 @@ from graphviz import Digraph
 
 def draw_state_machine_dot(json_file,
                           output_name='state_machine_picture',
-                          fmt='png'):
+                          fmt='png',
+                          dpi=300):
     """
     Reads a JSON file describing an FSM in the format:
     {
@@ -27,7 +28,7 @@ def draw_state_machine_dot(json_file,
         data = json.load(f)
 
     dot = Digraph(name='ProtocolStateMachine', format=fmt)
-    dot.attr(rankdir='LR', size='8,5')   # left-to-right layout
+    dot.attr(rankdir='LR', size='12,8', dpi=str(dpi))   # left-to-right layout with high DPI
 
     # Invisible start node pointing at the initial state
     dot.node('_start', shape='point')

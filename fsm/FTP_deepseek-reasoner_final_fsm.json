@@ -1,0 +1,162 @@
+{
+  "states": [
+    "Connected",
+    "AwaitingPassword",
+    "Authenticated",
+    "AwaitingAccount",
+    "AwaitingRenameTo",
+    "AwaitingRestartCommand",
+    "TransferInProgress",
+    "AwaitingPASV",
+    "AwaitingPORT",
+    "Closed",
+    "Waiting",
+    "Success",
+    "Failure",
+    "Error"
+  ],
+  "initial_state": "Connected",
+  "final_states": [
+    "Closed"
+  ],
+  "transitions": [
+    {
+      "from": "Connected",
+      "event": "receive USER",
+      "action": "reply 331",
+      "to": "AwaitingPassword"
+    },
+    {
+      "from": "AwaitingPassword",
+      "event": "receive PASS",
+      "action": "reply 230",
+      "to": "Authenticated"
+    },
+    {
+      "from": "AwaitingPassword",
+      "event": "receive PASS",
+      "action": "reply 332",
+      "to": "AwaitingAccount"
+    },
+    {
+      "from": "AwaitingAccount",
+      "event": "receive ACCT",
+      "action": "reply 230",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive RNFR",
+      "action": "reply 350",
+      "to": "AwaitingRenameTo"
+    },
+    {
+      "from": "AwaitingRenameTo",
+      "event": "receive RNTO",
+      "action": "reply 250",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive REST",
+      "action": "reply 350",
+      "to": "AwaitingRestartCommand"
+    },
+    {
+      "from": "AwaitingRestartCommand",
+      "event": "receive RETR",
+      "action": "reply 150",
+      "to": "TransferInProgress"
+    },
+    {
+      "from": "AwaitingRestartCommand",
+      "event": "receive STOR",
+      "action": "reply 150",
+      "to": "TransferInProgress"
+    },
+    {
+      "from": "TransferInProgress",
+      "event": "cond transfer_complete",
+      "action": "reply 226",
+      "to": "Authenticated"
+    },
+    {
+      "from": "TransferInProgress",
+      "event": "receive ABOR",
+      "action": "reply 426",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive REIN",
+      "action": "reset parameters",
+      "to": "Connected"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "Closed"
+    },
+    {
+      "from": "Connected",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "Closed"
+    },
+    {
+      "from": "AwaitingRenameTo",
+      "event": "receive_invalid_command",
+      "action": "reply 503",
+      "to": "AwaitingRenameTo"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive PORT",
+      "action": "reply 200",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive PASV",
+      "action": "reply 227",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive STOR",
+      "action": "reply 150",
+      "to": "TransferInProgress"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive RETR",
+      "action": "reply 150",
+      "to": "TransferInProgress"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive TYPE",
+      "action": "reply 200",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive STRU",
+      "action": "reply 200",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive MODE",
+      "action": "reply 200",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive NOOP",
+      "action": "reply 200",
+      "to": "Authenticated"
+    }
+  ]
+}

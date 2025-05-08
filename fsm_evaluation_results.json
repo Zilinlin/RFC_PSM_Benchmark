@@ -1,82 +1,182 @@
 {
-  "POP3_deepseek-reasoner": {
+  "NNTP_deepseek-reasoner": {
     "with_partial": {
-      "precision": 0.5714285442176883,
-      "recall": 0.6666666296296316,
-      "f1_score": 0.6153840867854126,
-      "matched": 12,
+      "precision": 0.027397259898667675,
+      "recall": 0.12499999218750048,
+      "f1_score": 0.044943524304413,
+      "matched": 2,
       "fully_correct": 0,
-      "partially_correct": 12,
-      "unmatched": 6
+      "partially_correct": 2,
+      "unmatched": 14
     },
     "no_partial": {
-      "precision": 0.09523809070294806,
-      "recall": 0.11111110493827195,
-      "f1_score": 0.10256360026539356,
-      "matched": 2,
-      "fully_correct": 2,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "matched": 0,
+      "fully_correct": 0,
       "partially_correct": 0,
       "unmatched": 16
     }
   },
-  "POP3_gpt-4o-mini": {
+  "NNTP_gpt-4o-mini": {
     "with_partial": {
-      "precision": 0.36363635261708027,
-      "recall": 0.6666666296296316,
-      "f1_score": 0.47058776009271297,
-      "matched": 12,
-      "fully_correct": 3,
-      "partially_correct": 9,
-      "unmatched": 6
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "matched": 0,
+      "fully_correct": 0,
+      "partially_correct": 0,
+      "unmatched": 16
     },
     "no_partial": {
-      "precision": 0.12121211753902675,
-      "recall": 0.2222222098765439,
-      "f1_score": 0.15686228220048096,
-      "matched": 4,
-      "fully_correct": 4,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "matched": 0,
+      "fully_correct": 0,
+      "partially_correct": 0,
+      "unmatched": 16
+    }
+  },
+  "NNTP_claude-3-7-sonnet-20250219": {
+    "with_partial": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "matched": 0,
+      "fully_correct": 0,
+      "partially_correct": 0,
+      "unmatched": 16
+    },
+    "no_partial": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "matched": 0,
+      "fully_correct": 0,
+      "partially_correct": 0,
+      "unmatched": 16
+    }
+  },
+  "SIP_deepseek-reasoner": {
+    "with_partial": {
+      "precision": 0.20689654815695607,
+      "recall": 0.5999999700000015,
+      "f1_score": 0.30769191847515437,
+      "matched": 12,
+      "fully_correct": 6,
+      "partially_correct": 6,
+      "unmatched": 8
+    },
+    "no_partial": {
+      "precision": 0.15517241111771707,
+      "recall": 0.4499999775000011,
+      "f1_score": 0.23076884352462157,
+      "matched": 9,
+      "fully_correct": 9,
+      "partially_correct": 0,
+      "unmatched": 11
+    }
+  },
+  "SIP_gpt-4o-mini": {
+    "with_partial": {
+      "precision": 0.07874015686031373,
+      "recall": 0.4999999750000012,
+      "f1_score": 0.13605418483079376,
+      "matched": 10,
+      "fully_correct": 5,
+      "partially_correct": 5,
+      "unmatched": 10
+    },
+    "no_partial": {
+      "precision": 0.04724409411618823,
+      "recall": 0.29999998500000075,
+      "f1_score": 0.08163241686401379,
+      "matched": 6,
+      "fully_correct": 6,
       "partially_correct": 0,
       "unmatched": 14
     }
   },
-  "POP3_claude-3-7-sonnet-20250219": {
+  "SIP_claude-3-7-sonnet-20250219": {
     "with_partial": {
-      "precision": 0.3461538328402372,
-      "recall": 0.49999997222222375,
-      "f1_score": 0.4090904070253641,
-      "matched": 9,
+      "precision": 0.012195121876859014,
+      "recall": 0.09999999500000024,
+      "f1_score": 0.021738936438393305,
+      "matched": 2,
       "fully_correct": 0,
-      "partially_correct": 9,
-      "unmatched": 9
+      "partially_correct": 2,
+      "unmatched": 18
     },
     "no_partial": {
-      "precision": 0.07692307396449716,
-      "recall": 0.11111110493827195,
-      "f1_score": 0.09090860330835497,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "matched": 0,
+      "fully_correct": 0,
+      "partially_correct": 0,
+      "unmatched": 20
+    }
+  },
+  "FTP_deepseek-reasoner": {
+    "with_partial": {
+      "precision": 0.21739129489603065,
+      "recall": 0.20833332465277812,
+      "f1_score": 0.21276544862045904,
+      "matched": 5,
+      "fully_correct": 2,
+      "partially_correct": 3,
+      "unmatched": 19
+    },
+    "no_partial": {
+      "precision": 0.17391303591682453,
+      "recall": 0.1666666597222225,
+      "f1_score": 0.17021225894216488,
+      "matched": 4,
+      "fully_correct": 4,
+      "partially_correct": 0,
+      "unmatched": 20
+    }
+  },
+  "FTP_gpt-4o-mini": {
+    "with_partial": {
+      "precision": 0.07547169668921327,
+      "recall": 0.1666666597222225,
+      "f1_score": 0.10389567212185612,
+      "matched": 4,
+      "fully_correct": 2,
+      "partially_correct": 2,
+      "unmatched": 20
+    },
+    "no_partial": {
+      "precision": 0.03773584834460664,
+      "recall": 0.08333332986111125,
+      "f1_score": 0.0519476215248762,
       "matched": 2,
       "fully_correct": 2,
       "partially_correct": 0,
-      "unmatched": 16
+      "unmatched": 22
     }
   },
-  "POP3_gemini-2.0-flash": {
+  "FTP_claude-3-7-sonnet-20250219": {
     "with_partial": {
-      "precision": 0.33333332478632505,
-      "recall": 0.7222221820987677,
-      "f1_score": 0.4561399027397097,
-      "matched": 13,
-      "fully_correct": 3,
-      "partially_correct": 10,
-      "unmatched": 5
+      "precision": 0.08695651984877131,
+      "recall": 0.1666666597222225,
+      "f1_score": 0.11428526040993725,
+      "matched": 4,
+      "fully_correct": 1,
+      "partially_correct": 3,
+      "unmatched": 20
     },
     "no_partial": {
-      "precision": 0.12820512491781733,
-      "recall": 0.27777776234567986,
-      "f1_score": 0.17543815820358374,
-      "matched": 5,
-      "fully_correct": 5,
+      "precision": 0.04347825992438566,
+      "recall": 0.08333332986111125,
+      "f1_score": 0.057142404901509784,
+      "matched": 2,
+      "fully_correct": 2,
       "partially_correct": 0,
-      "unmatched": 13
+      "unmatched": 22
     }
   }
 }

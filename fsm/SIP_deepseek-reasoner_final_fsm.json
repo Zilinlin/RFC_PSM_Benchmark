@@ -1,218 +1,384 @@
 {
   "states": [
-    "Init",
-    "AwaitingResponse",
-    "Proceeding",
-    "Ringing",
-    "Established",
-    "Terminated",
-    "EarlyDialog",
-    "Confirmed",
-    "TransactionCompleted",
-    "Ready",
-    "InviteClientTxInProgress",
-    "AwaitingRetry",
-    "InviteServerTxInProgress",
-    "DialogActive",
-    "Unregistered",
-    "Registered",
-    "Completed",
-    "Trying",
-    "ProceedingNonInvite",
-    "CompletedNonInvite",
-    "TerminatedNonInvite",
-    "ProceedingServer",
-    "CompletedServer",
-    "TryingServer",
-    "ProceedingServerNonInvite",
-    "CompletedServerNonInvite"
+    "Initial",
+    "Authenticating",
+    "CheckingAuthorization",
+    "ProcessingContacts",
+    "SendingResponse",
+    "Error",
+    "early_dialog",
+    "confirmed",
+    "terminated",
+    "initiating",
+    "waiting_response",
+    "processing_invite",
+    "waiting_ack",
+    "session_active",
+    "idle",
+    "client_tx_in_progress",
+    "server_tx_in_progress",
+    "waiting_retry",
+    "calling",
+    "proceeding",
+    "completed",
+    "trying",
+    "awaiting_request",
+    "challenged",
+    "authenticated"
   ],
-  "initial_state": "Init",
+  "initial_state": "initiating",
   "final_states": [
-    "Terminated",
-    "TransactionCompleted",
-    "TerminatedNonInvite"
+    "Error",
+    "terminated"
   ],
   "transitions": [
     {
-      "from": "Init",
+      "from": "Initial",
+      "event": "recv REGISTER",
+      "action": "inspect Request-URI",
+      "to": "Authenticating"
+    },
+    {
+      "from": "Authenticating",
+      "event": "authentication failed",
+      "action": "reply 403",
+      "to": "Error"
+    },
+    {
+      "from": "Authenticating",
+      "event": "authentication success",
+      "action": "check authorization",
+      "to": "CheckingAuthorization"
+    },
+    {
+      "from": "CheckingAuthorization",
+      "event": "unauthorized user",
+      "action": "reply 403",
+      "to": "Error"
+    },
+    {
+      "from": "CheckingAuthorization",
+      "event": "authorized user",
+      "action": "process contacts",
+      "to": "ProcessingContacts"
+    },
+    {
+      "from": "ProcessingContacts",
+      "event": "invalid expiration",
+      "action": "reply 423 Min-Expires",
+      "to": "Error"
+    },
+    {
+      "from": "ProcessingContacts",
+      "event": "valid contacts",
+      "action": "update bindings",
+      "to": "SendingResponse"
+    },
+    {
+      "from": "SendingResponse",
+      "event": "commit success",
+      "action": "reply 200 Contacts",
+      "to": "Initial"
+    },
+    {
+      "from": "SendingResponse",
+      "event": "commit failed",
+      "action": "reply 500",
+      "to": "Error"
+    },
+    {
+      "from": "early_dialog",
+      "event": "recv 2xx",
+      "action": "send ACK",
+      "to": "confirmed"
+    },
+    {
+      "from": "early_dialog",
+      "event": "recv non-2xx",
+      "action": "send ACK",
+      "to": "terminated"
+    },
+    {
+      "from": "initiating",
       "event": "send INVITE",
       "action": "send INVITE",
-      "to": "AwaitingResponse"
+      "to": "waiting_response"
     },
     {
-      "from": "AwaitingResponse",
-      "event": "recv 100 Trying",
-      "action": "process response",
-      "to": "Proceeding"
-    },
-    {
-      "from": "Proceeding",
-      "event": "recv 180 Ringing",
-      "action": "notify ringing",
-      "to": "Ringing"
-    },
-    {
-      "from": "Ringing",
-      "event": "recv 200 OK",
-      "action": "send ACK",
-      "to": "Established"
-    },
-    {
-      "from": "Established",
-      "event": "recv BYE",
-      "action": "send 200 OK",
-      "to": "Terminated"
-    },
-    {
-      "from": "EarlyDialog",
-      "event": "recv 2xx",
-      "action": "confirm dialog",
-      "to": "Confirmed"
-    },
-    {
-      "from": "EarlyDialog",
-      "event": "recv non2xx",
-      "action": "terminate dialog",
-      "to": "Terminated"
-    },
-    {
-      "from": "EarlyDialog",
-      "event": "timeout",
-      "action": "terminate dialog",
-      "to": "Terminated"
-    },
-    {
-      "from": "Confirmed",
-      "event": "recv BYE",
-      "action": "reply 200",
-      "to": "Terminated"
-    },
-    {
-      "from": "Confirmed",
-      "event": "recv 408",
-      "action": "terminate dialog",
-      "to": "Terminated"
-    },
-    {
-      "from": "Confirmed",
-      "event": "recv 481",
-      "action": "terminate dialog",
-      "to": "Terminated"
-    },
-    {
-      "from": "Confirmed",
-      "event": "timeout",
-      "action": "terminate dialog",
-      "to": "Terminated"
-    },
-    {
-      "from": "AwaitingResponse",
+      "from": "waiting_response",
       "event": "recv 1xx",
-      "action": "create early_dialog",
-      "to": "EarlyDialog"
+      "action": "create early dialog",
+      "to": "early_dialog"
     },
     {
-      "from": "AwaitingResponse",
+      "from": "waiting_response",
       "event": "recv 2xx",
       "action": "send ACK",
-      "to": "Confirmed"
+      "to": "confirmed"
     },
     {
-      "from": "AwaitingResponse",
+      "from": "waiting_response",
       "event": "recv 3xx/4xx/5xx/6xx",
       "action": "send ACK",
-      "to": "TransactionCompleted"
+      "to": "terminated"
     },
     {
-      "from": "EarlyDialog",
-      "event": "recv 2xx",
-      "action": "send ACK",
-      "to": "Confirmed"
+      "from": "waiting_response",
+      "event": "timeout",
+      "action": "handle 408",
+      "to": "terminated"
     },
     {
-      "from": "EarlyDialog",
-      "event": "recv non-2xx_final",
-      "action": "terminate dialog",
-      "to": "TransactionCompleted"
+      "from": "idle",
+      "event": "send re-INVITE",
+      "action": "send INVITE",
+      "to": "client_tx_in_progress"
     },
     {
-      "from": "Confirmed",
-      "event": "timeout 64*T1",
-      "action": "terminate session",
-      "to": "TransactionCompleted"
-    },
-    {
-      "from": "InviteClientTxInProgress",
+      "from": "client_tx_in_progress",
       "event": "recv 491",
       "action": "start timer",
-      "to": "AwaitingRetry"
+      "to": "waiting_retry"
     },
     {
-      "from": "AwaitingRetry",
+      "from": "waiting_retry",
       "event": "timeout",
-      "action": "send INVITE",
-      "to": "InviteClientTxInProgress"
+      "action": "send re-INVITE",
+      "to": "client_tx_in_progress"
     },
     {
-      "from": "InviteClientTxInProgress",
+      "from": "client_tx_in_progress",
+      "event": "recv 2xx",
+      "action": "send ACK",
+      "to": "idle"
+    },
+    {
+      "from": "client_tx_in_progress",
+      "event": "recv non-2xx",
+      "action": "none",
+      "to": "idle"
+    },
+    {
+      "from": "session_active",
+      "event": "send BYE",
+      "action": "terminate media",
+      "to": "terminated"
+    },
+    {
+      "from": "session_active",
+      "event": "receive BYE",
+      "action": "send 2xx, terminate media",
+      "to": "terminated"
+    },
+    {
+      "from": "session_active",
+      "event": "receive non-2xx",
+      "action": "terminate session",
+      "to": "terminated"
+    },
+    {
+      "from": "calling",
+      "event": "timer B fires",
+      "action": "inform TU",
+      "to": "terminated"
+    },
+    {
+      "from": "calling",
+      "event": "transport error",
+      "action": "inform TU",
+      "to": "terminated"
+    },
+    {
+      "from": "calling",
+      "event": "receive 1xx",
+      "action": "pass to TU",
+      "to": "proceeding"
+    },
+    {
+      "from": "calling",
+      "event": "receive 300-699",
+      "action": "send ACK",
+      "to": "completed"
+    },
+    {
+      "from": "calling",
+      "event": "receive 2xx",
+      "action": "pass to TU",
+      "to": "terminated"
+    },
+    {
+      "from": "proceeding",
+      "event": "receive 300-699",
+      "action": "send ACK",
+      "to": "completed"
+    },
+    {
+      "from": "proceeding",
+      "event": "receive 2xx",
+      "action": "pass to TU",
+      "to": "terminated"
+    },
+    {
+      "from": "proceeding",
+      "event": "transport error",
+      "action": "inform TU",
+      "to": "terminated"
+    },
+    {
+      "from": "completed",
+      "event": "timer D fires",
+      "action": "none",
+      "to": "terminated"
+    },
+    {
+      "from": "trying",
+      "event": "timer F fires",
+      "action": "inform TU",
+      "to": "terminated"
+    },
+    {
+      "from": "trying",
+      "event": "receive 1xx",
+      "action": "pass to TU",
+      "to": "proceeding"
+    },
+    {
+      "from": "trying",
+      "event": "receive 200-699",
+      "action": "pass to TU",
+      "to": "completed"
+    },
+    {
+      "from": "proceeding",
+      "event": "timer F fires",
+      "action": "inform TU",
+      "to": "terminated"
+    },
+    {
+      "from": "proceeding",
+      "event": "receive 200-699",
+      "action": "pass to TU",
+      "to": "completed"
+    },
+    {
+      "from": "completed",
+      "event": "timer K fires",
+      "action": "none",
+      "to": "terminated"
+    },
+    {
+      "from": "proceeding",
+      "event": "receive 2xx",
+      "action": "send response",
+      "to": "terminated"
+    },
+    {
+      "from": "proceeding",
+      "event": "receive 300-699",
+      "action": "send response",
+      "to": "completed"
+    },
+    {
+      "from": "completed",
+      "event": "receive ACK",
+      "action": "none",
+      "to": "confirmed"
+    },
+    {
+      "from": "completed",
+      "event": "timer H fires",
+      "action": "inform TU",
+      "to": "terminated"
+    },
+    {
+      "from": "confirmed",
+      "event": "timer I fires",
+      "action": "none",
+      "to": "terminated"
+    },
+    {
+      "from": "trying",
+      "event": "receive request",
+      "action": "send 100",
+      "to": "proceeding"
+    },
+    {
+      "from": "trying",
+      "event": "receive 200-699",
+      "action": "send response",
+      "to": "completed"
+    },
+    {
+      "from": "proceeding",
+      "event": "receive 200-699",
+      "action": "send response",
+      "to": "completed"
+    },
+    {
+      "from": "completed",
+      "event": "timer J fires",
+      "action": "none",
+      "to": "terminated"
+    },
+    {
+      "from": "awaiting_request",
+      "event": "recv request without auth",
+      "action": "reply 401/407",
+      "to": "challenged"
+    },
+    {
+      "from": "challenged",
+      "event": "recv valid credentials",
+      "action": "process request",
+      "to": "authenticated"
+    },
+    {
+      "from": "challenged",
+      "event": "recv invalid credentials",
+      "action": "reply 403",
+      "to": "awaiting_request"
+    },
+    {
+      "from": "awaiting_request",
+      "event": "recv request with auth",
+      "action": "validate credentials",
+      "to": "authenticated"
+    },
+    {
+      "from": "processing_invite",
+      "event": "send 1xx",
+      "action": "reply 1xx",
+      "to": "processing_invite"
+    },
+    {
+      "from": "processing_invite",
+      "event": "send 2xx",
+      "action": "reply 2xx",
+      "to": "waiting_ack"
+    },
+    {
+      "from": "processing_invite",
+      "event": "send non-2xx",
+      "action": "reply",
+      "to": "terminated"
+    },
+    {
+      "from": "waiting_ack",
+      "event": "recv ACK",
+      "action": "none",
+      "to": "session_active"
+    },
+    {
+      "from": "waiting_ack",
+      "event": "timeout",
+      "action": "send BYE",
+      "to": "terminated"
+    },
+    {
+      "from": "server_tx_in_progress",
       "event": "recv INVITE",
       "action": "reply 491",
-      "to": "InviteClientTxInProgress"
-    },
-    {
-      "from": "InviteServerTxInProgress",
-      "event": "recv INVITE",
-      "action": "reply 500",
-      "to": "InviteServerTxInProgress"
-    },
-    {
-      "from": "Ready",
-      "event": "recv INVITE",
-      "action": "process INVITE",
-      "to": "InviteServerTxInProgress"
-    },
-    {
-      "from": "DialogActive",
-      "event": "send BYE",
-      "action": "terminate session",
-      "to": "AwaitingResponse"
-    },
-    {
-      "from": "AwaitingResponse",
-      "event": "receive 2xx",
-      "action": "terminate dialog",
-      "to": "Terminated"
-    },
-    {
-      "from": "AwaitingResponse",
-      "event": "receive 481/408",
-      "action": "terminate dialog",
-      "to": "Terminated"
-    },
-    {
-      "from": "AwaitingResponse",
-      "event": "timeout",
-      "action": "terminate dialog",
-      "to": "Terminated"
-    },
-    {
-      "from": "DialogActive",
-      "event": "receive BYE",
-      "action": "send 2xx, terminate session",
-      "to": "Terminated"
-    },
-    {
-      "from": "Unregistered",
-      "event": "receive 200 OK",
-      "action": "record registered",
-      "to": "Registered"
-    },
-    {
-      "from": "Registered",
-      "event": "send INVITE",
-      "action": "send INVITE",
-      "to": "AwaitingResponse"
+      "to": "server_tx_in_progress"
     }
   ]
 }

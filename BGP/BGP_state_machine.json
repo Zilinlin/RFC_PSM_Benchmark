@@ -1,0 +1,172 @@
+{
+    "states": [
+        "Idle",
+        "Connect",
+        "Active",
+        "OpenSent",
+        "OpenConfirm",
+        "Established"
+    ],
+    "initial_state": "Idle",
+    "final_states": [
+        "Idle"
+    ],
+    "transitions": [
+        {
+            "from": "Idle",
+            "to": "Connect",
+            "event": "ManualStart",
+            "action": "Initiate TCP, start ConnectRetryTimer"
+        },
+        {
+            "from": "Idle",
+            "to": "Active",
+            "event": "ManualStart_with_PassiveTcpEstablishment",
+            "action": "Start listening, reset ConnectRetryCounter"
+        },
+        {
+            "from": "Idle",
+            "to": "Active",
+            "event": "AutomaticStart_with_PassiveTcpEstablishment",
+            "action": "Start listening, reset ConnectRetryCounter"
+        },
+        {
+            "from": "Idle",
+            "to": "Idle",
+            "event": "AutomaticStop",
+            "action": "Do nothing"
+        },
+        {
+            "from": "Idle",
+            "to": "Connect",
+            "event": "IdleHoldTimer_Expires",
+            "action": "Initiate connection after oscillation damping"
+        },
+        {
+            "from": "Connect",
+            "to": "Active",
+            "event": "TcpConnectionFails",
+            "action": "Reset ConnectRetryTimer, listen for incoming connection"
+        },
+        {
+            "from": "Connect",
+            "to": "OpenSent",
+            "event": "TcpConnectionConfirmed",
+            "action": "Send OPEN, start HoldTimer"
+        },
+        {
+            "from": "Connect",
+            "to": "OpenSent",
+            "event": "DelayOpenTimer_Expires",
+            "action": "Send OPEN, start HoldTimer"
+        },
+        {
+            "from": "Connect",
+            "to": "Idle",
+            "event": "ConnectRetryTimer_Expires",
+            "action": "Reset ConnectRetryCounter, release resources"
+        },
+        {
+            "from": "Active",
+            "to": "Connect",
+            "event": "TcpConnection_Valid",
+            "action": "Initiate TCP connection"
+        },
+        {
+            "from": "Active",
+            "to": "Idle",
+            "event": "TcpConnectionFails",
+            "action": "Reset ConnectRetryCounter, release resources"
+        },
+        {
+            "from": "Active",
+            "to": "OpenSent",
+            "event": "DelayOpenTimer_Expires",
+            "action": "Send OPEN, start HoldTimer"
+        },
+        {
+            "from": "Active",
+            "to": "Idle",
+            "event": "ConnectRetryTimer_Expires",
+            "action": "Reset ConnectRetryCounter, release resources"
+        },
+        {
+            "from": "OpenSent",
+            "to": "OpenConfirm",
+            "event": "BGPOpen",
+            "action": "Send KEEPALIVE, start HoldTimer"
+        },
+        {
+            "from": "OpenSent",
+            "to": "Idle",
+            "event": "TcpConnectionFails",
+            "action": "Reset ConnectRetryCounter, release resources"
+        },
+        {
+            "from": "OpenSent",
+            "to": "Idle",
+            "event": "BGPOpenMsgErr",
+            "action": "Send NOTIFICATION, reset ConnectRetryCounter, release resources"
+        },
+        {
+            "from": "OpenSent",
+            "to": "Idle",
+            "event": "OpenCollisionDump",
+            "action": "Send NOTIFICATION, reset ConnectRetryCounter, release resources"
+        },
+        {
+            "from": "OpenConfirm",
+            "to": "Established",
+            "event": "KeepAliveMsg",
+            "action": "Restart HoldTimer"
+        },
+        {
+            "from": "OpenConfirm",
+            "to": "Idle",
+            "event": "HoldTimer_Expires",
+            "action": "Send NOTIFICATION, reset ConnectRetryCounter, release resources"
+        },
+        {
+            "from": "OpenConfirm",
+            "to": "Idle",
+            "event": "NotifMsgVerErr",
+            "action": "Send NOTIFICATION, reset ConnectRetryCounter, release resources"
+        },
+        {
+            "from": "Established",
+            "to": "Idle",
+            "event": "ManualStop",
+            "action": "Send NOTIFICATION, reset ConnectRetryCounter, release resources"
+        },
+        {
+            "from": "Established",
+            "to": "Idle",
+            "event": "AutomaticStop",
+            "action": "Send NOTIFICATION, reset ConnectRetryCounter, release resources"
+        },
+        {
+            "from": "Established",
+            "to": "Idle",
+            "event": "HoldTimer_Expires",
+            "action": "Send NOTIFICATION, reset ConnectRetryCounter, release resources"
+        },
+        {
+            "from": "Established",
+            "to": "Idle",
+            "event": "NotifMsgVerErr",
+            "action": "Send NOTIFICATION, reset ConnectRetryCounter, release resources"
+        },
+        {
+            "from": "Established",
+            "to": "Idle",
+            "event": "TcpConnectionFails",
+            "action": "Reset ConnectRetryCounter, release resources"
+        },
+        {
+            "from": "Established",
+            "to": "Idle",
+            "event": "UpdateMsgErr",
+            "action": "Send NOTIFICATION, reset ConnectRetryCounter, release resources"
+        }
+    ]
+}
