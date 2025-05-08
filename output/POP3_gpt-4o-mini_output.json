@@ -15,7 +15,7 @@
     {
       "tag": "Section 3. Basic Operation",
       "prompt": "\nYou will be given the section \"Section 3. Basic Operation\" of an RFC document for protocol \"POP3\".\n\n**RESPONSE FORMAT (MANDATORY)**\n- Your reply must consist **exclusively** of the JSON object representing the state machine.\n- That JSON must be wrapped in <json> and </json> tags.\n- Do **not** include any extra text, explanation, code fences, or formatting.\n\n<section>\nInitially, the server host starts the POP3 service by listening on\n   TCP port 110.  When a client host wishes to make use of the service,\n   it establishes a TCP connection with the server host.  When the\n   connection is established, the POP3 server sends a greeting.  The\n   client and POP3 server then exchange commands and responses\n   (respectively) until the connection is closed or aborted.\n   Commands in the POP3 consist of a case-insensitive keyword, possibly\n   followed by one or more arguments.  All commands are terminated by a\n   CRLF pair.  Keywords and arguments consist of printable ASCII\n   characters.  Keywords and arguments are each separated by a single\n   SPACE character.  Keywords are three or four characters long. Each\n   argument may be up to 40 characters long.\n   Responses in the POP3 consist of a status indicator and a keyword\n   possibly followed by additional information.  All responses are\n   terminated by a CRLF pair.  Responses may be up to 512 characters\n   long, including the terminating CRLF.  There are currently two status\n   indicators: positive (\"+OK\") and negative (\"-ERR\").  Servers MUST\n   send the \"+OK\" and \"-ERR\" in upper case.\n   Responses to certain commands are multi-line.  In these cases, which\n   are clearly indicated below, after sending the first line of the\n   response and a CRLF, any additional lines are sent, each terminated\n   by a CRLF pair.  When all lines of the response have been sent, a\n   final line is sent, consisting of a termination octet (decimal code\n   046, \".\") and a CRLF pair.  If any line of the multi-line response\n   begins with the termination octet, the line is \"byte-stuffed\" by\n   pre-pending the termination octet to that line of the response.\n   Hence a multi-line response is terminated with the five octets\n   \"CRLF.CRLF\".  When examining a multi-line response, the client checks\n   to see if the line begins with the termination octet.  If so and if\n   octets other than CRLF follow, the first octet of the line (the\n   termination octet) is stripped away.  If so and if CRLF immediately\n   follows the termination character, then the response from the POP\n   server is ended and the line containing \".CRLF\" is not considered\n   part of the multi-line response.\n   A POP3 session progresses through a number of states during its\n   lifetime.  Once the TCP connection has been opened and the POP3\n   server has sent the greeting, the session enters the AUTHORIZATION\n   state.  In this state, the client must identify itself to the POP3\n   server.  Once the client has successfully done this, the server\n   acquires resources associated with the client's maildrop, and the\n   session enters the TRANSACTION state.  In this state, the client\n   requests actions on the part of the POP3 server.  When the client has\n   issued the QUIT command, the session enters the UPDATE state.  In\n   this state, the POP3 server releases any resources acquired during\n   the TRANSACTION state and says goodbye.  The TCP connection is then\n   closed.\n   A server MUST respond to an unrecognized, unimplemented, or\n   syntactically invalid command by responding with a negative status\n   indicator.  A server MUST respond to a command issued when the\n   session is in an incorrect state by responding with a negative status\n   indicator.  There is no general method for a client to distinguish\n   between a server which does not implement an optional command and a\n   server which is unwilling or unable to process the command.\n   A POP3 server MAY have an inactivity autologout timer.  Such a timer\n   MUST be of at least 10 minutes' duration.  The receipt of any command\n   from the client during that interval should suffice to reset the\n   autologout timer.  When the timer expires, the session does NOT enter\n   the UPDATE state--the server should close the TCP connection without\n   removing any messages or sending any response to the client.\n</section>\n\nSteps:\n1. Determine if this section has any FSM-related information (states, transitions, diagrams, reply codes, sequences).\n2. If **none**, reply exactly:\n   <json>None</json>\n3. If there is FSM information, extract it and return a structured JSON in the following format (strictly):\n\n{\n  \"states\": [\"state1\", \"state2\", \"state3\"],\n  \"transitions\": [\n    {\n      \"from\": \"state1\",\n      \"event\": \"recv COMMAND\",\n      \"action\": \"reply CODE\",\n      \"to\": \"state2\"\n    },\n    ...\n  ]\n}\n\n**FSM Field Constraints:**\n\n\ud83d\udd39 `\"states\"`:\n- List of all states appearing in `\"from\"` or `\"to\"` fields.\n- Each state must:\n  - Be 1 to 3 words (max 30 characters)\n  - Use `CamelCase` or `snake_case`\n  - Describe a protocol phase, status, or role (e.g., `Authenticated`, `WaitingForReply`)\n  - Contain no punctuation, spaces, or free-form descriptions\n\nGood: `\"AwaitingPassword\"`, `\"transfer_in_progress\"`  \nBad: `\"State 1\"`, `\"waiting for command\"`, `\"cmd?\"`\n\n\ud83d\udd39 `\"from\"` / `\"to\"`:\n- Same naming rules as above\n\n\ud83d\udd39 `\"event\"`:\n- Describes the trigger that causes the transition\n- Maybe begin with a fixed prefix:\n  - `\"receive \"` for received command\n  - `\"send \"` for sent response\n  - `\"timeout \"` for timing event\n  - `\"cond \"` for internal condition\n  - or other words \n\nExamples: `\"receive USER\"`, `\"send 230\"`, `\"timeout 5s\"`, `\"cond valid_credentials\"`\n\n\ud83d\udd39 `\"action\"`:\n- Describes what the system does in response\n- It's best start with an action verb from this fixed set or other verbs if needed: `reply`, `send`, `set`, `log`, `reset`, \n`close`, 'collect', `open`, 'record', 'stop'\n- Followed by one or two short arguments (max 4 words total)\n\nExamples: `\"reply 230\"`, `\"log failure\"`, `\"set authenticated true\"`\n\n---\n\nImportant:\n- Do not generate free-text descriptions in any field.\n- Each transition must contain **exactly**: `from`, `event`, `action`, `to`.\n- Do not invent vague or inconsistent state or event names.\n\n---\n\n**OUTPUT RULES:**\n- Wrap the JSON in **<json>\u2026</json>** only.\n- Do not include Markdown, explanations, comments, or extra text.\n- If nothing is found, return exactly `<json>None</json>`.\n\n",
-      "response": "<json>{\n  \"states\": [\"Authorization\", \"Transaction\", \"Update\"],\n  \"transitions\": [\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive USER\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Update\"\n    },\n    {\n      \"from\": \"Update\",\n      \"event\": \"send goodbye\",\n      \"action\": \"close connection\",\n      \"to\": \"None\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive invalid command\",\n      \"action\": \"reply -ERR\",\n      \"to\": \"Authorization\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive invalid command\",\n      \"action\": \"reply -ERR\",\n      \"to\": \"Transaction\"\n    }\n  ]\n}</json>"
+      "response": "<json>{\n  \"states\": [\"Authorization\", \"Transaction\", \"Update\"],\n  \"transitions\": [\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive USER\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Update\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive INVALID_COMMAND\",\n      \"action\": \"reply -ERR\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive INVALID_COMMAND\",\n      \"action\": \"reply -ERR\",\n      \"to\": \"Authorization\"\n    }\n  ]\n}</json>"
     },
     {
       "tag": "Section 4. The AUTHORIZATION State",
@@ -25,12 +25,12 @@
     {
       "tag": "Section 5. The TRANSACTION State",
       "prompt": "\nYou will be given the section \"Section 5. The TRANSACTION State\" of an RFC document for protocol \"POP3\".\n\n**RESPONSE FORMAT (MANDATORY)**\n- Your reply must consist **exclusively** of the JSON object representing the state machine.\n- That JSON must be wrapped in <json> and </json> tags.\n- Do **not** include any extra text, explanation, code fences, or formatting.\n\n<section>\nOnce the client has successfully identified itself to the POP3 server\n   and the POP3 server has locked and opened the appropriate maildrop,\n   the POP3 session is now in the TRANSACTION state.  The client may now\n   issue any of the following POP3 commands repeatedly.  After each\n   command, the POP3 server issues a response.  Eventually, the client\n   issues the QUIT command and the POP3 session enters the UPDATE state.\n   Here are the POP3 commands valid in the TRANSACTION state:\n      STAT\n         Arguments: none\n         Restrictions:\n             may only be given in the TRANSACTION state\n         Discussion:\n             The POP3 server issues a positive response with a line\n             containing information for the maildrop.  This line is\n             called a \"drop listing\" for that maildrop.\n             In order to simplify parsing, all POP3 servers are\n             required to use a certain format for drop listings.  The\n             positive response consists of \"+OK\" followed by a single\n             space, the number of messages in the maildrop, a single\n             space, and the size of the maildrop in octets.  This memo\n             makes no requirement on what follows the maildrop size.\n             Minimal implementations should just end that line of the\n             response with a CRLF pair.  More advanced implementations\n             may include other information.\n                NOTE: This memo STRONGLY discourages implementations\n                from supplying additional information in the drop\n                listing.  Other, optional, facilities are discussed\n                later on which permit the client to parse the messages\n                in the maildrop.\n             Note that messages marked as deleted are not counted in\n             either total.\n         Possible Responses:\n             +OK nn mm\n         Examples:\n             C: STAT\n             S: +OK 2 320\n      LIST [msg]\n         Arguments:\n             a message-number (optional), which, if present, may NOT\n             refer to a message marked as deleted\n         Restrictions:\n             may only be given in the TRANSACTION state\n         Discussion:\n             If an argument was given and the POP3 server issues a\n             positive response with a line containing information for\n             that message.  This line is called a \"scan listing\" for\n             that message.\n             If no argument was given and the POP3 server issues a\n             positive response, then the response given is multi-line.\n             After the initial +OK, for each message in the maildrop,\n             the POP3 server responds with a line containing\n             information for that message.  This line is also called a\n             \"scan listing\" for that message.  If there are no\n             messages in the maildrop, then the POP3 server responds\n             with no scan listings--it issues a positive response\n             followed by a line containing a termination octet and a\n             CRLF pair.\n             In order to simplify parsing, all POP3 servers are\n             required to use a certain format for scan listings.  A\n             scan listing consists of the message-number of the\n             message, followed by a single space and the exact size of\n             the message in octets.  Methods for calculating the exact\n             size of the message are described in the \"Message Format\"\n             section below.  This memo makes no requirement on what\n             follows the message size in the scan listing.  Minimal\n             implementations should just end that line of the response\n             with a CRLF pair.  More advanced implementations may\n             include other information, as parsed from the message.\n                NOTE: This memo STRONGLY discourages implementations\n                from supplying additional information in the scan\n                listing.  Other, optional, facilities are discussed\n                later on which permit the client to parse the messages\n                in the maildrop.\n             Note that messages marked as deleted are not listed.\n         Possible Responses:\n             +OK scan listing follows\n             -ERR no such message\n         Examples:\n             C: LIST\n             S: +OK 2 messages (320 octets)\n             S: 1 120\n             S: 2 200\n             S: .\n               ...\n             C: LIST 2\n             S: +OK 2 200\n               ...\n             C: LIST 3\n             S: -ERR no such message, only 2 messages in maildrop\n      RETR msg\n         Arguments:\n             a message-number (required) which may NOT refer to a\n             message marked as deleted\n         Restrictions:\n             may only be given in the TRANSACTION state\n         Discussion:\n             If the POP3 server issues a positive response, then the\n             response given is multi-line.  After the initial +OK, the\n             POP3 server sends the message corresponding to the given\n             message-number, being careful to byte-stuff the termination\n             character (as with all multi-line responses).\n         Possible Responses:\n             +OK message follows\n             -ERR no such message\n         Examples:\n             C: RETR 1\n             S: +OK 120 octets\n             S: <the POP3 server sends the entire message here>\n             S: .\n      DELE msg\n         Arguments:\n             a message-number (required) which may NOT refer to a\n             message marked as deleted\n         Restrictions:\n             may only be given in the TRANSACTION state\n         Discussion:\n             The POP3 server marks the message as deleted.  Any future\n             reference to the message-number associated with the message\n             in a POP3 command generates an error.  The POP3 server does\n             not actually delete the message until the POP3 session\n             enters the UPDATE state.\n         Possible Responses:\n             +OK message deleted\n             -ERR no such message\n         Examples:\n             C: DELE 1\n             S: +OK message 1 deleted\n                ...\n             C: DELE 2\n             S: -ERR message 2 already deleted\n      NOOP\n         Arguments: none\n         Restrictions:\n             may only be given in the TRANSACTION state\n         Discussion:\n             The POP3 server does nothing, it merely replies with a\n             positive response.\n         Possible Responses:\n             +OK\n         Examples:\n             C: NOOP\n             S: +OK\n      RSET\n         Arguments: none\n         Restrictions:\n             may only be given in the TRANSACTION state\n         Discussion:\n             If any messages have been marked as deleted by the POP3\n             server, they are unmarked.  The POP3 server then replies\n             with a positive response.\n         Possible Responses:\n             +OK\n         Examples:\n             C: RSET\n             S: +OK maildrop has 2 messages (320 octets)\n</section>\n\nSteps:\n1. Determine if this section has any FSM-related information (states, transitions, diagrams, reply codes, sequences).\n2. If **none**, reply exactly:\n   <json>None</json>\n3. If there is FSM information, extract it and return a structured JSON in the following format (strictly):\n\n{\n  \"states\": [\"state1\", \"state2\", \"state3\"],\n  \"transitions\": [\n    {\n      \"from\": \"state1\",\n      \"event\": \"recv COMMAND\",\n      \"action\": \"reply CODE\",\n      \"to\": \"state2\"\n    },\n    ...\n  ]\n}\n\n**FSM Field Constraints:**\n\n\ud83d\udd39 `\"states\"`:\n- List of all states appearing in `\"from\"` or `\"to\"` fields.\n- Each state must:\n  - Be 1 to 3 words (max 30 characters)\n  - Use `CamelCase` or `snake_case`\n  - Describe a protocol phase, status, or role (e.g., `Authenticated`, `WaitingForReply`)\n  - Contain no punctuation, spaces, or free-form descriptions\n\nGood: `\"AwaitingPassword\"`, `\"transfer_in_progress\"`  \nBad: `\"State 1\"`, `\"waiting for command\"`, `\"cmd?\"`\n\n\ud83d\udd39 `\"from\"` / `\"to\"`:\n- Same naming rules as above\n\n\ud83d\udd39 `\"event\"`:\n- Describes the trigger that causes the transition\n- Maybe begin with a fixed prefix:\n  - `\"receive \"` for received command\n  - `\"send \"` for sent response\n  - `\"timeout \"` for timing event\n  - `\"cond \"` for internal condition\n  - or other words \n\nExamples: `\"receive USER\"`, `\"send 230\"`, `\"timeout 5s\"`, `\"cond valid_credentials\"`\n\n\ud83d\udd39 `\"action\"`:\n- Describes what the system does in response\n- It's best start with an action verb from this fixed set or other verbs if needed: `reply`, `send`, `set`, `log`, `reset`, \n`close`, 'collect', `open`, 'record', 'stop'\n- Followed by one or two short arguments (max 4 words total)\n\nExamples: `\"reply 230\"`, `\"log failure\"`, `\"set authenticated true\"`\n\n---\n\nImportant:\n- Do not generate free-text descriptions in any field.\n- Each transition must contain **exactly**: `from`, `event`, `action`, `to`.\n- Do not invent vague or inconsistent state or event names.\n\n---\n\n**OUTPUT RULES:**\n- Wrap the JSON in **<json>\u2026</json>** only.\n- Do not include Markdown, explanations, comments, or extra text.\n- If nothing is found, return exactly `<json>None</json>`.\n\n",
-      "response": "<json>\n{\n  \"states\": [\"Transaction\", \"Update\"],\n  \"transitions\": [\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive STAT\",\n      \"action\": \"reply +OK nn mm\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive LIST\",\n      \"action\": \"reply +OK scan listing follows\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive LIST msg\",\n      \"action\": \"reply +OK msg size\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive RETR msg\",\n      \"action\": \"reply +OK message follows\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive DELE msg\",\n      \"action\": \"reply +OK message deleted\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive NOOP\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive RSET\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"transition to Update\",\n      \"to\": \"Update\"\n    }\n  ]\n}\n</json>"
+      "response": "<json>{\n  \"states\": [\"Transaction\", \"Update\"],\n  \"transitions\": [\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive STAT\",\n      \"action\": \"reply +OK nn mm\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive LIST\",\n      \"action\": \"reply +OK scan listing follows\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive LIST msg\",\n      \"action\": \"reply +OK msg size\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive RETR msg\",\n      \"action\": \"reply +OK message follows\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive DELE msg\",\n      \"action\": \"reply +OK message deleted\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive NOOP\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive RSET\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"transition to Update\",\n      \"to\": \"Update\"\n    }\n  ]\n}</json>"
     },
     {
       "tag": "Section 6. The UPDATE State",
       "prompt": "\nYou will be given the section \"Section 6. The UPDATE State\" of an RFC document for protocol \"POP3\".\n\n**RESPONSE FORMAT (MANDATORY)**\n- Your reply must consist **exclusively** of the JSON object representing the state machine.\n- That JSON must be wrapped in <json> and </json> tags.\n- Do **not** include any extra text, explanation, code fences, or formatting.\n\n<section>\nWhen the client issues the QUIT command from the TRANSACTION state,\n   the POP3 session enters the UPDATE state.  (Note that if the client\n   issues the QUIT command from the AUTHORIZATION state, the POP3\n   session terminates but does NOT enter the UPDATE state.)\n   If a session terminates for some reason other than a client-issued\n   QUIT command, the POP3 session does NOT enter the UPDATE state and\n   MUST not remove any messages from the maildrop.\n      QUIT\n         Arguments: none\n         Restrictions: none\n         Discussion:\n             The POP3 server removes all messages marked as deleted\n             from the maildrop and replies as to the status of this\n             operation.  If there is an error, such as a resource\n             shortage, encountered while removing messages, the\n             maildrop may result in having some or none of the messages\n             marked as deleted be removed.  In no case may the server\n             remove any messages not marked as deleted.\n             Whether the removal was successful or not, the server\n             then releases any exclusive-access lock on the maildrop\n             and closes the TCP connection.\n         Possible Responses:\n             +OK\n             -ERR some deleted messages not removed\n         Examples:\n             C: QUIT\n             S: +OK dewey POP3 server signing off (maildrop empty)\n                ...\n             C: QUIT\n             S: +OK dewey POP3 server signing off (2 messages left)\n                ...\n</section>\n\nSteps:\n1. Determine if this section has any FSM-related information (states, transitions, diagrams, reply codes, sequences).\n2. If **none**, reply exactly:\n   <json>None</json>\n3. If there is FSM information, extract it and return a structured JSON in the following format (strictly):\n\n{\n  \"states\": [\"state1\", \"state2\", \"state3\"],\n  \"transitions\": [\n    {\n      \"from\": \"state1\",\n      \"event\": \"recv COMMAND\",\n      \"action\": \"reply CODE\",\n      \"to\": \"state2\"\n    },\n    ...\n  ]\n}\n\n**FSM Field Constraints:**\n\n\ud83d\udd39 `\"states\"`:\n- List of all states appearing in `\"from\"` or `\"to\"` fields.\n- Each state must:\n  - Be 1 to 3 words (max 30 characters)\n  - Use `CamelCase` or `snake_case`\n  - Describe a protocol phase, status, or role (e.g., `Authenticated`, `WaitingForReply`)\n  - Contain no punctuation, spaces, or free-form descriptions\n\nGood: `\"AwaitingPassword\"`, `\"transfer_in_progress\"`  \nBad: `\"State 1\"`, `\"waiting for command\"`, `\"cmd?\"`\n\n\ud83d\udd39 `\"from\"` / `\"to\"`:\n- Same naming rules as above\n\n\ud83d\udd39 `\"event\"`:\n- Describes the trigger that causes the transition\n- Maybe begin with a fixed prefix:\n  - `\"receive \"` for received command\n  - `\"send \"` for sent response\n  - `\"timeout \"` for timing event\n  - `\"cond \"` for internal condition\n  - or other words \n\nExamples: `\"receive USER\"`, `\"send 230\"`, `\"timeout 5s\"`, `\"cond valid_credentials\"`\n\n\ud83d\udd39 `\"action\"`:\n- Describes what the system does in response\n- It's best start with an action verb from this fixed set or other verbs if needed: `reply`, `send`, `set`, `log`, `reset`, \n`close`, 'collect', `open`, 'record', 'stop'\n- Followed by one or two short arguments (max 4 words total)\n\nExamples: `\"reply 230\"`, `\"log failure\"`, `\"set authenticated true\"`\n\n---\n\nImportant:\n- Do not generate free-text descriptions in any field.\n- Each transition must contain **exactly**: `from`, `event`, `action`, `to`.\n- Do not invent vague or inconsistent state or event names.\n\n---\n\n**OUTPUT RULES:**\n- Wrap the JSON in **<json>\u2026</json>** only.\n- Do not include Markdown, explanations, comments, or extra text.\n- If nothing is found, return exactly `<json>None</json>`.\n\n",
-      "response": "<json>{\n  \"states\": [\"Transaction\", \"Update\"],\n  \"transitions\": [\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Update\"\n    }\n  ]\n}</json>"
+      "response": "<json>{\n  \"states\": [\"Transaction\", \"Update\"],\n  \"transitions\": [\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Update\"\n    },\n    {\n      \"from\": \"Update\",\n      \"event\": \"send response\",\n      \"action\": \"close connection\",\n      \"to\": \"Update\"\n    }\n  ]\n}</json>"
     },
     {
       "tag": "Section 7. Optional POP3 Commands",
@@ -50,7 +50,7 @@
     {
       "tag": "Section 10. Example POP3 Session",
       "prompt": "\nYou will be given the section \"Section 10. Example POP3 Session\" of an RFC document for protocol \"POP3\".\n\n**RESPONSE FORMAT (MANDATORY)**\n- Your reply must consist **exclusively** of the JSON object representing the state machine.\n- That JSON must be wrapped in <json> and </json> tags.\n- Do **not** include any extra text, explanation, code fences, or formatting.\n\n<section>\nS: <wait for connection on TCP port 110>\n      C: <open connection>\n      S:    +OK POP3 server ready <1896.697170952@dbc.mtview.ca.us>\n      C:    APOP mrose c4c9334bac560ecc979e58001b3e22fb\n      S:    +OK mrose's maildrop has 2 messages (320 octets)\n      C:    STAT\n      S:    +OK 2 320\n      C:    LIST\n      S:    +OK 2 messages (320 octets)\n      S:    1 120\n      S:    2 200\n      S:    .\n      C:    RETR 1\n      S:    +OK 120 octets\n      S:    <the POP3 server sends message 1>\n      S:    .\n      C:    DELE 1\n      S:    +OK message 1 deleted\n      C:    RETR 2\n      S:    +OK 200 octets\n      S:    <the POP3 server sends message 2>\n      S:    .\n      C:    DELE 2\n      S:    +OK message 2 deleted\n      C:    QUIT\n      S:    +OK dewey POP3 server signing off (maildrop empty)\n      C:  <close connection>\n      S:  <wait for next connection>\n</section>\n\nSteps:\n1. Determine if this section has any FSM-related information (states, transitions, diagrams, reply codes, sequences).\n2. If **none**, reply exactly:\n   <json>None</json>\n3. If there is FSM information, extract it and return a structured JSON in the following format (strictly):\n\n{\n  \"states\": [\"state1\", \"state2\", \"state3\"],\n  \"transitions\": [\n    {\n      \"from\": \"state1\",\n      \"event\": \"recv COMMAND\",\n      \"action\": \"reply CODE\",\n      \"to\": \"state2\"\n    },\n    ...\n  ]\n}\n\n**FSM Field Constraints:**\n\n\ud83d\udd39 `\"states\"`:\n- List of all states appearing in `\"from\"` or `\"to\"` fields.\n- Each state must:\n  - Be 1 to 3 words (max 30 characters)\n  - Use `CamelCase` or `snake_case`\n  - Describe a protocol phase, status, or role (e.g., `Authenticated`, `WaitingForReply`)\n  - Contain no punctuation, spaces, or free-form descriptions\n\nGood: `\"AwaitingPassword\"`, `\"transfer_in_progress\"`  \nBad: `\"State 1\"`, `\"waiting for command\"`, `\"cmd?\"`\n\n\ud83d\udd39 `\"from\"` / `\"to\"`:\n- Same naming rules as above\n\n\ud83d\udd39 `\"event\"`:\n- Describes the trigger that causes the transition\n- Maybe begin with a fixed prefix:\n  - `\"receive \"` for received command\n  - `\"send \"` for sent response\n  - `\"timeout \"` for timing event\n  - `\"cond \"` for internal condition\n  - or other words \n\nExamples: `\"receive USER\"`, `\"send 230\"`, `\"timeout 5s\"`, `\"cond valid_credentials\"`\n\n\ud83d\udd39 `\"action\"`:\n- Describes what the system does in response\n- It's best start with an action verb from this fixed set or other verbs if needed: `reply`, `send`, `set`, `log`, `reset`, \n`close`, 'collect', `open`, 'record', 'stop'\n- Followed by one or two short arguments (max 4 words total)\n\nExamples: `\"reply 230\"`, `\"log failure\"`, `\"set authenticated true\"`\n\n---\n\nImportant:\n- Do not generate free-text descriptions in any field.\n- Each transition must contain **exactly**: `from`, `event`, `action`, `to`.\n- Do not invent vague or inconsistent state or event names.\n\n---\n\n**OUTPUT RULES:**\n- Wrap the JSON in **<json>\u2026</json>** only.\n- Do not include Markdown, explanations, comments, or extra text.\n- If nothing is found, return exactly `<json>None</json>`.\n\n",
-      "response": "<json>{\n  \"states\": [\n    \"WaitingForConnection\",\n    \"Authenticated\",\n    \"Idle\",\n    \"MessageRetrieved\",\n    \"MessageDeleted\"\n  ],\n  \"transitions\": [\n    {\n      \"from\": \"WaitingForConnection\",\n      \"event\": \"receive open connection\",\n      \"action\": \"reply POP3 server ready\",\n      \"to\": \"Authenticated\"\n    },\n    {\n      \"from\": \"Authenticated\",\n      \"event\": \"receive APOP\",\n      \"action\": \"reply mrose's maildrop has 2 messages\",\n      \"to\": \"Idle\"\n    },\n    {\n      \"from\": \"Idle\",\n      \"event\": \"receive STAT\",\n      \"action\": \"reply 2 320\",\n      \"to\": \"Idle\"\n    },\n    {\n      \"from\": \"Idle\",\n      \"event\": \"receive LIST\",\n      \"action\": \"reply 2 messages\",\n      \"to\": \"Idle\"\n    },\n    {\n      \"from\": \"Idle\",\n      \"event\": \"receive RETR 1\",\n      \"action\": \"reply 120 octets\",\n      \"to\": \"MessageRetrieved\"\n    },\n    {\n      \"from\": \"MessageRetrieved\",\n      \"event\": \"receive DELE 1\",\n      \"action\": \"reply message 1 deleted\",\n      \"to\": \"MessageDeleted\"\n    },\n    {\n      \"from\": \"MessageDeleted\",\n      \"event\": \"receive RETR 2\",\n      \"action\": \"reply 200 octets\",\n      \"to\": \"MessageRetrieved\"\n    },\n    {\n      \"from\": \"MessageRetrieved\",\n      \"event\": \"receive DELE 2\",\n      \"action\": \"reply message 2 deleted\",\n      \"to\": \"Idle\"\n    },\n    {\n      \"from\": \"Idle\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"reply POP3 server signing off\",\n      \"to\": \"WaitingForConnection\"\n    }\n  ]\n}</json>"
+      "response": "<json>{\n  \"states\": [\n    \"WaitingForConnection\",\n    \"Connected\",\n    \"Authenticated\",\n    \"MaildropStatus\",\n    \"MessageList\",\n    \"MessageRetrieval\",\n    \"MessageDeletion\",\n    \"SessionEnding\"\n  ],\n  \"transitions\": [\n    {\n      \"from\": \"WaitingForConnection\",\n      \"event\": \"receive open connection\",\n      \"action\": \"reply POP3 server ready\",\n      \"to\": \"Connected\"\n    },\n    {\n      \"from\": \"Connected\",\n      \"event\": \"receive APOP\",\n      \"action\": \"reply mrose's maildrop has 2 messages\",\n      \"to\": \"Authenticated\"\n    },\n    {\n      \"from\": \"Authenticated\",\n      \"event\": \"receive STAT\",\n      \"action\": \"reply 2 320\",\n      \"to\": \"MaildropStatus\"\n    },\n    {\n      \"from\": \"MaildropStatus\",\n      \"event\": \"receive LIST\",\n      \"action\": \"reply 2 messages\",\n      \"to\": \"MessageList\"\n    },\n    {\n      \"from\": \"MessageList\",\n      \"event\": \"receive RETR 1\",\n      \"action\": \"reply 120 octets\",\n      \"to\": \"MessageRetrieval\"\n    },\n    {\n      \"from\": \"MessageRetrieval\",\n      \"event\": \"send message 1\",\n      \"action\": \"reply message 1 deleted\",\n      \"to\": \"MessageDeletion\"\n    },\n    {\n      \"from\": \"MessageDeletion\",\n      \"event\": \"receive RETR 2\",\n      \"action\": \"reply 200 octets\",\n      \"to\": \"MessageRetrieval\"\n    },\n    {\n      \"from\": \"MessageRetrieval\",\n      \"event\": \"send message 2\",\n      \"action\": \"reply message 2 deleted\",\n      \"to\": \"SessionEnding\"\n    },\n    {\n      \"from\": \"SessionEnding\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"reply server signing off\",\n      \"to\": \"WaitingForConnection\"\n    }\n  ]\n}</json>"
     },
     {
       "tag": "Section 11. Message Format",
@@ -80,7 +80,7 @@
     {
       "tag": "Section Appendix A. Differences from RFC 1725",
       "prompt": "\nYou will be given the section \"Section Appendix A. Differences from RFC 1725\" of an RFC document for protocol \"POP3\".\n\n**RESPONSE FORMAT (MANDATORY)**\n- Your reply must consist **exclusively** of the JSON object representing the state machine.\n- That JSON must be wrapped in <json> and </json> tags.\n- Do **not** include any extra text, explanation, code fences, or formatting.\n\n<section>\nThis memo is a revision to RFC 1725, a Draft Standard.  It makes the\n   following changes from that document:\n      - clarifies that command keywords are case insensitive.\n      - specifies that servers must send \"+OK\" and \"-ERR\" in\n        upper case.\n      - specifies that the initial greeting is a positive response,\n        instead of any string which should be a positive response.\n      - clarifies behavior for unimplemented commands.\n      - makes the USER and PASS commands optional.\n      - clarified the set of possible responses to the USER command.\n      - reverses the order of the examples in the USER and PASS\n        commands, to reduce confusion.\n      - clarifies that the PASS command may only be given immediately\n        after a successful USER command.\n      - clarified the persistence requirements of UIDs and added some\n        implementation notes.\n      - specifies a UID length limitation of one to 70 octets.\n      - specifies a status indicator length limitation\n        of 512 octets, including the CRLF.\n      - clarifies that LIST with no arguments on an empty mailbox\n        returns success.\n      - adds a reference from the LIST command to the Message Format\n        section\n      - clarifies the behavior of QUIT upon failure\n      - clarifies the security section to not imply the use of the\n        USER command with the APOP command.\n      - adds references to RFCs 1730 and 1734\n      - clarifies the method by which a UA may enter mail into the\n        transport system.\n      - clarifies that the second argument to the TOP command is a\n        number of lines.\n      - changes the suggestion in the Security Considerations section\n        for a server to not accept both PASS and APOP for a given user\n        from a \"must\" to a \"should\".\n      - adds a section on scaling and operational considerations\n</section>\n\nSteps:\n1. Determine if this section has any FSM-related information (states, transitions, diagrams, reply codes, sequences).\n2. If **none**, reply exactly:\n   <json>None</json>\n3. If there is FSM information, extract it and return a structured JSON in the following format (strictly):\n\n{\n  \"states\": [\"state1\", \"state2\", \"state3\"],\n  \"transitions\": [\n    {\n      \"from\": \"state1\",\n      \"event\": \"recv COMMAND\",\n      \"action\": \"reply CODE\",\n      \"to\": \"state2\"\n    },\n    ...\n  ]\n}\n\n**FSM Field Constraints:**\n\n\ud83d\udd39 `\"states\"`:\n- List of all states appearing in `\"from\"` or `\"to\"` fields.\n- Each state must:\n  - Be 1 to 3 words (max 30 characters)\n  - Use `CamelCase` or `snake_case`\n  - Describe a protocol phase, status, or role (e.g., `Authenticated`, `WaitingForReply`)\n  - Contain no punctuation, spaces, or free-form descriptions\n\nGood: `\"AwaitingPassword\"`, `\"transfer_in_progress\"`  \nBad: `\"State 1\"`, `\"waiting for command\"`, `\"cmd?\"`\n\n\ud83d\udd39 `\"from\"` / `\"to\"`:\n- Same naming rules as above\n\n\ud83d\udd39 `\"event\"`:\n- Describes the trigger that causes the transition\n- Maybe begin with a fixed prefix:\n  - `\"receive \"` for received command\n  - `\"send \"` for sent response\n  - `\"timeout \"` for timing event\n  - `\"cond \"` for internal condition\n  - or other words \n\nExamples: `\"receive USER\"`, `\"send 230\"`, `\"timeout 5s\"`, `\"cond valid_credentials\"`\n\n\ud83d\udd39 `\"action\"`:\n- Describes what the system does in response\n- It's best start with an action verb from this fixed set or other verbs if needed: `reply`, `send`, `set`, `log`, `reset`, \n`close`, 'collect', `open`, 'record', 'stop'\n- Followed by one or two short arguments (max 4 words total)\n\nExamples: `\"reply 230\"`, `\"log failure\"`, `\"set authenticated true\"`\n\n---\n\nImportant:\n- Do not generate free-text descriptions in any field.\n- Each transition must contain **exactly**: `from`, `event`, `action`, `to`.\n- Do not invent vague or inconsistent state or event names.\n\n---\n\n**OUTPUT RULES:**\n- Wrap the JSON in **<json>\u2026</json>** only.\n- Do not include Markdown, explanations, comments, or extra text.\n- If nothing is found, return exactly `<json>None</json>`.\n\n",
-      "response": "<json>{\"states\":[\"InitialGreeting\",\"Authenticated\",\"WaitingForReply\",\"ErrorState\"],\"transitions\":[{\"from\":\"InitialGreeting\",\"event\":\"send greeting\",\"action\":\"reply +OK\",\"to\":\"WaitingForReply\"},{\"from\":\"WaitingForReply\",\"event\":\"receive USER\",\"action\":\"reply USER response\",\"to\":\"WaitingForReply\"},{\"from\":\"WaitingForReply\",\"event\":\"receive PASS\",\"action\":\"reply PASS response\",\"to\":\"Authenticated\"},{\"from\":\"Authenticated\",\"event\":\"receive LIST\",\"action\":\"reply LIST response\",\"to\":\"WaitingForReply\"},{\"from\":\"WaitingForReply\",\"event\":\"receive QUIT\",\"action\":\"reply QUIT response\",\"to\":\"ErrorState\"},{\"from\":\"ErrorState\",\"event\":\"timeout\",\"action\":\"close connection\",\"to\":\"InitialGreeting\"}]}"
+      "response": "<json>{\"states\":[\"InitialGreeting\",\"Authenticated\",\"WaitingForCommand\",\"ErrorState\"],\"transitions\":[{\"from\":\"InitialGreeting\",\"event\":\"send greeting\",\"action\":\"reply +OK\",\"to\":\"WaitingForCommand\"},{\"from\":\"WaitingForCommand\",\"event\":\"receive USER\",\"action\":\"reply 331\",\"to\":\"WaitingForCommand\"},{\"from\":\"WaitingForCommand\",\"event\":\"receive PASS\",\"action\":\"reply 230\",\"to\":\"Authenticated\"},{\"from\":\"WaitingForCommand\",\"event\":\"receive QUIT\",\"action\":\"reply 221\",\"to\":\"ErrorState\"},{\"from\":\"WaitingForCommand\",\"event\":\"receive LIST\",\"action\":\"reply 200\",\"to\":\"WaitingForCommand\"},{\"from\":\"Authenticated\",\"event\":\"receive LIST\",\"action\":\"reply 200\",\"to\":\"Authenticated\"},{\"from\":\"Authenticated\",\"event\":\"receive QUIT\",\"action\":\"reply 221\",\"to\":\"ErrorState\"},{\"from\":\"ErrorState\",\"event\":\"timeout 5s\",\"action\":\"close connection\",\"to\":\"InitialGreeting\"}]}"
     },
     {
       "tag": "Section Appendix B. Command Index",
@@ -88,24 +88,27 @@
       "response": "<json>None</json>"
     }
   ],
-  "final_response": "<json>\n{\n  \"states\": [\n    \"Authorization\",\n    \"Transaction\",\n    \"Update\",\n    \"WaitingForConnection\",\n    \"Authenticated\",\n    \"Idle\",\n    \"MessageRetrieved\",\n    \"MessageDeleted\",\n    \"InitialGreeting\",\n    \"WaitingForReply\",\n    \"ErrorState\"\n  ],\n  \"initial_state\": \"WaitingForConnection\",\n  \"final_states\": [\n    \"MessageDeleted\",\n    \"ErrorState\"\n  ],\n  \"transitions\": [\n    {\n      \"from\": \"WaitingForConnection\",\n      \"event\": \"receive open connection\",\n      \"action\": \"reply POP3 server ready\",\n      \"to\": \"Authenticated\"\n    },\n    {\n      \"from\": \"Authenticated\",\n      \"event\": \"receive APOP\",\n      \"action\": \"reply mrose's maildrop has 2 messages\",\n      \"to\": \"Idle\"\n    },\n    {\n      \"from\": \"Idle\",\n      \"event\": \"receive STAT\",\n      \"action\": \"reply 2 320\",\n      \"to\": \"Idle\"\n    },\n    {\n      \"from\": \"Idle\",\n      \"event\": \"receive LIST\",\n      \"action\": \"reply 2 messages\",\n      \"to\": \"Idle\"\n    },\n    {\n      \"from\": \"Idle\",\n      \"event\": \"receive RETR 1\",\n      \"action\": \"reply 120 octets\",\n      \"to\": \"MessageRetrieved\"\n    },\n    {\n      \"from\": \"MessageRetrieved\",\n      \"event\": \"receive DELE 1\",\n      \"action\": \"reply message 1 deleted\",\n      \"to\": \"MessageDeleted\"\n    },\n    {\n      \"from\": \"MessageDeleted\",\n      \"event\": \"receive RETR 2\",\n      \"action\": \"reply 200 octets\",\n      \"to\": \"MessageRetrieved\"\n    },\n    {\n      \"from\": \"MessageRetrieved\",\n      \"event\": \"receive DELE 2\",\n      \"action\": \"reply message 2 deleted\",\n      \"to\": \"Idle\"\n    },\n    {\n      \"from\": \"Idle\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"reply POP3 server signing off\",\n      \"to\": \"WaitingForConnection\"\n    },\n    {\n      \"from\": \"InitialGreeting\",\n      \"event\": \"send greeting\",\n      \"action\": \"reply +OK\",\n      \"to\": \"WaitingForReply\"\n    },\n    {\n      \"from\": \"WaitingForReply\",\n      \"event\": \"receive USER\",\n      \"action\": \"reply USER response\",\n      \"to\": \"WaitingForReply\"\n    },\n    {\n      \"from\": \"WaitingForReply\",\n      \"event\": \"receive PASS\",\n      \"action\": \"reply PASS response\",\n      \"to\": \"Authenticated\"\n    },\n    {\n      \"from\": \"Authenticated\",\n      \"event\": \"receive LIST\",\n      \"action\": \"reply LIST response\",\n      \"to\": \"WaitingForReply\"\n    },\n    {\n      \"from\": \"WaitingForReply\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"reply QUIT response\",\n      \"to\": \"ErrorState\"\n    },\n    {\n      \"from\": \"ErrorState\",\n      \"event\": \"timeout\",\n      \"action\": \"close connection\",\n      \"to\": \"InitialGreeting\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive USER\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive PASS\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive APOP\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive STAT\",\n      \"action\": \"reply +OK nn mm\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive LIST\",\n      \"action\": \"reply +OK scan listing follows\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive LIST msg\",\n      \"action\": \"reply +OK msg size\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive RETR msg\",\n      \"action\": \"reply +OK message follows\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive DELE msg\",\n      \"action\": \"reply +OK message deleted\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive NOOP\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive RSET\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Update\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"transition to Update\",\n      \"to\": \"Update\"\n    },\n    {\n      \"from\": \"Update\",\n      \"event\": \"send goodbye\",\n      \"action\": \"close connection\",\n      \"to\": \"None\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive invalid command\",\n      \"action\": \"reply -ERR\",\n      \"to\": \"Authorization\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive invalid command\",\n      \"action\": \"reply -ERR\",\n      \"to\": \"Transaction\"\n    }\n  ]\n}\n</json>",
+  "final_response": "<json>\n{\n  \"states\": [\n    \"Authorization\",\n    \"Transaction\",\n    \"Update\",\n    \"WaitingForConnection\",\n    \"Connected\",\n    \"Authenticated\",\n    \"MaildropStatus\",\n    \"MessageList\",\n    \"MessageRetrieval\",\n    \"MessageDeletion\",\n    \"SessionEnding\",\n    \"InitialGreeting\",\n    \"WaitingForCommand\",\n    \"ErrorState\"\n  ],\n  \"initial_state\": \"WaitingForConnection\",\n  \"final_states\": [\n    \"SessionEnding\",\n    \"ErrorState\"\n  ],\n  \"transitions\": [\n    {\n      \"from\": \"WaitingForConnection\",\n      \"event\": \"receive open connection\",\n      \"action\": \"reply POP3 server ready\",\n      \"to\": \"Connected\"\n    },\n    {\n      \"from\": \"Connected\",\n      \"event\": \"receive APOP\",\n      \"action\": \"reply mrose's maildrop has 2 messages\",\n      \"to\": \"Authenticated\"\n    },\n    {\n      \"from\": \"Authenticated\",\n      \"event\": \"receive STAT\",\n      \"action\": \"reply 2 320\",\n      \"to\": \"MaildropStatus\"\n    },\n    {\n      \"from\": \"MaildropStatus\",\n      \"event\": \"receive LIST\",\n      \"action\": \"reply 2 messages\",\n      \"to\": \"MessageList\"\n    },\n    {\n      \"from\": \"MessageList\",\n      \"event\": \"receive RETR 1\",\n      \"action\": \"reply 120 octets\",\n      \"to\": \"MessageRetrieval\"\n    },\n    {\n      \"from\": \"MessageRetrieval\",\n      \"event\": \"send message 1\",\n      \"action\": \"reply message 1 deleted\",\n      \"to\": \"MessageDeletion\"\n    },\n    {\n      \"from\": \"MessageDeletion\",\n      \"event\": \"receive RETR 2\",\n      \"action\": \"reply 200 octets\",\n      \"to\": \"MessageRetrieval\"\n    },\n    {\n      \"from\": \"MessageRetrieval\",\n      \"event\": \"send message 2\",\n      \"action\": \"reply message 2 deleted\",\n      \"to\": \"SessionEnding\"\n    },\n    {\n      \"from\": \"SessionEnding\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"reply server signing off\",\n      \"to\": \"WaitingForConnection\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive USER\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Authorization\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive USER\",\n      \"action\": \"reply -ERR\",\n      \"to\": \"Authorization\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive PASS\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive PASS\",\n      \"action\": \"reply -ERR\",\n      \"to\": \"Authorization\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive APOP\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive APOP\",\n      \"action\": \"reply -ERR\",\n      \"to\": \"Authorization\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Update\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Authorization\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive STAT\",\n      \"action\": \"reply +OK nn mm\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive LIST\",\n      \"action\": \"reply +OK scan listing follows\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive LIST msg\",\n      \"action\": \"reply +OK msg size\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive RETR msg\",\n      \"action\": \"reply +OK message follows\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive DELE msg\",\n      \"action\": \"reply +OK message deleted\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive NOOP\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive RSET\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive TOP\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive UIDL\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"WaitingForCommand\",\n      \"event\": \"receive USER\",\n      \"action\": \"reply 331\",\n      \"to\": \"WaitingForCommand\"\n    },\n    {\n      \"from\": \"WaitingForCommand\",\n      \"event\": \"receive PASS\",\n      \"action\": \"reply 230\",\n      \"to\": \"Authenticated\"\n    },\n    {\n      \"from\": \"WaitingForCommand\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"reply 221\",\n      \"to\": \"ErrorState\"\n    },\n    {\n      \"from\": \"WaitingForCommand\",\n      \"event\": \"receive LIST\",\n      \"action\": \"reply 200\",\n      \"to\": \"WaitingForCommand\"\n    },\n    {\n      \"from\": \"Authenticated\",\n      \"event\": \"receive LIST\",\n      \"action\": \"reply 200\",\n      \"to\": \"Authenticated\"\n    },\n    {\n      \"from\": \"Authenticated\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"reply 221\",\n      \"to\": \"ErrorState\"\n    },\n    {\n      \"from\": \"ErrorState\",\n      \"event\": \"timeout 5s\",\n      \"action\": \"close connection\",\n      \"to\": \"InitialGreeting\"\n    }\n  ]\n}\n</json>",
   "final_fsm": {
     "states": [
       "Authorization",
       "Transaction",
       "Update",
       "WaitingForConnection",
+      "Connected",
       "Authenticated",
-      "Idle",
-      "MessageRetrieved",
-      "MessageDeleted",
+      "MaildropStatus",
+      "MessageList",
+      "MessageRetrieval",
+      "MessageDeletion",
+      "SessionEnding",
       "InitialGreeting",
-      "WaitingForReply",
+      "WaitingForCommand",
       "ErrorState"
     ],
     "initial_state": "WaitingForConnection",
     "final_states": [
-      "MessageDeleted",
+      "SessionEnding",
       "ErrorState"
     ],
     "transitions": [
@@ -113,109 +116,103 @@
         "from": "WaitingForConnection",
         "event": "receive open connection",
         "action": "reply POP3 server ready",
+        "to": "Connected"
+      },
+      {
+        "from": "Connected",
+        "event": "receive APOP",
+        "action": "reply mrose's maildrop has 2 messages",
         "to": "Authenticated"
       },
       {
         "from": "Authenticated",
-        "event": "receive APOP",
-        "action": "reply mrose's maildrop has 2 messages",
-        "to": "Idle"
-      },
-      {
-        "from": "Idle",
         "event": "receive STAT",
         "action": "reply 2 320",
-        "to": "Idle"
+        "to": "MaildropStatus"
       },
       {
-        "from": "Idle",
+        "from": "MaildropStatus",
         "event": "receive LIST",
         "action": "reply 2 messages",
-        "to": "Idle"
+        "to": "MessageList"
       },
       {
-        "from": "Idle",
+        "from": "MessageList",
         "event": "receive RETR 1",
         "action": "reply 120 octets",
-        "to": "MessageRetrieved"
+        "to": "MessageRetrieval"
       },
       {
-        "from": "MessageRetrieved",
-        "event": "receive DELE 1",
+        "from": "MessageRetrieval",
+        "event": "send message 1",
         "action": "reply message 1 deleted",
-        "to": "MessageDeleted"
+        "to": "MessageDeletion"
       },
       {
-        "from": "MessageDeleted",
+        "from": "MessageDeletion",
         "event": "receive RETR 2",
         "action": "reply 200 octets",
-        "to": "MessageRetrieved"
+        "to": "MessageRetrieval"
       },
       {
-        "from": "MessageRetrieved",
-        "event": "receive DELE 2",
+        "from": "MessageRetrieval",
+        "event": "send message 2",
         "action": "reply message 2 deleted",
-        "to": "Idle"
+        "to": "SessionEnding"
       },
       {
-        "from": "Idle",
+        "from": "SessionEnding",
         "event": "receive QUIT",
-        "action": "reply POP3 server signing off",
+        "action": "reply server signing off",
         "to": "WaitingForConnection"
       },
       {
-        "from": "InitialGreeting",
-        "event": "send greeting",
-        "action": "reply +OK",
-        "to": "WaitingForReply"
-      },
-      {
-        "from": "WaitingForReply",
+        "from": "Authorization",
         "event": "receive USER",
-        "action": "reply USER response",
-        "to": "WaitingForReply"
-      },
-      {
-        "from": "WaitingForReply",
-        "event": "receive PASS",
-        "action": "reply PASS response",
-        "to": "Authenticated"
-      },
-      {
-        "from": "Authenticated",
-        "event": "receive LIST",
-        "action": "reply LIST response",
-        "to": "WaitingForReply"
-      },
-      {
-        "from": "WaitingForReply",
-        "event": "receive QUIT",
-        "action": "reply QUIT response",
-        "to": "ErrorState"
-      },
-      {
-        "from": "ErrorState",
-        "event": "timeout",
-        "action": "close connection",
-        "to": "InitialGreeting"
+        "action": "reply +OK",
+        "to": "Authorization"
       },
       {
         "from": "Authorization",
         "event": "receive USER",
-        "action": "reply +OK",
-        "to": "Transaction"
+        "action": "reply -ERR",
+        "to": "Authorization"
       },
       {
         "from": "Authorization",
         "event": "receive PASS",
         "action": "reply +OK",
         "to": "Transaction"
+      },
+      {
+        "from": "Authorization",
+        "event": "receive PASS",
+        "action": "reply -ERR",
+        "to": "Authorization"
       },
       {
         "from": "Authorization",
         "event": "receive APOP",
         "action": "reply +OK",
         "to": "Transaction"
+      },
+      {
+        "from": "Authorization",
+        "event": "receive APOP",
+        "action": "reply -ERR",
+        "to": "Authorization"
+      },
+      {
+        "from": "Transaction",
+        "event": "receive QUIT",
+        "action": "reply +OK",
+        "to": "Update"
+      },
+      {
+        "from": "Transaction",
+        "event": "receive QUIT",
+        "action": "reply +OK",
+        "to": "Authorization"
       },
       {
         "from": "Transaction",
@@ -261,33 +258,57 @@
       },
       {
         "from": "Transaction",
-        "event": "receive QUIT",
+        "event": "receive TOP",
         "action": "reply +OK",
-        "to": "Update"
-      },
-      {
-        "from": "Transaction",
-        "event": "receive QUIT",
-        "action": "transition to Update",
-        "to": "Update"
-      },
-      {
-        "from": "Update",
-        "event": "send goodbye",
-        "action": "close connection",
-        "to": "None"
-      },
-      {
-        "from": "Authorization",
-        "event": "receive invalid command",
-        "action": "reply -ERR",
-        "to": "Authorization"
-      },
-      {
-        "from": "Transaction",
-        "event": "receive invalid command",
-        "action": "reply -ERR",
         "to": "Transaction"
+      },
+      {
+        "from": "Transaction",
+        "event": "receive UIDL",
+        "action": "reply +OK",
+        "to": "Transaction"
+      },
+      {
+        "from": "WaitingForCommand",
+        "event": "receive USER",
+        "action": "reply 331",
+        "to": "WaitingForCommand"
+      },
+      {
+        "from": "WaitingForCommand",
+        "event": "receive PASS",
+        "action": "reply 230",
+        "to": "Authenticated"
+      },
+      {
+        "from": "WaitingForCommand",
+        "event": "receive QUIT",
+        "action": "reply 221",
+        "to": "ErrorState"
+      },
+      {
+        "from": "WaitingForCommand",
+        "event": "receive LIST",
+        "action": "reply 200",
+        "to": "WaitingForCommand"
+      },
+      {
+        "from": "Authenticated",
+        "event": "receive LIST",
+        "action": "reply 200",
+        "to": "Authenticated"
+      },
+      {
+        "from": "Authenticated",
+        "event": "receive QUIT",
+        "action": "reply 221",
+        "to": "ErrorState"
+      },
+      {
+        "from": "ErrorState",
+        "event": "timeout 5s",
+        "action": "close connection",
+        "to": "InitialGreeting"
       }
     ]
   }

@@ -1,0 +1,223 @@
+{
+  "states": [
+    "Authorization",
+    "Transaction",
+    "Update",
+    "WaitingForConnection",
+    "Connected",
+    "Authenticated",
+    "MaildropStatus",
+    "MessageList",
+    "MessageRetrieval",
+    "MessageDeletion",
+    "SessionEnding",
+    "InitialGreeting",
+    "WaitingForCommand",
+    "ErrorState"
+  ],
+  "initial_state": "WaitingForConnection",
+  "final_states": [
+    "SessionEnding",
+    "ErrorState"
+  ],
+  "transitions": [
+    {
+      "from": "WaitingForConnection",
+      "event": "receive open connection",
+      "action": "reply POP3 server ready",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "receive APOP",
+      "action": "reply mrose's maildrop has 2 messages",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive STAT",
+      "action": "reply 2 320",
+      "to": "MaildropStatus"
+    },
+    {
+      "from": "MaildropStatus",
+      "event": "receive LIST",
+      "action": "reply 2 messages",
+      "to": "MessageList"
+    },
+    {
+      "from": "MessageList",
+      "event": "receive RETR 1",
+      "action": "reply 120 octets",
+      "to": "MessageRetrieval"
+    },
+    {
+      "from": "MessageRetrieval",
+      "event": "send message 1",
+      "action": "reply message 1 deleted",
+      "to": "MessageDeletion"
+    },
+    {
+      "from": "MessageDeletion",
+      "event": "receive RETR 2",
+      "action": "reply 200 octets",
+      "to": "MessageRetrieval"
+    },
+    {
+      "from": "MessageRetrieval",
+      "event": "send message 2",
+      "action": "reply message 2 deleted",
+      "to": "SessionEnding"
+    },
+    {
+      "from": "SessionEnding",
+      "event": "receive QUIT",
+      "action": "reply server signing off",
+      "to": "WaitingForConnection"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive USER",
+      "action": "reply +OK",
+      "to": "Authorization"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive USER",
+      "action": "reply -ERR",
+      "to": "Authorization"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive PASS",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive PASS",
+      "action": "reply -ERR",
+      "to": "Authorization"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive APOP",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive APOP",
+      "action": "reply -ERR",
+      "to": "Authorization"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive QUIT",
+      "action": "reply +OK",
+      "to": "Update"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive QUIT",
+      "action": "reply +OK",
+      "to": "Authorization"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive STAT",
+      "action": "reply +OK nn mm",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive LIST",
+      "action": "reply +OK scan listing follows",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive LIST msg",
+      "action": "reply +OK msg size",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive RETR msg",
+      "action": "reply +OK message follows",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive DELE msg",
+      "action": "reply +OK message deleted",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive NOOP",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive RSET",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive TOP",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive UIDL",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "WaitingForCommand",
+      "event": "receive USER",
+      "action": "reply 331",
+      "to": "WaitingForCommand"
+    },
+    {
+      "from": "WaitingForCommand",
+      "event": "receive PASS",
+      "action": "reply 230",
+      "to": "Authenticated"
+    },
+    {
+      "from": "WaitingForCommand",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "ErrorState"
+    },
+    {
+      "from": "WaitingForCommand",
+      "event": "receive LIST",
+      "action": "reply 200",
+      "to": "WaitingForCommand"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive LIST",
+      "action": "reply 200",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "ErrorState"
+    },
+    {
+      "from": "ErrorState",
+      "event": "timeout 5s",
+      "action": "close connection",
+      "to": "InitialGreeting"
+    }
+  ]
+}

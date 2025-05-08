@@ -1,0 +1,171 @@
+{
+  "states": [
+    "Initialization",
+    "Authorization",
+    "Transaction",
+    "Update",
+    "Closed"
+  ],
+  "initial_state": "Initialization",
+  "final_states": [
+    "Closed"
+  ],
+  "transitions": [
+    {
+      "from": "Initialization",
+      "event": "establish TCP connection",
+      "action": "send greeting",
+      "to": "Authorization"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive USER",
+      "action": "reply +OK",
+      "to": "Authorization"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive PASS",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive APOP",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Authorization",
+      "event": "cond authentication_failed",
+      "action": "reply -ERR",
+      "to": "Authorization"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive QUIT",
+      "action": "reply +OK",
+      "to": "Authorization"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive unrecognized command",
+      "action": "reply negative indicator",
+      "to": "Authorization"
+    },
+    {
+      "from": "Authorization",
+      "event": "timeout inactivity",
+      "action": "close TCP connection",
+      "to": "Initialization"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive STAT",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive LIST",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive LIST_with_msg",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive LIST_invalid_msg",
+      "action": "reply -ERR",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive RETR",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive RETR_invalid_msg",
+      "action": "reply -ERR",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive DELE",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive DELE_invalid_msg",
+      "action": "reply -ERR",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive NOOP",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive RSET",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive TOP",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive UIDL",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive unrecognized command",
+      "action": "reply negative indicator",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "timeout inactivity",
+      "action": "close TCP connection",
+      "to": "Initialization"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive QUIT",
+      "action": "reply +OK",
+      "to": "Update"
+    },
+    {
+      "from": "Update",
+      "event": "complete goodbye",
+      "action": "close TCP connection",
+      "to": "Initialization"
+    },
+    {
+      "from": "Update",
+      "event": "cond messages_removed",
+      "action": "close connection",
+      "to": "Closed"
+    },
+    {
+      "from": "Update",
+      "event": "cond removal_error",
+      "action": "reply -ERR",
+      "to": "Closed"
+    }
+  ]
+}

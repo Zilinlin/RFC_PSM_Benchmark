@@ -1,0 +1,140 @@
+{
+  "states": [
+    "WaitingForConnection",
+    "Authorization",
+    "Transaction",
+    "Update"
+  ],
+  "initial_state": "WaitingForConnection",
+  "final_states": [
+    "Update"
+  ],
+  "transitions": [
+    {
+      "from": "WaitingForConnection",
+      "event": "receive open_connection",
+      "action": "reply +OK",
+      "to": "Authorization"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive USER",
+      "action": "reply +OK/-ERR",
+      "to": "Authorization"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive PASS",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive PASS",
+      "action": "reply -ERR",
+      "to": "Authorization"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive APOP",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive APOP",
+      "action": "reply -ERR",
+      "to": "Authorization"
+    },
+    {
+      "from": "Authorization",
+      "event": "cond valid_credentials",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Authorization",
+      "event": "cond valid_authentication",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "recv STAT",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "recv LIST",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "recv LIST",
+      "action": "reply -ERR",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "recv RETR",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "recv RETR",
+      "action": "reply -ERR",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "recv DELE",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "recv DELE",
+      "action": "reply -ERR",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "recv NOOP",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "recv RSET",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "recv QUIT",
+      "action": "reply +OK",
+      "to": "Update"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive QUIT",
+      "action": "reply +OK",
+      "to": "WaitingForConnection"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive TOP",
+      "action": "reply +OK/-ERR",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive UIDL",
+      "action": "reply +OK/-ERR",
+      "to": "Transaction"
+    }
+  ]
+}

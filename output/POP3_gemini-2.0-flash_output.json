@@ -30,7 +30,7 @@
     {
       "tag": "Section 6. The UPDATE State",
       "prompt": "\nYou will be given the section \"Section 6. The UPDATE State\" of an RFC document for protocol \"POP3\".\n\n**RESPONSE FORMAT (MANDATORY)**\n- Your reply must consist **exclusively** of the JSON object representing the state machine.\n- That JSON must be wrapped in <json> and </json> tags.\n- Do **not** include any extra text, explanation, code fences, or formatting.\n\n<section>\nWhen the client issues the QUIT command from the TRANSACTION state,\n   the POP3 session enters the UPDATE state.  (Note that if the client\n   issues the QUIT command from the AUTHORIZATION state, the POP3\n   session terminates but does NOT enter the UPDATE state.)\n   If a session terminates for some reason other than a client-issued\n   QUIT command, the POP3 session does NOT enter the UPDATE state and\n   MUST not remove any messages from the maildrop.\n      QUIT\n         Arguments: none\n         Restrictions: none\n         Discussion:\n             The POP3 server removes all messages marked as deleted\n             from the maildrop and replies as to the status of this\n             operation.  If there is an error, such as a resource\n             shortage, encountered while removing messages, the\n             maildrop may result in having some or none of the messages\n             marked as deleted be removed.  In no case may the server\n             remove any messages not marked as deleted.\n             Whether the removal was successful or not, the server\n             then releases any exclusive-access lock on the maildrop\n             and closes the TCP connection.\n         Possible Responses:\n             +OK\n             -ERR some deleted messages not removed\n         Examples:\n             C: QUIT\n             S: +OK dewey POP3 server signing off (maildrop empty)\n                ...\n             C: QUIT\n             S: +OK dewey POP3 server signing off (2 messages left)\n                ...\n</section>\n\nSteps:\n1. Determine if this section has any FSM-related information (states, transitions, diagrams, reply codes, sequences).\n2. If **none**, reply exactly:\n   <json>None</json>\n3. If there is FSM information, extract it and return a structured JSON in the following format (strictly):\n\n{\n  \"states\": [\"state1\", \"state2\", \"state3\"],\n  \"transitions\": [\n    {\n      \"from\": \"state1\",\n      \"event\": \"recv COMMAND\",\n      \"action\": \"reply CODE\",\n      \"to\": \"state2\"\n    },\n    ...\n  ]\n}\n\n**FSM Field Constraints:**\n\n\ud83d\udd39 `\"states\"`:\n- List of all states appearing in `\"from\"` or `\"to\"` fields.\n- Each state must:\n  - Be 1 to 3 words (max 30 characters)\n  - Use `CamelCase` or `snake_case`\n  - Describe a protocol phase, status, or role (e.g., `Authenticated`, `WaitingForReply`)\n  - Contain no punctuation, spaces, or free-form descriptions\n\nGood: `\"AwaitingPassword\"`, `\"transfer_in_progress\"`  \nBad: `\"State 1\"`, `\"waiting for command\"`, `\"cmd?\"`\n\n\ud83d\udd39 `\"from\"` / `\"to\"`:\n- Same naming rules as above\n\n\ud83d\udd39 `\"event\"`:\n- Describes the trigger that causes the transition\n- Maybe begin with a fixed prefix:\n  - `\"receive \"` for received command\n  - `\"send \"` for sent response\n  - `\"timeout \"` for timing event\n  - `\"cond \"` for internal condition\n  - or other words \n\nExamples: `\"receive USER\"`, `\"send 230\"`, `\"timeout 5s\"`, `\"cond valid_credentials\"`\n\n\ud83d\udd39 `\"action\"`:\n- Describes what the system does in response\n- It's best start with an action verb from this fixed set or other verbs if needed: `reply`, `send`, `set`, `log`, `reset`, \n`close`, 'collect', `open`, 'record', 'stop'\n- Followed by one or two short arguments (max 4 words total)\n\nExamples: `\"reply 230\"`, `\"log failure\"`, `\"set authenticated true\"`\n\n---\n\nImportant:\n- Do not generate free-text descriptions in any field.\n- Each transition must contain **exactly**: `from`, `event`, `action`, `to`.\n- Do not invent vague or inconsistent state or event names.\n\n---\n\n**OUTPUT RULES:**\n- Wrap the JSON in **<json>\u2026</json>** only.\n- Do not include Markdown, explanations, comments, or extra text.\n- If nothing is found, return exactly `<json>None</json>`.\n\n",
-      "response": "```json\n{\n  \"states\": [\"TransactionState\", \"UpdateState\", \"AuthorizationState\"],\n  \"transitions\": [\n    {\n      \"from\": \"TransactionState\",\n      \"event\": \"recv QUIT\",\n      \"action\": \"remove deleted messages\",\n      \"to\": \"UpdateState\"\n    },\n    {\n      \"from\": \"AuthorizationState\",\n      \"event\": \"recv QUIT\",\n      \"action\": \"terminate session\",\n      \"to\": \"None\"\n    },\n    {\n      \"from\": \"UpdateState\",\n      \"event\": \"cond removal success\",\n      \"action\": \"reply OK\",\n      \"to\": \"None\"\n    },\n    {\n      \"from\": \"UpdateState\",\n      \"event\": \"cond removal failure\",\n      \"action\": \"reply ERR\",\n      \"to\": \"None\"\n    },\n    {\n      \"from\": \"UpdateState\",\n      \"event\": \"cond always\",\n      \"action\": \"release lock and close\",\n      \"to\": \"None\"\n    }\n  ]\n}\n```"
+      "response": "```json\n{\n  \"states\": [\"TransactionState\", \"UpdateState\", \"AuthorizationState\"],\n  \"transitions\": [\n    {\n      \"from\": \"TransactionState\",\n      \"event\": \"recv QUIT\",\n      \"action\": \"remove deleted messages\",\n      \"to\": \"UpdateState\"\n    },\n    {\n      \"from\": \"AuthorizationState\",\n      \"event\": \"recv QUIT\",\n      \"action\": \"terminate session\",\n      \"to\": \"None\"\n    },\n    {\n      \"from\": \"UpdateState\",\n      \"event\": \"cond remove success\",\n      \"action\": \"reply OK\",\n      \"to\": \"None\"\n    },\n    {\n      \"from\": \"UpdateState\",\n      \"event\": \"cond remove failure\",\n      \"action\": \"reply ERR\",\n      \"to\": \"None\"\n    },\n    {\n      \"from\": \"UpdateState\",\n      \"event\": \"cond always\",\n      \"action\": \"release lock\",\n      \"to\": \"None\"\n    },\n    {\n      \"from\": \"UpdateState\",\n      \"event\": \"cond always\",\n      \"action\": \"close connection\",\n      \"to\": \"None\"\n    }\n  ]\n}\n```"
     },
     {
       "tag": "Section 7. Optional POP3 Commands",
@@ -50,12 +50,12 @@
     {
       "tag": "Section 10. Example POP3 Session",
       "prompt": "\nYou will be given the section \"Section 10. Example POP3 Session\" of an RFC document for protocol \"POP3\".\n\n**RESPONSE FORMAT (MANDATORY)**\n- Your reply must consist **exclusively** of the JSON object representing the state machine.\n- That JSON must be wrapped in <json> and </json> tags.\n- Do **not** include any extra text, explanation, code fences, or formatting.\n\n<section>\nS: <wait for connection on TCP port 110>\n      C: <open connection>\n      S:    +OK POP3 server ready <1896.697170952@dbc.mtview.ca.us>\n      C:    APOP mrose c4c9334bac560ecc979e58001b3e22fb\n      S:    +OK mrose's maildrop has 2 messages (320 octets)\n      C:    STAT\n      S:    +OK 2 320\n      C:    LIST\n      S:    +OK 2 messages (320 octets)\n      S:    1 120\n      S:    2 200\n      S:    .\n      C:    RETR 1\n      S:    +OK 120 octets\n      S:    <the POP3 server sends message 1>\n      S:    .\n      C:    DELE 1\n      S:    +OK message 1 deleted\n      C:    RETR 2\n      S:    +OK 200 octets\n      S:    <the POP3 server sends message 2>\n      S:    .\n      C:    DELE 2\n      S:    +OK message 2 deleted\n      C:    QUIT\n      S:    +OK dewey POP3 server signing off (maildrop empty)\n      C:  <close connection>\n      S:  <wait for next connection>\n</section>\n\nSteps:\n1. Determine if this section has any FSM-related information (states, transitions, diagrams, reply codes, sequences).\n2. If **none**, reply exactly:\n   <json>None</json>\n3. If there is FSM information, extract it and return a structured JSON in the following format (strictly):\n\n{\n  \"states\": [\"state1\", \"state2\", \"state3\"],\n  \"transitions\": [\n    {\n      \"from\": \"state1\",\n      \"event\": \"recv COMMAND\",\n      \"action\": \"reply CODE\",\n      \"to\": \"state2\"\n    },\n    ...\n  ]\n}\n\n**FSM Field Constraints:**\n\n\ud83d\udd39 `\"states\"`:\n- List of all states appearing in `\"from\"` or `\"to\"` fields.\n- Each state must:\n  - Be 1 to 3 words (max 30 characters)\n  - Use `CamelCase` or `snake_case`\n  - Describe a protocol phase, status, or role (e.g., `Authenticated`, `WaitingForReply`)\n  - Contain no punctuation, spaces, or free-form descriptions\n\nGood: `\"AwaitingPassword\"`, `\"transfer_in_progress\"`  \nBad: `\"State 1\"`, `\"waiting for command\"`, `\"cmd?\"`\n\n\ud83d\udd39 `\"from\"` / `\"to\"`:\n- Same naming rules as above\n\n\ud83d\udd39 `\"event\"`:\n- Describes the trigger that causes the transition\n- Maybe begin with a fixed prefix:\n  - `\"receive \"` for received command\n  - `\"send \"` for sent response\n  - `\"timeout \"` for timing event\n  - `\"cond \"` for internal condition\n  - or other words \n\nExamples: `\"receive USER\"`, `\"send 230\"`, `\"timeout 5s\"`, `\"cond valid_credentials\"`\n\n\ud83d\udd39 `\"action\"`:\n- Describes what the system does in response\n- It's best start with an action verb from this fixed set or other verbs if needed: `reply`, `send`, `set`, `log`, `reset`, \n`close`, 'collect', `open`, 'record', 'stop'\n- Followed by one or two short arguments (max 4 words total)\n\nExamples: `\"reply 230\"`, `\"log failure\"`, `\"set authenticated true\"`\n\n---\n\nImportant:\n- Do not generate free-text descriptions in any field.\n- Each transition must contain **exactly**: `from`, `event`, `action`, `to`.\n- Do not invent vague or inconsistent state or event names.\n\n---\n\n**OUTPUT RULES:**\n- Wrap the JSON in **<json>\u2026</json>** only.\n- Do not include Markdown, explanations, comments, or extra text.\n- If nothing is found, return exactly `<json>None</json>`.\n\n",
-      "response": "```json\n{\n  \"states\": [\n    \"authorization\",\n    \"transaction\",\n    \"update\"\n  ],\n  \"transitions\": [\n    {\n      \"from\": \"authorization\",\n      \"event\": \"receive APOP\",\n      \"action\": \"reply +OK\",\n      \"to\": \"transaction\"\n    },\n    {\n      \"from\": \"transaction\",\n      \"event\": \"receive STAT\",\n      \"action\": \"reply +OK\",\n      \"to\": \"transaction\"\n    },\n    {\n      \"from\": \"transaction\",\n      \"event\": \"receive LIST\",\n      \"action\": \"reply +OK\",\n      \"to\": \"transaction\"\n    },\n    {\n      \"from\": \"transaction\",\n      \"event\": \"receive RETR\",\n      \"action\": \"reply +OK\",\n      \"to\": \"transaction\"\n    },\n    {\n      \"from\": \"transaction\",\n      \"event\": \"receive DELE\",\n      \"action\": \"reply +OK\",\n      \"to\": \"transaction\"\n    },\n    {\n      \"from\": \"transaction\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"reply +OK\",\n      \"to\": \"update\"\n    },\n    {\n      \"from\": \"update\",\n      \"event\": \"close connection\",\n      \"action\": \"wait next connection\",\n      \"to\": \"authorization\"\n    }\n  ]\n}\n```"
+      "response": "```json\n<json>\n{\n  \"states\": [\n    \"authorization\",\n    \"transaction\",\n    \"update\"\n  ],\n  \"transitions\": [\n    {\n      \"from\": \"authorization\",\n      \"event\": \"receive APOP\",\n      \"action\": \"reply OK\",\n      \"to\": \"transaction\"\n    },\n    {\n      \"from\": \"transaction\",\n      \"event\": \"receive STAT\",\n      \"action\": \"reply OK\",\n      \"to\": \"transaction\"\n    },\n    {\n      \"from\": \"transaction\",\n      \"event\": \"receive LIST\",\n      \"action\": \"reply OK\",\n      \"to\": \"transaction\"\n    },\n    {\n      \"from\": \"transaction\",\n      \"event\": \"receive RETR\",\n      \"action\": \"reply OK\",\n      \"to\": \"transaction\"\n    },\n    {\n      \"from\": \"transaction\",\n      \"event\": \"receive DELE\",\n      \"action\": \"reply OK\",\n      \"to\": \"transaction\"\n    },\n    {\n      \"from\": \"transaction\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"reply OK\",\n      \"to\": \"update\"\n    }\n  ]\n}\n</json>\n```"
     },
     {
       "tag": "Section 11. Message Format",
       "prompt": "\nYou will be given the section \"Section 11. Message Format\" of an RFC document for protocol \"POP3\".\n\n**RESPONSE FORMAT (MANDATORY)**\n- Your reply must consist **exclusively** of the JSON object representing the state machine.\n- That JSON must be wrapped in <json> and </json> tags.\n- Do **not** include any extra text, explanation, code fences, or formatting.\n\n<section>\nAll messages transmitted during a POP3 session are assumed to conform\n   to the standard for the format of Internet text messages [RFC822].\n   It is important to note that the octet count for a message on the\n   server host may differ from the octet count assigned to that message\n   due to local conventions for designating end-of-line.  Usually,\n   during the AUTHORIZATION state of the POP3 session, the POP3 server\n   can calculate the size of each message in octets when it opens the\n   maildrop.  For example, if the POP3 server host internally represents\n   end-of-line as a single character, then the POP3 server simply counts\n   each occurrence of this character in a message as two octets.  Note\n   that lines in the message which start with the termination octet need\n   not (and must not) be counted twice, since the POP3 client will\n   remove all byte-stuffed termination characters when it receives a\n   multi-line response.\n</section>\n\nSteps:\n1. Determine if this section has any FSM-related information (states, transitions, diagrams, reply codes, sequences).\n2. If **none**, reply exactly:\n   <json>None</json>\n3. If there is FSM information, extract it and return a structured JSON in the following format (strictly):\n\n{\n  \"states\": [\"state1\", \"state2\", \"state3\"],\n  \"transitions\": [\n    {\n      \"from\": \"state1\",\n      \"event\": \"recv COMMAND\",\n      \"action\": \"reply CODE\",\n      \"to\": \"state2\"\n    },\n    ...\n  ]\n}\n\n**FSM Field Constraints:**\n\n\ud83d\udd39 `\"states\"`:\n- List of all states appearing in `\"from\"` or `\"to\"` fields.\n- Each state must:\n  - Be 1 to 3 words (max 30 characters)\n  - Use `CamelCase` or `snake_case`\n  - Describe a protocol phase, status, or role (e.g., `Authenticated`, `WaitingForReply`)\n  - Contain no punctuation, spaces, or free-form descriptions\n\nGood: `\"AwaitingPassword\"`, `\"transfer_in_progress\"`  \nBad: `\"State 1\"`, `\"waiting for command\"`, `\"cmd?\"`\n\n\ud83d\udd39 `\"from\"` / `\"to\"`:\n- Same naming rules as above\n\n\ud83d\udd39 `\"event\"`:\n- Describes the trigger that causes the transition\n- Maybe begin with a fixed prefix:\n  - `\"receive \"` for received command\n  - `\"send \"` for sent response\n  - `\"timeout \"` for timing event\n  - `\"cond \"` for internal condition\n  - or other words \n\nExamples: `\"receive USER\"`, `\"send 230\"`, `\"timeout 5s\"`, `\"cond valid_credentials\"`\n\n\ud83d\udd39 `\"action\"`:\n- Describes what the system does in response\n- It's best start with an action verb from this fixed set or other verbs if needed: `reply`, `send`, `set`, `log`, `reset`, \n`close`, 'collect', `open`, 'record', 'stop'\n- Followed by one or two short arguments (max 4 words total)\n\nExamples: `\"reply 230\"`, `\"log failure\"`, `\"set authenticated true\"`\n\n---\n\nImportant:\n- Do not generate free-text descriptions in any field.\n- Each transition must contain **exactly**: `from`, `event`, `action`, `to`.\n- Do not invent vague or inconsistent state or event names.\n\n---\n\n**OUTPUT RULES:**\n- Wrap the JSON in **<json>\u2026</json>** only.\n- Do not include Markdown, explanations, comments, or extra text.\n- If nothing is found, return exactly `<json>None</json>`.\n\n",
-      "response": "<json>None</json>\n"
+      "response": "```json\n<json>None</json>\n```"
     },
     {
       "tag": "Section 12. References",
@@ -88,7 +88,7 @@
       "response": "```json\n<json>None</json>\n```"
     }
   ],
-  "final_response": "```json\n<json>\n{\n  \"states\": [\n    \"Authorization\",\n    \"Transaction\",\n    \"Update\",\n    \"Closed\"\n  ],\n  \"initial_state\": \"Authorization\",\n  \"final_states\": [\n    \"Closed\"\n  ],\n  \"transitions\": [\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive valid credentials\",\n      \"action\": \"acquire resources\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"release resources\",\n      \"to\": \"Update\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive unrecognized command\",\n      \"action\": \"reply -ERR\",\n      \"to\": \"Authorization\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive unrecognized command\",\n      \"action\": \"reply -ERR\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Update\",\n      \"event\": \"connection closed\",\n      \"action\": \"say goodbye\",\n      \"to\": \"Closed\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"timeout inactivity\",\n      \"action\": \"close connection\",\n      \"to\": \"Authorization\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"timeout inactivity\",\n      \"action\": \"close connection\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive USER or APOP\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive USER or APOP\",\n      \"action\": \"reply -ERR\",\n      \"to\": \"Authorization\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Closed\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive STAT\",\n      \"action\": \"reply +OK drop listing\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive LIST\",\n      \"action\": \"reply +OK scan listing\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive LIST msg\",\n      \"action\": \"reply +OK scan listing\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive LIST invalid_msg\",\n      \"action\": \"reply -ERR no such message\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive RETR msg\",\n      \"action\": \"reply +OK message follows\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive RETR invalid_msg\",\n      \"action\": \"reply -ERR no such message\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive DELE msg\",\n      \"action\": \"reply +OK message deleted\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive DELE invalid_msg\",\n      \"action\": \"reply -ERR no such message\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive NOOP\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive RSET\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"remove deleted messages\",\n      \"to\": \"Update\"\n    },\n    {\n      \"from\": \"Update\",\n      \"event\": \"cond removal success\",\n      \"action\": \"reply OK\",\n      \"to\": \"Closed\"\n    },\n    {\n      \"from\": \"Update\",\n      \"event\": \"cond removal failure\",\n      \"action\": \"reply ERR\",\n      \"to\": \"Closed\"\n    },\n    {\n      \"from\": \"Update\",\n      \"event\": \"cond always\",\n      \"action\": \"release lock and close\",\n      \"to\": \"Closed\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive USER\",\n      \"action\": \"reply OK\",\n      \"to\": \"Authorization\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive USER\",\n      \"action\": \"reply ERR\",\n      \"to\": \"Authorization\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive PASS\",\n      \"action\": \"reply OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive PASS\",\n      \"action\": \"reply ERR\",\n      \"to\": \"Authorization\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive TOP\",\n      \"action\": \"reply OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive TOP\",\n      \"action\": \"reply ERR\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive UIDL\",\n      \"action\": \"reply OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive UIDL\",\n      \"action\": \"reply ERR\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive APOP\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Update\",\n      \"event\": \"close connection\",\n      \"action\": \"wait next connection\",\n      \"to\": \"Authorization\"\n    }\n  ]\n}\n</json>\n```",
+  "final_response": "```json\n<json>\n{\n  \"states\": [\n    \"Authorization\",\n    \"Transaction\",\n    \"Update\",\n    \"Closed\"\n  ],\n  \"initial_state\": \"Authorization\",\n  \"final_states\": [\n    \"Update\",\n    \"Closed\"\n  ],\n  \"transitions\": [\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive valid credentials\",\n      \"action\": \"acquire resources\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"release resources\",\n      \"to\": \"Update\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive unrecognized command\",\n      \"action\": \"reply -ERR\",\n      \"to\": \"Authorization\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive unrecognized command\",\n      \"action\": \"reply -ERR\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Update\",\n      \"event\": \"connection closed\",\n      \"action\": \"say goodbye\",\n      \"to\": \"Update\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"timeout inactivity\",\n      \"action\": \"close connection\",\n      \"to\": \"Authorization\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"timeout inactivity\",\n      \"action\": \"close connection\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive USER or APOP\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive USER or APOP\",\n      \"action\": \"reply -ERR\",\n      \"to\": \"Authorization\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Closed\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive STAT\",\n      \"action\": \"reply +OK drop listing\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive LIST\",\n      \"action\": \"reply +OK scan listing\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive LIST msg\",\n      \"action\": \"reply +OK scan listing\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive LIST invalid_msg\",\n      \"action\": \"reply -ERR no such message\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive RETR msg\",\n      \"action\": \"reply +OK message follows\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive RETR invalid_msg\",\n      \"action\": \"reply -ERR no such message\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive DELE msg\",\n      \"action\": \"reply +OK message deleted\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive DELE invalid_msg\",\n      \"action\": \"reply -ERR no such message\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive NOOP\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive RSET\",\n      \"action\": \"reply +OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive TOP\",\n      \"action\": \"reply OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive UIDL\",\n      \"action\": \"reply OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"remove deleted messages\",\n      \"to\": \"Update\"\n    },\n    {\n      \"from\": \"Update\",\n      \"event\": \"cond remove success\",\n      \"action\": \"reply OK\",\n      \"to\": \"Update\"\n    },\n    {\n      \"from\": \"Update\",\n      \"event\": \"cond remove failure\",\n      \"action\": \"reply ERR\",\n      \"to\": \"Update\"\n    },\n    {\n      \"from\": \"Update\",\n      \"event\": \"cond always\",\n      \"action\": \"release lock\",\n      \"to\": \"Update\"\n    },\n    {\n      \"from\": \"Update\",\n      \"event\": \"cond always\",\n      \"action\": \"close connection\",\n      \"to\": \"Update\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive USER\",\n      \"action\": \"reply OK/ERR\",\n      \"to\": \"Authorization\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive PASS\",\n      \"action\": \"reply OK/ERR\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive STAT\",\n      \"action\": \"reply OK/ERR\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive LIST\",\n      \"action\": \"reply OK/ERR\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive RETR\",\n      \"action\": \"reply OK/ERR\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive DELE\",\n      \"action\": \"reply OK/ERR\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive NOOP\",\n      \"action\": \"reply OK/ERR\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive RSET\",\n      \"action\": \"reply OK/ERR\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"reply OK\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Authorization\",\n      \"event\": \"receive APOP\",\n      \"action\": \"reply OK/ERR\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive TOP\",\n      \"action\": \"reply OK/ERR\",\n      \"to\": \"Transaction\"\n    },\n    {\n      \"from\": \"Transaction\",\n      \"event\": \"receive UIDL\",\n      \"action\": \"reply OK/ERR\",\n      \"to\": \"Transaction\"\n    }\n  ]\n}\n</json>\n```",
   "final_fsm": {
     "states": [
       "Authorization",
@@ -98,6 +98,7 @@
     ],
     "initial_state": "Authorization",
     "final_states": [
+      "Update",
       "Closed"
     ],
     "transitions": [
@@ -129,7 +130,7 @@
         "from": "Update",
         "event": "connection closed",
         "action": "say goodbye",
-        "to": "Closed"
+        "to": "Update"
       },
       {
         "from": "Authorization",
@@ -223,87 +224,117 @@
       },
       {
         "from": "Transaction",
+        "event": "receive TOP",
+        "action": "reply OK",
+        "to": "Transaction"
+      },
+      {
+        "from": "Transaction",
+        "event": "receive UIDL",
+        "action": "reply OK",
+        "to": "Transaction"
+      },
+      {
+        "from": "Transaction",
         "event": "receive QUIT",
         "action": "remove deleted messages",
         "to": "Update"
       },
       {
         "from": "Update",
-        "event": "cond removal success",
+        "event": "cond remove success",
         "action": "reply OK",
-        "to": "Closed"
+        "to": "Update"
       },
       {
         "from": "Update",
-        "event": "cond removal failure",
+        "event": "cond remove failure",
         "action": "reply ERR",
-        "to": "Closed"
+        "to": "Update"
       },
       {
         "from": "Update",
         "event": "cond always",
-        "action": "release lock and close",
-        "to": "Closed"
+        "action": "release lock",
+        "to": "Update"
+      },
+      {
+        "from": "Update",
+        "event": "cond always",
+        "action": "close connection",
+        "to": "Update"
       },
       {
         "from": "Authorization",
         "event": "receive USER",
-        "action": "reply OK",
-        "to": "Authorization"
-      },
-      {
-        "from": "Authorization",
-        "event": "receive USER",
-        "action": "reply ERR",
+        "action": "reply OK/ERR",
         "to": "Authorization"
       },
       {
         "from": "Authorization",
         "event": "receive PASS",
+        "action": "reply OK/ERR",
+        "to": "Transaction"
+      },
+      {
+        "from": "Transaction",
+        "event": "receive STAT",
+        "action": "reply OK/ERR",
+        "to": "Transaction"
+      },
+      {
+        "from": "Transaction",
+        "event": "receive LIST",
+        "action": "reply OK/ERR",
+        "to": "Transaction"
+      },
+      {
+        "from": "Transaction",
+        "event": "receive RETR",
+        "action": "reply OK/ERR",
+        "to": "Transaction"
+      },
+      {
+        "from": "Transaction",
+        "event": "receive DELE",
+        "action": "reply OK/ERR",
+        "to": "Transaction"
+      },
+      {
+        "from": "Transaction",
+        "event": "receive NOOP",
+        "action": "reply OK/ERR",
+        "to": "Transaction"
+      },
+      {
+        "from": "Transaction",
+        "event": "receive RSET",
+        "action": "reply OK/ERR",
+        "to": "Transaction"
+      },
+      {
+        "from": "Transaction",
+        "event": "receive QUIT",
         "action": "reply OK",
-        "to": "Transaction"
-      },
-      {
-        "from": "Authorization",
-        "event": "receive PASS",
-        "action": "reply ERR",
-        "to": "Authorization"
-      },
-      {
-        "from": "Transaction",
-        "event": "receive TOP",
-        "action": "reply OK",
-        "to": "Transaction"
-      },
-      {
-        "from": "Transaction",
-        "event": "receive TOP",
-        "action": "reply ERR",
-        "to": "Transaction"
-      },
-      {
-        "from": "Transaction",
-        "event": "receive UIDL",
-        "action": "reply OK",
-        "to": "Transaction"
-      },
-      {
-        "from": "Transaction",
-        "event": "receive UIDL",
-        "action": "reply ERR",
         "to": "Transaction"
       },
       {
         "from": "Authorization",
         "event": "receive APOP",
-        "action": "reply +OK",
+        "action": "reply OK/ERR",
         "to": "Transaction"
       },
       {
-        "from": "Update",
-        "event": "close connection",
-        "action": "wait next connection",
-        "to": "Authorization"
+        "from": "Transaction",
+        "event": "receive TOP",
+        "action": "reply OK/ERR",
+        "to": "Transaction"
+      },
+      {
+        "from": "Transaction",
+        "event": "receive UIDL",
+        "action": "reply OK/ERR",
+        "to": "Transaction"
       }
     ]
   }

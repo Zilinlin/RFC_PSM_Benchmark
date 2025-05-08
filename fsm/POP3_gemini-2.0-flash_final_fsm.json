@@ -1,0 +1,249 @@
+{
+  "states": [
+    "Authorization",
+    "Transaction",
+    "Update",
+    "Closed"
+  ],
+  "initial_state": "Authorization",
+  "final_states": [
+    "Update",
+    "Closed"
+  ],
+  "transitions": [
+    {
+      "from": "Authorization",
+      "event": "receive valid credentials",
+      "action": "acquire resources",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive QUIT",
+      "action": "release resources",
+      "to": "Update"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive unrecognized command",
+      "action": "reply -ERR",
+      "to": "Authorization"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive unrecognized command",
+      "action": "reply -ERR",
+      "to": "Transaction"
+    },
+    {
+      "from": "Update",
+      "event": "connection closed",
+      "action": "say goodbye",
+      "to": "Update"
+    },
+    {
+      "from": "Authorization",
+      "event": "timeout inactivity",
+      "action": "close connection",
+      "to": "Authorization"
+    },
+    {
+      "from": "Transaction",
+      "event": "timeout inactivity",
+      "action": "close connection",
+      "to": "Transaction"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive USER or APOP",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive USER or APOP",
+      "action": "reply -ERR",
+      "to": "Authorization"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive QUIT",
+      "action": "reply +OK",
+      "to": "Closed"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive STAT",
+      "action": "reply +OK drop listing",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive LIST",
+      "action": "reply +OK scan listing",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive LIST msg",
+      "action": "reply +OK scan listing",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive LIST invalid_msg",
+      "action": "reply -ERR no such message",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive RETR msg",
+      "action": "reply +OK message follows",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive RETR invalid_msg",
+      "action": "reply -ERR no such message",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive DELE msg",
+      "action": "reply +OK message deleted",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive DELE invalid_msg",
+      "action": "reply -ERR no such message",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive NOOP",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive RSET",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive TOP",
+      "action": "reply OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive UIDL",
+      "action": "reply OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive QUIT",
+      "action": "remove deleted messages",
+      "to": "Update"
+    },
+    {
+      "from": "Update",
+      "event": "cond remove success",
+      "action": "reply OK",
+      "to": "Update"
+    },
+    {
+      "from": "Update",
+      "event": "cond remove failure",
+      "action": "reply ERR",
+      "to": "Update"
+    },
+    {
+      "from": "Update",
+      "event": "cond always",
+      "action": "release lock",
+      "to": "Update"
+    },
+    {
+      "from": "Update",
+      "event": "cond always",
+      "action": "close connection",
+      "to": "Update"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive USER",
+      "action": "reply OK/ERR",
+      "to": "Authorization"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive PASS",
+      "action": "reply OK/ERR",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive STAT",
+      "action": "reply OK/ERR",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive LIST",
+      "action": "reply OK/ERR",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive RETR",
+      "action": "reply OK/ERR",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive DELE",
+      "action": "reply OK/ERR",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive NOOP",
+      "action": "reply OK/ERR",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive RSET",
+      "action": "reply OK/ERR",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive QUIT",
+      "action": "reply OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive APOP",
+      "action": "reply OK/ERR",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive TOP",
+      "action": "reply OK/ERR",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive UIDL",
+      "action": "reply OK/ERR",
+      "to": "Transaction"
+    }
+  ]
+}

@@ -302,7 +302,7 @@ if __name__ == "__main__":
     
     # protocols = ["DCCP","DHCP", "FTP", "IMAP", 
     #              "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP"]
-    protocols = ["RTSP", "SIP", "SMTP", "TCP"]  # for testing purposes
+    protocols = ["FTP", "SIP", "NNTP"]  # for testing purposes
     # model = "deepseek-r1:14b"
     # models = ["deepseek-r1:32b","qwen3:32b","gemma3:27b"]
     # models = ["mistral-small3.1"] # this is 24b
