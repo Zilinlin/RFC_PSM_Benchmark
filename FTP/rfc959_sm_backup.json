@@ -1,0 +1,47 @@
+{
+  "states": [
+    "BEGIN",
+    "WAIT_REPLY",
+    "SUCCESS",
+    "FAILURE",
+    "ERROR"
+  ],
+  "initial_state": "BEGIN",
+  "final_states": [
+    "SUCCESS",
+    "FAILURE",
+    "ERROR"
+  ],
+  "transitions": [
+    {
+      "from": "BEGIN",
+      "to": "WAIT_REPLY",
+      "event": "FTP command issued",
+      "action": "Send command"
+    },
+    {
+      "from": "WAIT_REPLY",
+      "to": "SUCCESS",
+      "event": "Reply code 2xx",
+      "action": "Process success"
+    },
+    {
+      "from": "WAIT_REPLY",
+      "to": "FAILURE",
+      "event": "Reply code 4xx or 5xx",
+      "action": "Handle failure"
+    },
+    {
+      "from": "WAIT_REPLY",
+      "to": "ERROR",
+      "event": "Unexpected reply (e.g., 1xx/3xx)",
+      "action": "Handle error"
+    },
+    {
+      "from": "WAIT_REPLY",
+      "to": "WAIT_REPLY",
+      "event": "Intermediate reply (1xx)",
+      "action": "Wait for final reply"
+    }
+  ]
+}

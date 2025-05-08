@@ -320,7 +320,7 @@ if __name__ == "__main__":
     # "DCCP","DHCP", "FTP","IMAP",
     #             "NNTP", "POP3",
     # protocols = [  "RTSP", "SIP", "SMTP", "TCP"]
-    protocols = ["FTP", "SIP", "NNTP"]
+    protocols = ["SIP", "NNTP"]
     # model = "deepseek-r1:14b"
     # models = ["deepseek-r1:32b","qwen3:32b","gemma3:27b"]
     # models = ["mistral-small3.1"] # this is 24b

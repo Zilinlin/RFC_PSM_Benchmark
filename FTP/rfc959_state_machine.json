@@ -1,47 +1,164 @@
 {
-  "states": [
-    "BEGIN",
-    "WAIT_REPLY",
-    "SUCCESS",
-    "FAILURE",
-    "ERROR"
-  ],
-  "initial_state": "BEGIN",
-  "final_states": [
-    "SUCCESS",
-    "FAILURE",
-    "ERROR"
-  ],
-  "transitions": [
-    {
-      "from": "BEGIN",
-      "to": "WAIT_REPLY",
-      "event": "FTP command issued",
-      "action": "Send command"
-    },
-    {
-      "from": "WAIT_REPLY",
-      "to": "SUCCESS",
-      "event": "Reply code 2xx",
-      "action": "Process success"
-    },
-    {
-      "from": "WAIT_REPLY",
-      "to": "FAILURE",
-      "event": "Reply code 4xx or 5xx",
-      "action": "Handle failure"
-    },
-    {
-      "from": "WAIT_REPLY",
-      "to": "ERROR",
-      "event": "Unexpected reply (e.g., 1xx/3xx)",
-      "action": "Handle error"
-    },
-    {
-      "from": "WAIT_REPLY",
-      "to": "WAIT_REPLY",
-      "event": "Intermediate reply (1xx)",
-      "action": "Wait for final reply"
-    }
-  ]
+    "states": [
+        "Disconnected",
+        "Connected",
+        "Authenticated",
+        "Need_Account",
+        "Accounted",
+        "Data_Connection_Ready",
+        "Data_Transfer",
+        "Restart_Point_Set",
+        "Awaiting_RNTO",
+        "Logged_Out"
+    ],
+    "initial_state": "Disconnected",
+    "final_states": [
+        "Logged_Out"
+    ],
+    "transitions": [
+        {
+            "from": "Disconnected",
+            "event": "receive USER",
+            "action": "reply 331",
+            "to": "Connected"
+        },
+        {
+            "from": "Connected",
+            "event": "receive PASS",
+            "action": "reply 230",
+            "to": "Authenticated"
+        },
+        {
+            "from": "Connected",
+            "event": "receive PASS",
+            "action": "reply 530",
+            "to": "Disconnected"
+        },
+        {
+            "from": "Connected",
+            "event": "receive PASS",
+            "action": "reply 332",
+            "to": "Need_Account"
+        },
+        {
+            "from": "Need_Account",
+            "event": "receive ACCT",
+            "action": "reply 230",
+            "to": "Accounted"
+        },
+        {
+            "from": "Need_Account",
+            "event": "receive ACCT",
+            "action": "reply 332",
+            "to": "Need_Account"
+        },
+        {
+            "from": "Authenticated",
+            "event": "receive ACCT",
+            "action": "reply 230",
+            "to": "Accounted"
+        },
+        {
+            "from": "Authenticated",
+            "event": "receive ACCT",
+            "action": "reply 332",
+            "to": "Authenticated"
+        },
+        {
+            "from": "Authenticated",
+            "event": "receive PASV",
+            "action": "reply 227",
+            "to": "Data_Connection_Ready"
+        },
+        {
+            "from": "Authenticated",
+            "event": "receive PORT",
+            "action": "reply 200",
+            "to": "Data_Connection_Ready"
+        },
+        {
+            "from": "Data_Connection_Ready",
+            "event": "receive RETR",
+            "action": "reply 150",
+            "to": "Data_Transfer"
+        },
+        {
+            "from": "Data_Connection_Ready",
+            "event": "receive STOR",
+            "action": "reply 150",
+            "to": "Data_Transfer"
+        },
+        {
+            "from": "Data_Connection_Ready",
+            "event": "receive APPE",
+            "action": "reply 150",
+            "to": "Data_Transfer"
+        },
+        {
+            "from": "Data_Transfer",
+            "event": "Transfer Complete",
+            "action": "reply 226",
+            "to": "Authenticated"
+        },
+        {
+            "from": "Data_Transfer",
+            "event": "receive QUIT",
+            "action": "reply 221",
+            "to": "Logged_Out"
+        },
+        {
+            "from": "Authenticated",
+            "event": "receive REST",
+            "action": "reply 350",
+            "to": "Restart_Point_Set"
+        },
+        {
+            "from": "Restart_Point_Set",
+            "event": "receive RETR",
+            "action": "reply 150",
+            "to": "Data_Transfer"
+        },
+        {
+            "from": "Restart_Point_Set",
+            "event": "receive STOR",
+            "action": "reply 150",
+            "to": "Data_Transfer"
+        },
+        {
+            "from": "Restart_Point_Set",
+            "event": "receive APPE",
+            "action": "reply 150",
+            "to": "Data_Transfer"
+        },
+        {
+            "from": "Authenticated",
+            "event": "receive RNFR",
+            "action": "reply 350",
+            "to": "Awaiting_RNTO"
+        },
+        {
+            "from": "Awaiting_RNTO",
+            "event": "receive RNTO",
+            "action": "reply 250",
+            "to": "Authenticated"
+        },
+        {
+            "from": "Authenticated",
+            "event": "receive QUIT",
+            "action": "reply 221",
+            "to": "Logged_Out"
+        },
+        {
+            "from": "Accounted",
+            "event": "receive QUIT",
+            "action": "reply 221",
+            "to": "Logged_Out"
+        },
+        {
+            "from": "Restart_Point_Set",
+            "event": "receive QUIT",
+            "action": "reply 221",
+            "to": "Logged_Out"
+        }
+    ]
 }

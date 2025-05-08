@@ -1,0 +1,135 @@
+{
+    "states": [
+        "Calling",
+        "Proceeding",
+        "Completed",
+        "Confirmed",
+        "Terminated"
+    ],
+    "initial_state": "Calling",
+    "final_states": [
+        "Terminated"
+    ],
+    "transitions": [
+        {
+            "from": "Calling",
+            "event": "timeout Timer A",
+            "action": "send INVITE",
+            "to": "Calling"
+        },
+        {
+            "from": "Calling",
+            "event": "receive 1xx",
+            "action": "send 1xx to TU",
+            "to": "Proceeding"
+        },
+        {
+            "from": "Calling",
+            "event": "receive 2xx",
+            "action": "send 2xx to TU",
+            "to": "Terminated"
+        },
+        {
+            "from": "Calling",
+            "event": "timeout Timer B or Transport Error",
+            "action": "inform TU",
+            "to": "Terminated"
+        },
+        {
+            "from": "Calling",
+            "event": "receive 300-699",
+            "action": "send ACK, send response to TU",
+            "to": "Completed"
+        },
+        {
+            "from": "Proceeding",
+            "event": "receive 2xx",
+            "action": "send 2xx to TU",
+            "to": "Terminated"
+        },
+        {
+            "from": "Proceeding",
+            "event": "receive 300-699",
+            "action": "send ACK, send response to TU",
+            "to": "Completed"
+        },
+        {
+            "from": "Proceeding",
+            "event": "receive 1xx",
+            "action": "send 1xx to TU",
+            "to": "Proceeding"
+        },
+        {
+            "from": "Proceeding",
+            "event": "receive INVITE",
+            "action": "send response",
+            "to": "Proceeding"
+        },
+        {
+            "from": "Proceeding",
+            "event": "receive Transport Error",
+            "action": "inform TU",
+            "to": "Terminated"
+        },
+        {
+            "from": "Completed",
+            "event": "timeout Timer D",
+            "action": "",
+            "to": "Terminated"
+        },
+        {
+            "from": "Completed",
+            "event": "receive 300-699",
+            "action": "send ACK",
+            "to": "Completed"
+        },
+        {
+            "from": "Completed",
+            "event": "receive Transport Error",
+            "action": "inform TU",
+            "to": "Terminated"
+        },
+        {
+            "from": "Completed",
+            "event": "receive ACK",
+            "action": "",
+            "to": "Confirmed"
+        },
+        {
+            "from": "Confirmed",
+            "event": "timeout Timer I",
+            "action": "",
+            "to": "Terminated"
+        },
+        {
+            "from": "Proceeding",
+            "event": "receive 101-199 from TU",
+            "action": "send response",
+            "to": "Proceeding"
+        },
+        {
+            "from": "Proceeding",
+            "event": "receive 300-699 from TU",
+            "action": "send response",
+            "to": "Completed"
+        },
+        {
+            "from": "Completed",
+            "event": "timeout Timer G",
+            "action": "send response",
+            "to": "Completed"
+        },
+        {
+            "from": "Completed",
+            "event": "receive INVITE",
+            "action": "send response",
+            "to": "Completed"
+        },
+        {
+            "from": "Completed",
+            "event": "timeout Timer H or Transport Error",
+            "action": "inform TU",
+            "to": "Terminated"
+        }
+    ]
+}

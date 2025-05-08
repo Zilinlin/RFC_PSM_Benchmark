@@ -1,0 +1,141 @@
+{
+  "states": [
+    "Init",
+    "Registering",
+    "Unauthorized",
+    "Ready",
+    "Inviting",
+    "Trying",
+    "Ringing",
+    "Acknowledged",
+    "RTP_RTCP",
+    "Bye",
+    "OK"
+  ],
+  "initial_state": "Init",
+  "final_states": [
+    "Bye"
+  ],
+  "transitions": [
+    {
+      "from": "Init",
+      "event": "receive Connection",
+      "action": "reply 200",
+      "to": "Registering"
+    },
+    {
+      "from": "Registering",
+      "event": "receive Register",
+      "action": "reply 200",
+      "to": "Ready"
+    },
+    {
+      "from": "Registering",
+      "event": "receive Unauthorized",
+      "action": "reply 401",
+      "to": "Unauthorized"
+    },
+    {
+      "from": "Unauthorized",
+      "event": "receive Register",
+      "action": "reply 200",
+      "to": "Ready"
+    },
+    {
+      "from": "Ready",
+      "event": "receive Invite",
+      "action": "reply 100",
+      "to": "Trying"
+    },
+    {
+      "from": "Trying",
+      "event": "receive Ringing",
+      "action": "reply 180",
+      "to": "Ringing"
+    },
+    {
+      "from": "Trying",
+      "event": "receive OK",
+      "action": "reply 200",
+      "to": "Acknowledged"
+    },
+    {
+      "from": "Ringing",
+      "event": "receive OK",
+      "action": "reply 200",
+      "to": "Acknowledged"
+    },
+    {
+      "from": "Acknowledged",
+      "event": "receive RTP",
+      "action": "reply 200",
+      "to": "RTP_RTCP"
+    },
+    {
+      "from": "RTP_RTCP",
+      "event": "receive Bye",
+      "action": "reply 200",
+      "to": "Bye"
+    },
+    {
+      "from": "Bye",
+      "event": "receive OK",
+      "action": "reply 200",
+      "to": "OK"
+    },
+    {
+      "from": "OK",
+      "event": "receive Bye",
+      "action": "reply 200",
+      "to": "Bye"
+    },
+    {
+      "from": "Ready",
+      "event": "receive Register",
+      "action": "reply 200",
+      "to": "Registering"
+    },
+    {
+      "from": "Ready",
+      "event": "receive Bye",
+      "action": "reply 200",
+      "to": "Bye"
+    },
+    {
+      "from": "Inviting",
+      "event": "receive Trying",
+      "action": "reply 100",
+      "to": "Trying"
+    },
+    {
+      "from": "Inviting",
+      "event": "receive Ringing",
+      "action": "reply 180",
+      "to": "Ringing"
+    },
+    {
+      "from": "Inviting",
+      "event": "receive OK",
+      "action": "reply 200",
+      "to": "Acknowledged"
+    },
+    {
+      "from": "Acknowledged",
+      "event": "receive Bye",
+      "action": "reply 200",
+      "to": "Bye"
+    },
+    {
+      "from": "RTP_RTCP",
+      "event": "receive Bye",
+      "action": "reply 200",
+      "to": "Bye"
+    },
+    {
+      "from": "RTP_RTCP",
+      "event": "receive OK",
+      "action": "reply 200",
+      "to": "OK"
+    }
+  ]
+}
