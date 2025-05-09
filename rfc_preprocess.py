@@ -16,47 +16,98 @@ def count_tokens(text: str) -> int:
     return len(_encoding.encode(text))
 
 
+# def clean_rfc_headers(text: str) -> str:
+#     """
+#     Cleans an RFC text file by removing header lines.
+#     This version replaces form feed characters (\f) with newline characters (\n)
+#     and then processes each line to remove headers if at least two header patterns match.
+#     """
+#     # Replace form feed characters with newline to ensure consistent line separation.
+#     text = text.replace('\f', '\n')
+    
+#     # Define multiple regex patterns for common header artifacts.
+#     header_patterns = [
+#         r'\[Page\s*\d+\]',                       # Matches: [Page 13]
+#         r'\bRFC\s*\d+\b',                         # Matches: RFC 7826
+#         r'\bStandards\s+Track\b',                 # Matches: Standards Track
+#         r'\bRTSP\s+\d+\.\d+\b',                    # Matches: RTSP 2.0
+#         # Matches dates in the format "December 2016" etc.
+#         r'\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}\b'
+#     ]
+#     compiled_patterns = [re.compile(p, re.IGNORECASE) for p in header_patterns]
+
+#     # Split text into lines.
+#     lines = text.splitlines()
+#     cleaned_lines = []
+    
+#     # Process each line individually.
+#     for line in lines:
+#         stripped_line = line.strip()
+#         # Count the number of header patterns that match the line.
+#         match_count = sum(1 for cp in compiled_patterns if cp.search(stripped_line))
+#         # Remove the line if at least two header patterns match.
+#         if match_count >= 2:
+#             continue
+#         cleaned_lines.append(line)
+    
+#     # Reassemble the cleaned lines into a single string.
+#     cleaned_text = "\n".join(cleaned_lines)
+    
+#     # Collapse multiple consecutive newlines into a single newline.
+#     cleaned_text = re.sub(r'\n+', '\n', cleaned_text)
+    
+#     return cleaned_text
+
+
+
 def clean_rfc_headers(text: str) -> str:
     """
-    Cleans an RFC text file by removing header lines.
-    This version replaces form feed characters (\f) with newline characters (\n)
-    and then processes each line to remove headers if at least two header patterns match.
-    """
-    # Replace form feed characters with newline to ensure consistent line separation.
-    text = text.replace('\f', '\n')
+    Removes RFC page headers such as:
     
-    # Define multiple regex patterns for common header artifacts.
+       Simpson                                  [Page ii]
+       <formfeed>
+       RFC 1661   Point-to-Point Protocol   July 1994
+    
+    Any line matching at least two header patterns will be dropped.
+    """
+    # Normalize form-feeds into newlines
+    text = text.replace('\f', '\n')
+
     header_patterns = [
-        r'\[Page\s*\d+\]',                       # Matches: [Page 13]
-        r'\bRFC\s*\d+\b',                         # Matches: RFC 7826
-        r'\bStandards\s+Track\b',                 # Matches: Standards Track
-        r'\bRTSP\s+\d+\.\d+\b',                    # Matches: RTSP 2.0
-        # Matches dates in the format "December 2016" etc.
+        # [Page 1] or [Page ii] (Roman or Arabic)
+        r'\[Page\s*(?:\d+|[IVXLCDMivxlcdm]+)\]',
+        # single surname immediately before the page-marker
+        r'^[A-Za-z]+(?=\s+\[Page)',
+        # common author patterns
+        r'\bet al\.\b',
+        # track/type indicators
+        r'\bStandards\s+Track\b',
+        r'\bInformational\b',
+        # RFC number
+        r'\bRFC\s*\d+\b',
+        # protocol names like BGP-4, PPTP-2, etc.
+        r'\b[A-Z][A-Za-z]*-\d+\b',
+        # month-year dates
         r'\b(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{4}\b'
     ]
-    compiled_patterns = [re.compile(p, re.IGNORECASE) for p in header_patterns]
+    # use MULTILINE so ^ applies per-line
+    compiled = [re.compile(p, re.IGNORECASE | re.MULTILINE) for p in header_patterns]
 
-    # Split text into lines.
-    lines = text.splitlines()
-    cleaned_lines = []
-    
-    # Process each line individually.
-    for line in lines:
-        stripped_line = line.strip()
-        # Count the number of header patterns that match the line.
-        match_count = sum(1 for cp in compiled_patterns if cp.search(stripped_line))
-        # Remove the line if at least two header patterns match.
-        if match_count >= 2:
+    cleaned = []
+    for line in text.splitlines():
+        # count how many patterns match this line
+        hits = sum(1 for cp in compiled if cp.search(line))
+        # drop if two or more header artifacts
+        if hits >= 2:
             continue
-        cleaned_lines.append(line)
-    
-    # Reassemble the cleaned lines into a single string.
-    cleaned_text = "\n".join(cleaned_lines)
-    
-    # Collapse multiple consecutive newlines into a single newline.
-    cleaned_text = re.sub(r'\n+', '\n', cleaned_text)
-    
-    return cleaned_text
+        cleaned.append(line)
+
+    # reassemble and collapse extra blank lines
+    out = "\n".join(cleaned)
+    out = re.sub(r'\n{2,}', '\n', out)
+    return out
+
+
 
 
 
@@ -64,32 +115,64 @@ def extract_section_from_toc_line(line: str):
     """
     Extracts (section_number, section_title) from a TOC line in either style:
     
-      1.  Introduction . . . . . . . . . . . . . . . . . . . . . . .  5
-      2.1. Requirements Language
-      Appendix A. Other Implementation Notes . . . . . . . . . . . . 85
+      1.     Introduction ......................................    1
+      1.1   Specification of Requirements ...................    2
+      6.6   Address-and-Control-Field-Compression (ACFC)
+      Appendix A. Other Implementation Notes .................   85
 
     Returns (sec_num, sec_title) or None if no match.
     """
     pattern = re.compile(r"""
         ^\s*
-        (?:(Appendix)\s+)?                        # optional 'Appendix'
-        ([A-Za-z0-9]+(?:\.[A-Za-z0-9]+)*\.)       # section number with trailing dot
+        (?:(Appendix)\s+)?                   # optional 'Appendix'
+        ([A-Za-z0-9]+(?:\.[A-Za-z0-9]+)*)\.? # section number (e.g. 1, 1.1, 2.2.1) with optional dot
         \s+
-        (.+?)                                     # section title (non-greedy)
-        (?:
-            \s+(?:(?:\.\s*){2,}|\.{2,})\s*\d+\s*  # optional leader+dots+page#
-          | \s*$                                  # or end-of-line
-        )
+        (.+?)                                # section title (non-greedy)
+        (?:\s+\.{2,}\s*\d+)?                 # optional leader of dots + page#
+        \s*$
     """, re.VERBOSE)
 
     m = pattern.match(line)
     if not m:
         return None
+
     appendix, num, title = m.groups()
     title = title.strip()
     if appendix:
-        num = f"{appendix} {num}"
+        num = f"{appendix} {num}."
+    elif not num.endswith('.'):
+        num = num + '.'
     return num, title
+
+
+# def extract_section_from_toc_line(line: str):
+#     """
+#     Extracts (section_number, section_title) from a TOC line of the form:
+    
+#       1.  Introduction
+#       1.1.  Requirements Language
+#       Appendix A.  Checklist for Profile Requirements
+    
+#     Returns (sec_num, sec_title) or None if no match.
+#     """
+#     pattern = re.compile(r'''
+#         ^\s*
+#         (?:(Appendix)\s+)?                  # optional 'Appendix'
+#         ([0-9A-Za-z]+(?:\.[0-9A-Za-z]+)*\.) # section number (with trailing dot)
+#         \s+
+#         (.+?)                               # title (non-greedy)
+#         \s*$                                # optional trailing spaces then end-of-line
+#     ''', re.VERBOSE | re.IGNORECASE)
+
+#     m = pattern.match(line)
+#     if not m:
+#         return None
+
+#     appendix, num, title = m.groups()
+#     title = title.strip()
+#     if appendix:
+#         num = f"{appendix} {num}"
+#     return num, title
 
 
 def process_toc_file(input_file: str, output_file: str):
@@ -101,34 +184,27 @@ def process_toc_file(input_file: str, output_file: str):
     extracted = []
     kept = []
     toc_mode = False
-    toc_ended = False
 
     with open(input_file, "r", encoding="utf-8") as f:
         for line in f:
             if not toc_mode:
-                # look for the start of the TOC
                 if line.strip().lower().startswith("table of contents"):
                     toc_mode = True
-                    continue  # drop the “Table of Contents” line itself
-                else:
-                    kept.append(line)
+                    continue
+                kept.append(line)
             else:
-                # we are in TOC mode: try to extract
                 pair = extract_section_from_toc_line(line)
                 if pair:
                     extracted.append(pair)
                 elif line.strip() == "":
-                    # blank lines we just drop
+                    # drop blank lines inside TOC
                     continue
                 else:
-                    # first non-blank non-TOC line => TOC is done
+                    # first non-TOC line: exit TOC mode and keep it
                     toc_mode = False
-                    toc_ended = True
                     kept.append(line)
-            # once TOC has ended, we just keep the rest
-        # Note: if toc_mode stays True until EOF, that's fine too.
 
-    # write out the non-TOC content
+    # write back everything except the TOC block
     with open(output_file, "w", encoding="utf-8") as f:
         f.writelines(kept)
 
@@ -272,40 +348,40 @@ if __name__ == "__main__":
     # the protocol list
     # dirs = ["DCCP", "DHCP", "FTP", "IMAP", 
     #         "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP"]
+    # "MQTT", "PPTP", "BGP", "PPP"
     
-    
+    dirs = ["PPP"]
     '''---------------clean RFC file------------------------------'''
-    # for prot in dirs:
-    #     # check directory exists
-    #     if not os.path.isdir(prot):
-    #         print(f"Skipping '{prot}': not a directory.")
-    #         continue
+    for prot in dirs:
+        # check directory exists
+        if not os.path.isdir(prot):
+            print(f"Skipping '{prot}': not a directory.")
+            continue
 
-    #     # find all *_raw.txt files in this directory
-    #     raw_files = [f for f in os.listdir(prot) if f.endswith("_raw.txt")]
-    #     if not raw_files:
-    #         print(f"No '_raw.txt' files found in '{prot}/'.")
-    #         continue
+        # find all *_raw.txt files in this directory
+        raw_files = [f for f in os.listdir(prot) if f.endswith("_raw.txt")]
+        if not raw_files:
+            print(f"No '_raw.txt' files found in '{prot}/'.")
+            continue
 
-    #     # process each raw file
-    #     for raw_fn in raw_files:
-    #         raw_path = os.path.join(prot, raw_fn)
-    #         with open(raw_path, "r", encoding="utf-8") as f_in:
-    #             raw_text = f_in.read()
+        # process each raw file
+        for raw_fn in raw_files:
+            raw_path = os.path.join(prot, raw_fn)
+            with open(raw_path, "r", encoding="utf-8") as f_in:
+                raw_text = f_in.read()
 
-    #         clean_text = clean_rfc_headers(raw_text)
+            clean_text = clean_rfc_headers(raw_text)
 
-    #         # build cleaned filename by swapping suffix
-    #         cleaned_fn  = raw_fn.replace("_raw.txt", "_cleaned.txt")
-    #         cleaned_path = os.path.join(prot, cleaned_fn)
+            # build cleaned filename by swapping suffix
+            cleaned_fn  = raw_fn.replace("_raw.txt", "_cleaned.txt")
+            cleaned_path = os.path.join(prot, cleaned_fn)
 
-    #         with open(cleaned_path, "w", encoding="utf-8") as f_out:
-    #             f_out.write(clean_text)
+            with open(cleaned_path, "w", encoding="utf-8") as f_out:
+                f_out.write(clean_text)
 
-    #         print(f"{prot}/{raw_fn} → {prot}/{cleaned_fn}")
+            print(f"{prot}/{raw_fn} → {prot}/{cleaned_fn}")
     
     '''---------------extract the sections------------------------------'''
-    dirs = ["IMAP"]
     for prot in dirs:
         # check directory exists
         if not os.path.isdir(prot):
