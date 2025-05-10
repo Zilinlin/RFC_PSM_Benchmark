@@ -303,7 +303,7 @@ if __name__ == "__main__":
     # protocols = ["DCCP","DHCP", "FTP", "IMAP", 
     #              "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP"]
     
-    protocols = ["FTP", "SIP", "NNTP"]
+    protocols = ["MQTT", "PPP", "PPTP", "BGP"]
     
     # model = "deepseek-r1:14b"
     # models = ["deepseek-r1:32b","qwen3:32b","gemma3:27b"]
