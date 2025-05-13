@@ -1,0 +1,260 @@
+{
+  "states": [
+    "Client",
+    "Broker",
+    "ResourceServer",
+    "AuthorizationServer",
+    "Session",
+    "ApplicationMessage",
+    "MQTTControlPacket",
+    "Connected",
+    "NotAuthorized",
+    "ReceivingPublish",
+    "PublishingMessage",
+    "AuthorizationFailure",
+    "ReceivingSubscribe",
+    "Subscribing",
+    "AuthorizationSuccess",
+    "TokenExpired",
+    "Reauthentication",
+    "Authorized",
+    "Disconnected",
+    "SessionStored",
+    "WillMessageSent",
+    "Connecting",
+    "AuthorizationFailed",
+    "SessionResumed"
+  ],
+  "initial_state": "Client",
+  "final_states": [
+    "NotAuthorized",
+    "AuthorizationFailure",
+    "TokenExpired",
+    "Disconnected",
+    "AuthorizationFailed"
+  ],
+  "transitions": [
+    {
+      "from": "Client",
+      "event": "receive CONNECT",
+      "action": "send CONNACK",
+      "to": "Broker"
+    },
+    {
+      "from": "Broker",
+      "event": "receive PUBLISH",
+      "action": "send PUBACK",
+      "to": "Client"
+    },
+    {
+      "from": "Client",
+      "event": "receive SUBSCRIBE",
+      "action": "send SUBACK",
+      "to": "Broker"
+    },
+    {
+      "from": "Client",
+      "event": "receive PINGREQ",
+      "action": "send PINGRESP",
+      "to": "Broker"
+    },
+    {
+      "from": "Client",
+      "event": "receive DISCONNECT",
+      "action": "close connection",
+      "to": "Broker"
+    },
+    {
+      "from": "Client",
+      "event": "send TokenRequest",
+      "action": "reply AccessToken",
+      "to": "AuthorizationServer"
+    },
+    {
+      "from": "AuthorizationServer",
+      "event": "receive TokenRequest",
+      "action": "send AccessToken",
+      "to": "Client"
+    },
+    {
+      "from": "Client",
+      "event": "send ConnectionRequest",
+      "action": "reply CONNACK",
+      "to": "Broker"
+    },
+    {
+      "from": "Broker",
+      "event": "receive ConnectionRequest",
+      "action": "send CONNACK",
+      "to": "Connected"
+    },
+    {
+      "from": "Broker",
+      "event": "receive InvalidToken",
+      "action": "send CONNACK NotAuthorized",
+      "to": "NotAuthorized"
+    },
+    {
+      "from": "NotAuthorized",
+      "event": "send ASDiscovery",
+      "action": "reply ASRequestHints",
+      "to": "Client"
+    },
+    {
+      "from": "Connected",
+      "event": "send Publish",
+      "action": "reply PUBACK",
+      "to": "Broker"
+    },
+    {
+      "from": "ReceivingPublish",
+      "event": "receive PUBLISH",
+      "action": "check authorization",
+      "to": "PublishingMessage"
+    },
+    {
+      "from": "PublishingMessage",
+      "event": "authorization success",
+      "action": "send message",
+      "to": "ReceivingPublish"
+    },
+    {
+      "from": "PublishingMessage",
+      "event": "authorization failure",
+      "action": "reply 0x87",
+      "to": "AuthorizationFailure"
+    },
+    {
+      "from": "AuthorizationFailure",
+      "event": "receive QoS 0",
+      "action": "send DISCONNECT",
+      "to": "ReceivingPublish"
+    },
+    {
+      "from": "ReceivingSubscribe",
+      "event": "receive SUBSCRIBE",
+      "action": "check authorization",
+      "to": "Subscribing"
+    },
+    {
+      "from": "Subscribing",
+      "event": "authorization success",
+      "action": "send SUBACK",
+      "to": "ReceivingSubscribe"
+    },
+    {
+      "from": "Subscribing",
+      "event": "authorization failure",
+      "action": "reply 0x87",
+      "to": "ReceivingSubscribe"
+    },
+    {
+      "from": "Authorized",
+      "event": "receive CONNECT",
+      "action": "check token expiration",
+      "to": "TokenExpired"
+    },
+    {
+      "from": "Authorized",
+      "event": "receive PUBLISH",
+      "action": "check token expiration",
+      "to": "TokenExpired"
+    },
+    {
+      "from": "Authorized",
+      "event": "receive SUBSCRIBE",
+      "action": "check token expiration",
+      "to": "TokenExpired"
+    },
+    {
+      "from": "TokenExpired",
+      "event": "cond token expired",
+      "action": "send DISCONNECT",
+      "to": "Authorized"
+    },
+    {
+      "from": "TokenExpired",
+      "event": "receive AUTH",
+      "action": "accept reauthentication",
+      "to": "Authorized"
+    },
+    {
+      "from": "TokenExpired",
+      "event": "cond reauthentication failed",
+      "action": "send DISCONNECT",
+      "to": "Authorized"
+    },
+    {
+      "from": "Disconnected",
+      "event": "receive DISCONNECT",
+      "action": "set SessionStored true",
+      "to": "SessionStored"
+    },
+    {
+      "from": "SessionStored",
+      "event": "timeout token_expiry",
+      "action": "log discard_retained_message",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Disconnected",
+      "event": "receive CONNECT with Will",
+      "action": "set WillMessageSent true",
+      "to": "WillMessageSent"
+    },
+    {
+      "from": "WillMessageSent",
+      "event": "network_error",
+      "action": "send WillMessage",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Disconnected",
+      "event": "receive CONNECT",
+      "action": "set connecting true",
+      "to": "Connecting"
+    },
+    {
+      "from": "Connecting",
+      "event": "receive valid token",
+      "action": "set session_state true",
+      "to": "Connected"
+    },
+    {
+      "from": "Connecting",
+      "event": "receive invalid token",
+      "action": "reply 0x84",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Connected",
+      "event": "receive PUBLISH",
+      "action": "log success",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "receive PUBLISH unauthorized",
+      "action": "log failure",
+      "to": "AuthorizationFailed"
+    },
+    {
+      "from": "AuthorizationFailed",
+      "event": "receive valid token",
+      "action": "set session_state true",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "receive SUBSCRIBE",
+      "action": "reply 0x80",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "receive DISCONNECT",
+      "action": "close connection",
+      "to": "Disconnected"
+    }
+  ]
+}

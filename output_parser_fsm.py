@@ -179,7 +179,7 @@ if __name__ == "__main__":
     # protocols = ["DCCP","DHCP", "FTP", "IMAP", 
     #              "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP"]
     # TODO sip!
-    protocols = ["FTP", 'SIP', "NNTP"]
+    protocols = ["MQTT", 'PPP', "PPTP", "BGP"]
     close_models = ["deepseek-reasoner","gpt-4o-mini", "claude-3-7-sonnet-20250219","gemini-2.0-flash"]
     directory = "output"
     fsm_dir = "fsm"

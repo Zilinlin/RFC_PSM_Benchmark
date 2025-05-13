@@ -1,0 +1,779 @@
+{
+  "states": [
+    "Initial",
+    "Closed",
+    "Starting",
+    "ReqSent",
+    "AckRcvd",
+    "AckSent",
+    "Opened",
+    "Stopping",
+    "Closing",
+    "Stopped",
+    "Authenticate",
+    "Network",
+    "Terminate"
+  ],
+  "initial_state": "Initial",
+  "final_states": [
+    "Terminate"
+  ],
+  "transitions": [
+    {
+      "from": "Initial",
+      "event": "Up",
+      "action": "reply ThisLayerUp",
+      "to": "Closed"
+    },
+    {
+      "from": "Starting",
+      "event": "Up",
+      "action": "initializeRestartCount, send ConfigureRequest",
+      "to": "ReqSent"
+    },
+    {
+      "from": "Closed",
+      "event": "Down",
+      "action": "reply Initial",
+      "to": "Initial"
+    },
+    {
+      "from": "Stopped",
+      "event": "Down",
+      "action": "reply ThisLayerStarted",
+      "to": "Starting"
+    },
+    {
+      "from": "Closing",
+      "event": "Down",
+      "action": "reply Initial",
+      "to": "Initial"
+    },
+    {
+      "from": "Stopping",
+      "event": "Down",
+      "action": "reply ThisLayerStarted",
+      "to": "Starting"
+    },
+    {
+      "from": "Initial",
+      "event": "Open",
+      "action": "reply ThisLayerStarted",
+      "to": "Starting"
+    },
+    {
+      "from": "Starting",
+      "event": "Open",
+      "action": "reply Starting",
+      "to": "Starting"
+    },
+    {
+      "from": "Closed",
+      "event": "Open",
+      "action": "initializeRestartCount, send ConfigureRequest",
+      "to": "ReqSent"
+    },
+    {
+      "from": "Stopped",
+      "event": "Open",
+      "action": "reply Stopped",
+      "to": "Stopped"
+    },
+    {
+      "from": "Closing",
+      "event": "Open",
+      "action": "reply Stopping",
+      "to": "Stopping"
+    },
+    {
+      "from": "Stopping",
+      "event": "Open",
+      "action": "reply Stopping",
+      "to": "Stopping"
+    },
+    {
+      "from": "Initial",
+      "event": "Close",
+      "action": "reply Initial",
+      "to": "Initial"
+    },
+    {
+      "from": "Starting",
+      "event": "Close",
+      "action": "reply ThisLayerFinished",
+      "to": "Initial"
+    },
+    {
+      "from": "Closed",
+      "event": "Close",
+      "action": "reply Closed",
+      "to": "Closed"
+    },
+    {
+      "from": "Stopped",
+      "event": "Close",
+      "action": "reply Closed",
+      "to": "Closed"
+    },
+    {
+      "from": "Closing",
+      "event": "Close",
+      "action": "reply Closing",
+      "to": "Closing"
+    },
+    {
+      "from": "Stopping",
+      "event": "Close",
+      "action": "reply Stopping",
+      "to": "Stopping"
+    },
+    {
+      "from": "Closing",
+      "event": "timeout TO+",
+      "action": "send TerminateRequest",
+      "to": "Closing"
+    },
+    {
+      "from": "Stopping",
+      "event": "timeout TO+",
+      "action": "send TerminateRequest",
+      "to": "Stopping"
+    },
+    {
+      "from": "Closing",
+      "event": "timeout TO-",
+      "action": "reply ThisLayerFinished",
+      "to": "Closed"
+    },
+    {
+      "from": "Stopping",
+      "event": "timeout TO-",
+      "action": "reply ThisLayerFinished",
+      "to": "Stopped"
+    },
+    {
+      "from": "Closed",
+      "event": "receive RCR+",
+      "action": "send TerminateAck",
+      "to": "Closed"
+    },
+    {
+      "from": "Stopped",
+      "event": "receive RCR+",
+      "action": "initializeRestartCount, send ConfigureRequest, send ConfigureAck",
+      "to": "AckSent"
+    },
+    {
+      "from": "Closing",
+      "event": "receive RCR+",
+      "action": "reply Closing",
+      "to": "Closing"
+    },
+    {
+      "from": "Stopping",
+      "event": "receive RCR+",
+      "action": "reply Stopping",
+      "to": "Stopping"
+    },
+    {
+      "from": "Closed",
+      "event": "receive RCR-",
+      "action": "send TerminateAck",
+      "to": "Closed"
+    },
+    {
+      "from": "Stopped",
+      "event": "receive RCR-",
+      "action": "initializeRestartCount, send ConfigureRequest, send ConfigureNak",
+      "to": "ReqSent"
+    },
+    {
+      "from": "Closing",
+      "event": "receive RCR-",
+      "action": "reply Closing",
+      "to": "Closing"
+    },
+    {
+      "from": "Stopping",
+      "event": "receive RCR-",
+      "action": "reply Stopping",
+      "to": "Stopping"
+    },
+    {
+      "from": "Closed",
+      "event": "receive RCA",
+      "action": "send TerminateAck",
+      "to": "Closed"
+    },
+    {
+      "from": "Stopped",
+      "event": "receive RCA",
+      "action": "send ConfigureAck",
+      "to": "Stopped"
+    },
+    {
+      "from": "Closing",
+      "event": "receive RCA",
+      "action": "reply Closing",
+      "to": "Closing"
+    },
+    {
+      "from": "Stopping",
+      "event": "receive RCA",
+      "action": "reply Stopping",
+      "to": "Stopping"
+    },
+    {
+      "from": "Closed",
+      "event": "receive RCN",
+      "action": "send TerminateAck",
+      "to": "Closed"
+    },
+    {
+      "from": "Stopped",
+      "event": "receive RCN",
+      "action": "send ConfigureAck",
+      "to": "Stopped"
+    },
+    {
+      "from": "Closing",
+      "event": "receive RCN",
+      "action": "reply Closing",
+      "to": "Closing"
+    },
+    {
+      "from": "Stopping",
+      "event": "receive RCN",
+      "action": "reply Stopping",
+      "to": "Stopping"
+    },
+    {
+      "from": "Closed",
+      "event": "receive RTR",
+      "action": "send TerminateAck",
+      "to": "Closed"
+    },
+    {
+      "from": "Stopped",
+      "event": "receive RTR",
+      "action": "send ConfigureAck",
+      "to": "Stopped"
+    },
+    {
+      "from": "Closing",
+      "event": "receive RTR",
+      "action": "send ConfigureAck",
+      "to": "Closing"
+    },
+    {
+      "from": "Stopping",
+      "event": "receive RTR",
+      "action": "send ConfigureAck",
+      "to": "Stopping"
+    },
+    {
+      "from": "Closed",
+      "event": "receive RTA",
+      "action": "reply Closed",
+      "to": "Closed"
+    },
+    {
+      "from": "Stopped",
+      "event": "receive RTA",
+      "action": "reply Stopped",
+      "to": "Stopped"
+    },
+    {
+      "from": "Closing",
+      "event": "receive RTA",
+      "action": "reply ThisLayerFinished",
+      "to": "Closed"
+    },
+    {
+      "from": "Stopping",
+      "event": "receive RTA",
+      "action": "reply ThisLayerFinished",
+      "to": "Stopped"
+    },
+    {
+      "from": "Closed",
+      "event": "receive RUC",
+      "action": "send CodeReject",
+      "to": "Closed"
+    },
+    {
+      "from": "Stopped",
+      "event": "receive RUC",
+      "action": "send CodeReject",
+      "to": "Stopped"
+    },
+    {
+      "from": "Closing",
+      "event": "receive RUC",
+      "action": "send CodeReject",
+      "to": "Closing"
+    },
+    {
+      "from": "Stopping",
+      "event": "receive RUC",
+      "action": "send CodeReject",
+      "to": "Stopping"
+    },
+    {
+      "from": "Closed",
+      "event": "receive RXJ+",
+      "action": "reply Closed",
+      "to": "Closed"
+    },
+    {
+      "from": "Stopped",
+      "event": "receive RXJ+",
+      "action": "reply Stopped",
+      "to": "Stopped"
+    },
+    {
+      "from": "Closing",
+      "event": "receive RXJ+",
+      "action": "reply Closing",
+      "to": "Closing"
+    },
+    {
+      "from": "Stopping",
+      "event": "receive RXJ+",
+      "action": "reply Stopping",
+      "to": "Stopping"
+    },
+    {
+      "from": "Closed",
+      "event": "receive RXJ-",
+      "action": "reply ThisLayerFinished",
+      "to": "Closed"
+    },
+    {
+      "from": "Stopped",
+      "event": "receive RXJ-",
+      "action": "reply ThisLayerFinished",
+      "to": "Stopped"
+    },
+    {
+      "from": "Closing",
+      "event": "receive RXJ-",
+      "action": "reply ThisLayerFinished",
+      "to": "Closed"
+    },
+    {
+      "from": "Stopping",
+      "event": "receive RXJ-",
+      "action": "reply ThisLayerFinished",
+      "to": "Stopped"
+    },
+    {
+      "from": "Closed",
+      "event": "receive RXR",
+      "action": "reply Closed",
+      "to": "Closed"
+    },
+    {
+      "from": "Stopped",
+      "event": "receive RXR",
+      "action": "reply Stopped",
+      "to": "Stopped"
+    },
+    {
+      "from": "Closing",
+      "event": "receive RXR",
+      "action": "reply Closing",
+      "to": "Closing"
+    },
+    {
+      "from": "Stopping",
+      "event": "receive RXR",
+      "action": "reply Stopping",
+      "to": "Stopping"
+    },
+    {
+      "from": "ReqSent",
+      "event": "Up",
+      "action": "reply Starting",
+      "to": "Starting"
+    },
+    {
+      "from": "AckRcvd",
+      "event": "Up",
+      "action": "reply Starting",
+      "to": "Starting"
+    },
+    {
+      "from": "AckSent",
+      "event": "Up",
+      "action": "reply Starting",
+      "to": "Starting"
+    },
+    {
+      "from": "Opened",
+      "event": "Down",
+      "action": "reply ThisLayerDown",
+      "to": "Starting"
+    },
+    {
+      "from": "ReqSent",
+      "event": "Open",
+      "action": "reply ReqSent",
+      "to": "ReqSent"
+    },
+    {
+      "from": "AckRcvd",
+      "event": "Open",
+      "action": "reply AckRcvd",
+      "to": "AckRcvd"
+    },
+    {
+      "from": "AckSent",
+      "event": "Open",
+      "action": "reply AckSent",
+      "to": "AckSent"
+    },
+    {
+      "from": "Opened",
+      "event": "Open",
+      "action": "reply Opened",
+      "to": "Opened"
+    },
+    {
+      "from": "ReqSent",
+      "event": "Close",
+      "action": "initializeRestartCount, send TerminateRequest",
+      "to": "Closing"
+    },
+    {
+      "from": "AckRcvd",
+      "event": "Close",
+      "action": "initializeRestartCount, send TerminateRequest",
+      "to": "Closing"
+    },
+    {
+      "from": "AckSent",
+      "event": "Close",
+      "action": "initializeRestartCount, send TerminateRequest",
+      "to": "Closing"
+    },
+    {
+      "from": "Opened",
+      "event": "Close",
+      "action": "reply ThisLayerDown, initializeRestartCount, send TerminateRequest",
+      "to": "Closing"
+    },
+    {
+      "from": "ReqSent",
+      "event": "timeout TO+",
+      "action": "send ConfigureRequest",
+      "to": "ReqSent"
+    },
+    {
+      "from": "AckRcvd",
+      "event": "timeout TO+",
+      "action": "send ConfigureRequest",
+      "to": "AckRcvd"
+    },
+    {
+      "from": "AckSent",
+      "event": "timeout TO+",
+      "action": "send ConfigureRequest",
+      "to": "AckSent"
+    },
+    {
+      "from": "ReqSent",
+      "event": "timeout TO-",
+      "action": "reply ThisLayerFinished",
+      "to": "Stopped"
+    },
+    {
+      "from": "AckRcvd",
+      "event": "timeout TO-",
+      "action": "reply ThisLayerFinished",
+      "to": "Stopped"
+    },
+    {
+      "from": "AckSent",
+      "event": "timeout TO-",
+      "action": "reply ThisLayerFinished",
+      "to": "Stopped"
+    },
+    {
+      "from": "ReqSent",
+      "event": "receive RCR+",
+      "action": "send ConfigureAck",
+      "to": "AckSent"
+    },
+    {
+      "from": "AckRcvd",
+      "event": "receive RCR+",
+      "action": "send ConfigureAck, reply ThisLayerUp",
+      "to": "Opened"
+    },
+    {
+      "from": "AckSent",
+      "event": "receive RCR+",
+      "action": "send ConfigureAck",
+      "to": "AckSent"
+    },
+    {
+      "from": "Opened",
+      "event": "receive RCR+",
+      "action": "reply ThisLayerDown, send ConfigureRequest, send ConfigureAck",
+      "to": "AckSent"
+    },
+    {
+      "from": "ReqSent",
+      "event": "receive RCR-",
+      "action": "send ConfigureNak",
+      "to": "ReqSent"
+    },
+    {
+      "from": "AckRcvd",
+      "event": "receive RCR-",
+      "action": "send ConfigureNak",
+      "to": "AckRcvd"
+    },
+    {
+      "from": "AckSent",
+      "event": "receive RCR-",
+      "action": "send ConfigureNak",
+      "to": "ReqSent"
+    },
+    {
+      "from": "Opened",
+      "event": "receive RCR-",
+      "action": "reply ThisLayerDown, send ConfigureRequest, send ConfigureNak",
+      "to": "ReqSent"
+    },
+    {
+      "from": "ReqSent",
+      "event": "receive RCA",
+      "action": "initializeRestartCount",
+      "to": "AckRcvd"
+    },
+    {
+      "from": "AckRcvd",
+      "event": "receive RCA",
+      "action": "send ConfigureRequest",
+      "to": "ReqSent"
+    },
+    {
+      "from": "AckSent",
+      "event": "receive RCA",
+      "action": "initializeRestartCount, reply ThisLayerUp",
+      "to": "Opened"
+    },
+    {
+      "from": "Opened",
+      "event": "receive RCA",
+      "action": "reply ThisLayerDown, send ConfigureRequest",
+      "to": "ReqSent"
+    },
+    {
+      "from": "ReqSent",
+      "event": "receive RCN",
+      "action": "initializeRestartCount, send ConfigureRequest",
+      "to": "ReqSent"
+    },
+    {
+      "from": "AckRcvd",
+      "event": "receive RCN",
+      "action": "send ConfigureRequest",
+      "to": "ReqSent"
+    },
+    {
+      "from": "AckSent",
+      "event": "receive RCN",
+      "action": "initializeRestartCount, send ConfigureRequest",
+      "to": "ReqSent"
+    },
+    {
+      "from": "Opened",
+      "event": "receive RCN",
+      "action": "reply ThisLayerDown, send ConfigureRequest",
+      "to": "ReqSent"
+    },
+    {
+      "from": "ReqSent",
+      "event": "receive RTR",
+      "action": "send TerminateAck",
+      "to": "ReqSent"
+    },
+    {
+      "from": "AckRcvd",
+      "event": "receive RTR",
+      "action": "send TerminateAck",
+      "to": "AckRcvd"
+    },
+    {
+      "from": "AckSent",
+      "event": "receive RTR",
+      "action": "send TerminateAck",
+      "to": "AckSent"
+    },
+    {
+      "from": "Opened",
+      "event": "receive RTR",
+      "action": "reply ThisLayerDown, zeroRestartCount, send TerminateAck",
+      "to": "Stopping"
+    },
+    {
+      "from": "ReqSent",
+      "event": "receive RTA",
+      "action": "reply ReqSent",
+      "to": "ReqSent"
+    },
+    {
+      "from": "AckRcvd",
+      "event": "receive RTA",
+      "action": "reply AckRcvd",
+      "to": "AckRcvd"
+    },
+    {
+      "from": "AckSent",
+      "event": "receive RTA",
+      "action": "reply AckSent",
+      "to": "AckSent"
+    },
+    {
+      "from": "Opened",
+      "event": "receive RTA",
+      "action": "reply ThisLayerDown, send ConfigureRequest",
+      "to": "ReqSent"
+    },
+    {
+      "from": "ReqSent",
+      "event": "receive RUC",
+      "action": "send CodeReject",
+      "to": "ReqSent"
+    },
+    {
+      "from": "AckRcvd",
+      "event": "receive RUC",
+      "action": "send CodeReject",
+      "to": "AckRcvd"
+    },
+    {
+      "from": "AckSent",
+      "event": "receive RUC",
+      "action": "send CodeReject",
+      "to": "AckSent"
+    },
+    {
+      "from": "Opened",
+      "event": "receive RUC",
+      "action": "send CodeReject",
+      "to": "Opened"
+    },
+    {
+      "from": "ReqSent",
+      "event": "receive RXJ+",
+      "action": "reply ReqSent",
+      "to": "ReqSent"
+    },
+    {
+      "from": "AckRcvd",
+      "event": "receive RXJ+",
+      "action": "reply AckRcvd",
+      "to": "AckRcvd"
+    },
+    {
+      "from": "AckSent",
+      "event": "receive RXJ+",
+      "action": "reply AckSent",
+      "to": "AckSent"
+    },
+    {
+      "from": "Opened",
+      "event": "receive RXJ+",
+      "action": "reply Opened",
+      "to": "Opened"
+    },
+    {
+      "from": "ReqSent",
+      "event": "receive RXJ-",
+      "action": "reply ThisLayerFinished",
+      "to": "Stopped"
+    },
+    {
+      "from": "AckRcvd",
+      "event": "receive RXJ-",
+      "action": "reply ThisLayerFinished",
+      "to": "Stopped"
+    },
+    {
+      "from": "AckSent",
+      "event": "receive RXJ-",
+      "action": "reply ThisLayerFinished",
+      "to": "Stopped"
+    },
+    {
+      "from": "Opened",
+      "event": "receive RXJ-",
+      "action": "reply ThisLayerDown, initializeRestartCount, send TerminateRequest",
+      "to": "Stopping"
+    },
+    {
+      "from": "ReqSent",
+      "event": "receive RXR",
+      "action": "reply ReqSent",
+      "to": "ReqSent"
+    },
+    {
+      "from": "AckRcvd",
+      "event": "receive RXR",
+      "action": "reply AckRcvd",
+      "to": "AckRcvd"
+    },
+    {
+      "from": "AckSent",
+      "event": "receive RXR",
+      "action": "reply AckSent",
+      "to": "AckSent"
+    },
+    {
+      "from": "Opened",
+      "event": "receive RXR",
+      "action": "send EchoReply",
+      "to": "Opened"
+    },
+    {
+      "from": "Initial",
+      "event": "UP",
+      "action": "none",
+      "to": "Starting"
+    },
+    {
+      "from": "Starting",
+      "event": "OPENED",
+      "action": "none",
+      "to": "Authenticate"
+    },
+    {
+      "from": "Authenticate",
+      "event": "SUCCESS/NONE",
+      "action": "none",
+      "to": "Network"
+    },
+    {
+      "from": "Authenticate",
+      "event": "FAIL",
+      "action": "none",
+      "to": "Terminate"
+    },
+    {
+      "from": "Starting",
+      "event": "FAIL",
+      "action": "none",
+      "to": "Terminate"
+    },
+    {
+      "from": "Network",
+      "event": "CLOSING",
+      "action": "none",
+      "to": "Terminate"
+    }
+  ]
+}

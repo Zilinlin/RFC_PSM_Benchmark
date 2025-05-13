@@ -1,0 +1,159 @@
+{
+  "states": [
+    "ControlDisconnected",
+    "ControlConnecting",
+    "ControlConnected",
+    "CallIdle",
+    "CallOutgoing",
+    "CallIncoming",
+    "CallConnected",
+    "TransmittingData",
+    "TimeoutOccurred",
+    "WindowClosed",
+    "WindowOpen"
+  ],
+  "initial_state": "ControlDisconnected",
+  "final_states": [
+    "ControlDisconnected"
+  ],
+  "transitions": [
+    {
+      "from": "ControlDisconnected",
+      "event": "receive StartControlConnectionRequest",
+      "action": "send StartControlConnectionReply",
+      "to": "ControlConnecting"
+    },
+    {
+      "from": "ControlConnecting",
+      "event": "receive StartControlConnectionRequest",
+      "action": "send StartControlConnectionReply",
+      "to": "ControlConnecting"
+    },
+    {
+      "from": "ControlConnecting",
+      "event": "receive StartControlConnectionReply",
+      "action": "set connection parameters",
+      "to": "ControlConnected"
+    },
+    {
+      "from": "ControlConnected",
+      "event": "receive StopControlConnectionRequest",
+      "action": "send StopControlConnectionReply",
+      "to": "ControlDisconnected"
+    },
+    {
+      "from": "ControlConnected",
+      "event": "send EchoRequest",
+      "action": "wait for EchoReply",
+      "to": "ControlConnected"
+    },
+    {
+      "from": "ControlConnected",
+      "event": "receive EchoRequest",
+      "action": "send EchoReply",
+      "to": "ControlConnected"
+    },
+    {
+      "from": "ControlConnected",
+      "event": "timeout EchoReply",
+      "action": "close connection",
+      "to": "ControlDisconnected"
+    },
+    {
+      "from": "CallIdle",
+      "event": "receive OutgoingCallRequest",
+      "action": "send OutgoingCallReply",
+      "to": "CallOutgoing"
+    },
+    {
+      "from": "CallIdle",
+      "event": "receive IncomingCallRequest",
+      "action": "send IncomingCallReply",
+      "to": "CallIncoming"
+    },
+    {
+      "from": "CallOutgoing",
+      "event": "receive OutgoingCallReply",
+      "action": "set call parameters",
+      "to": "CallConnected"
+    },
+    {
+      "from": "CallIncoming",
+      "event": "receive IncomingCallReply",
+      "action": "send IncomingCallConnected",
+      "to": "CallConnected"
+    },
+    {
+      "from": "CallConnected",
+      "event": "receive CallClearRequest",
+      "action": "send CallDisconnectNotify",
+      "to": "CallIdle"
+    },
+    {
+      "from": "CallConnected",
+      "event": "cond call disconnected",
+      "action": "send CallDisconnectNotify",
+      "to": "CallIdle"
+    },
+    {
+      "from": "CallConnected",
+      "event": "send SetLinkInfo",
+      "action": "update link info",
+      "to": "CallConnected"
+    },
+    {
+      "from": "CallConnected",
+      "event": "send WanErrorNotify",
+      "action": "log wan error",
+      "to": "CallConnected"
+    },
+    {
+      "from": "TransmittingData",
+      "event": "send packet",
+      "action": "await acknowledgment",
+      "to": "TransmittingData"
+    },
+    {
+      "from": "TransmittingData",
+      "event": "timeout packet",
+      "action": "adjust window_size",
+      "to": "TimeoutOccurred"
+    },
+    {
+      "from": "TransmittingData",
+      "event": "receive acknowledgment",
+      "action": "adjust window_size",
+      "to": "WindowOpen"
+    },
+    {
+      "from": "TimeoutOccurred",
+      "event": "cond window_size_at_one",
+      "action": "resume transmission",
+      "to": "TransmittingData"
+    },
+    {
+      "from": "TimeoutOccurred",
+      "event": "cond window_size_gt_one",
+      "action": "resume transmission",
+      "to": "TransmittingData"
+    },
+    {
+      "from": "WindowOpen",
+      "event": "cond window_not_full",
+      "action": "continue transmission",
+      "to": "TransmittingData"
+    },
+    {
+      "from": "WindowOpen",
+      "event": "cond window_full",
+      "action": "stop transmission",
+      "to": "WindowClosed"
+    },
+    {
+      "from": "WindowClosed",
+      "event": "receive acknowledgment",
+      "action": "open window",
+      "to": "TransmittingData"
+    }
+  ]
+}

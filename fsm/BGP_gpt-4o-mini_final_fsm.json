@@ -1,0 +1,176 @@
+{
+  "states": [
+    "Idle",
+    "Established",
+    "Active",
+    "Error",
+    "OpenSent",
+    "OpenConfirm",
+    "Notification",
+    "Connect",
+    "Adj-RIB-In",
+    "Loc-RIB",
+    "Adj-RIBs-Out",
+    "OpenAttemptFailed",
+    "CommonVersionDetermined"
+  ],
+  "initial_state": "Idle",
+  "final_states": [
+    "Error",
+    "Notification",
+    "OpenAttemptFailed",
+    "CommonVersionDetermined"
+  ],
+  "transitions": [
+    {
+      "from": "Idle",
+      "event": "receive OPEN",
+      "action": "send OPEN_CONFIRM",
+      "to": "Established"
+    },
+    {
+      "from": "Idle",
+      "event": "receive OPEN",
+      "action": "accept new connection",
+      "to": "OpenConfirm"
+    },
+    {
+      "from": "Idle",
+      "event": "receive ManualStart",
+      "action": "set ConnectRetryCounter to 0",
+      "to": "Connect"
+    },
+    {
+      "from": "Idle",
+      "event": "receive AutomaticStart",
+      "action": "set ConnectRetryCounter to 0",
+      "to": "Connect"
+    },
+    {
+      "from": "Idle",
+      "event": "receive ManualStart_with_PassiveTcpEstablishment",
+      "action": "set ConnectRetryCounter to 0",
+      "to": "Active"
+    },
+    {
+      "from": "Idle",
+      "event": "receive AutomaticStart_with_PassiveTcpEstablishment",
+      "action": "set ConnectRetryCounter to 0",
+      "to": "Active"
+    },
+    {
+      "from": "OpenSent",
+      "event": "receive KEEPALIVE",
+      "action": "set OpenConfirm true",
+      "to": "OpenConfirm"
+    },
+    {
+      "from": "OpenSent",
+      "event": "receive NOTIFICATION",
+      "action": "close connection",
+      "to": "Notification"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "receive OPEN",
+      "action": "close existing connection",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "receive KEEPALIVE message",
+      "action": "restart HoldTimer",
+      "to": "Established"
+    },
+    {
+      "from": "Established",
+      "event": "receive UPDATE",
+      "action": "log route",
+      "to": "Active"
+    },
+    {
+      "from": "Established",
+      "event": "receive NOTIFICATION",
+      "action": "close connection",
+      "to": "Notification"
+    },
+    {
+      "from": "Established",
+      "event": "cond collision detected",
+      "action": "close new connection",
+      "to": "Established"
+    },
+    {
+      "from": "Active",
+      "event": "receive KEEPALIVE",
+      "action": "reset timer",
+      "to": "Active"
+    },
+    {
+      "from": "Connect",
+      "event": "timeout ConnectRetryTimer_Expires",
+      "action": "restart ConnectRetryTimer",
+      "to": "Connect"
+    },
+    {
+      "from": "Connect",
+      "event": "timeout DelayOpenTimer_Expires",
+      "action": "send OPEN message",
+      "to": "OpenSent"
+    },
+    {
+      "from": "Connect",
+      "event": "receive TcpConnectionFails",
+      "action": "set ConnectRetryCounter to 0",
+      "to": "Idle"
+    },
+    {
+      "from": "Adj-RIB-In",
+      "event": "process valid attribute",
+      "action": "update Adj-RIB-In",
+      "to": "Adj-RIB-In"
+    },
+    {
+      "from": "Adj-RIB-In",
+      "event": "receive WITHDRAWN ROUTES",
+      "action": "remove routes",
+      "to": "Adj-RIB-In"
+    },
+    {
+      "from": "Adj-RIB-In",
+      "event": "receive feasible route",
+      "action": "update Adj-RIB-In",
+      "to": "Adj-RIB-In"
+    },
+    {
+      "from": "Adj-RIB-In",
+      "event": "update Adj-RIB-In",
+      "action": "run Decision Process",
+      "to": "Loc-RIB"
+    },
+    {
+      "from": "Loc-RIB",
+      "event": "modify Loc-RIB",
+      "action": "run Phase 3",
+      "to": "Adj-RIBs-Out"
+    },
+    {
+      "from": "Adj-RIBs-Out",
+      "event": "complete update",
+      "action": "send UPDATE",
+      "to": "Established"
+    },
+    {
+      "from": "NegotiatingVersion",
+      "event": "receive OPEN Message Error",
+      "action": "set Unsupported Version Number",
+      "to": "OpenAttemptFailed"
+    },
+    {
+      "from": "OpenAttemptFailed",
+      "event": "cond common versions available",
+      "action": "reply highest common version",
+      "to": "CommonVersionDetermined"
+    }
+  ]
+}

@@ -1,0 +1,206 @@
+{
+  "states": [
+    "ControlConnectionEstablished",
+    "ControlConnectionClosed",
+    "WaitingForReply",
+    "OutgoingCallEstablished",
+    "IncomingCallEstablished",
+    "CallDisconnected",
+    "ErrorOccurred",
+    "Idle",
+    "WaitCtlReply",
+    "Established",
+    "WaitStopReply",
+    "WaitReply",
+    "WaitCsAns",
+    "WaitDisconnect",
+    "OpeningWindow",
+    "ClosingWindow",
+    "MultiPacketAcknowledgment",
+    "OutOfSequencePackets",
+    "AcknowledgmentTimeouts",
+    "CongestionControl"
+  ],
+  "initial_state": "Idle",
+  "final_states": [
+    "ControlConnectionClosed",
+    "CallDisconnected",
+    "ErrorOccurred"
+  ],
+  "transitions": [
+    {
+      "from": "ControlConnectionEstablished",
+      "event": "receive Start-Control-Connection-Request",
+      "action": "reply Start-Control-Connection-Reply",
+      "to": "WaitingForReply"
+    },
+    {
+      "from": "WaitingForReply",
+      "event": "receive Stop-Control-Connection-Request",
+      "action": "reply Stop-Control-Connection-Reply",
+      "to": "ControlConnectionClosed"
+    },
+    {
+      "from": "ControlConnectionEstablished",
+      "event": "receive Outgoing-Call-Request",
+      "action": "reply Outgoing-Call-Reply",
+      "to": "OutgoingCallEstablished"
+    },
+    {
+      "from": "ControlConnectionEstablished",
+      "event": "receive Incoming-Call-Request",
+      "action": "reply Incoming-Call-Reply",
+      "to": "IncomingCallEstablished"
+    },
+    {
+      "from": "OutgoingCallEstablished",
+      "event": "receive Call-Clear-Request",
+      "action": "reply Call-Disconnect-Notify",
+      "to": "CallDisconnected"
+    },
+    {
+      "from": "IncomingCallEstablished",
+      "event": "receive Call-Clear-Request",
+      "action": "reply Call-Disconnect-Notify",
+      "to": "CallDisconnected"
+    },
+    {
+      "from": "CallDisconnected",
+      "event": "receive WAN-Error-Notify",
+      "action": "log WAN error",
+      "to": "ErrorOccurred"
+    },
+    {
+      "from": "ErrorOccurred",
+      "event": "timeout 60s",
+      "action": "reset error state",
+      "to": "ControlConnectionEstablished"
+    },
+    {
+      "from": "Idle",
+      "event": "send StartControlConnectionRequest",
+      "action": "set WaitCtlReply",
+      "to": "WaitCtlReply"
+    },
+    {
+      "from": "WaitCtlReply",
+      "event": "receive StartControlConnectionReply Version OK",
+      "action": "set Established",
+      "to": "Established"
+    },
+    {
+      "from": "WaitCtlReply",
+      "event": "receive StartControlConnectionReply Version Not OK",
+      "action": "send StopControlConnectionRequest",
+      "to": "WaitStopReply"
+    },
+    {
+      "from": "Established",
+      "event": "receive StopControlConnectionRequest",
+      "action": "send StopControlConnectionReply",
+      "to": "WaitStopReply"
+    },
+    {
+      "from": "WaitStopReply",
+      "event": "receive StopControlConnectionReply",
+      "action": "close TCP",
+      "to": "Idle"
+    },
+    {
+      "from": "Idle",
+      "event": "receive IncomingCallRequest",
+      "action": "send IncomingCallReply",
+      "to": "WaitReply"
+    },
+    {
+      "from": "WaitReply",
+      "event": "receive IncomingCallReply Not Accepting",
+      "action": "set Idle",
+      "to": "Idle"
+    },
+    {
+      "from": "WaitReply",
+      "event": "receive IncomingCallReply Accepting",
+      "action": "send IncomingCallConnected",
+      "to": "Established"
+    },
+    {
+      "from": "Established",
+      "event": "receive CallDisconnectNotify",
+      "action": "send CallDisconnectNotify",
+      "to": "Idle"
+    },
+    {
+      "from": "Idle",
+      "event": "receive OutgoingCallRequest in Error",
+      "action": "send OutgoingCallReply with Error",
+      "to": "Idle"
+    },
+    {
+      "from": "Idle",
+      "event": "receive OutgoingCallRequest No Error",
+      "action": "set WaitCsAns",
+      "to": "WaitCsAns"
+    },
+    {
+      "from": "WaitCsAns",
+      "event": "receive CallClearRequest",
+      "action": "send CallDisconnectNotify",
+      "to": "Established"
+    },
+    {
+      "from": "Established",
+      "event": "receive CallClearRequest",
+      "action": "send CallDisconnectNotify",
+      "to": "Idle"
+    },
+    {
+      "from": "OpeningWindow",
+      "event": "receive data",
+      "action": "set window size",
+      "to": "OpeningWindow"
+    },
+    {
+      "from": "OpeningWindow",
+      "event": "timeout packet",
+      "action": "set window size to half",
+      "to": "ClosingWindow"
+    },
+    {
+      "from": "ClosingWindow",
+      "event": "receive acknowledgment",
+      "action": "increase window size",
+      "to": "OpeningWindow"
+    },
+    {
+      "from": "OpeningWindow",
+      "event": "receive packet",
+      "action": "acknowledge packet",
+      "to": "MultiPacketAcknowledgment"
+    },
+    {
+      "from": "MultiPacketAcknowledgment",
+      "event": "receive out-of-sequence packet",
+      "action": "discard packet",
+      "to": "OutOfSequencePackets"
+    },
+    {
+      "from": "OutOfSequencePackets",
+      "event": "receive valid packet",
+      "action": "acknowledge packet",
+      "to": "MultiPacketAcknowledgment"
+    },
+    {
+      "from": "AcknowledgmentTimeouts",
+      "event": "timeout acknowledgment",
+      "action": "adjust ATO",
+      "to": "CongestionControl"
+    },
+    {
+      "from": "CongestionControl",
+      "event": "timeout event",
+      "action": "increase ATO",
+      "to": "CongestionControl"
+    }
+  ]
+}

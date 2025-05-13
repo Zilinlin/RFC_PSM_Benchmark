@@ -1,0 +1,114 @@
+{
+  "states": [
+    "Connecting",
+    "ValidatingToken",
+    "ChallengeSent",
+    "Authenticated",
+    "Unauthorized",
+    "Reauthentication_Needed",
+    "Disconnected"
+  ],
+  "initial_state": "Connecting",
+  "final_states": [
+    "Unauthorized",
+    "Disconnected"
+  ],
+  "transitions": [
+    {
+      "from": "Connecting",
+      "event": "receive CONNECT with token",
+      "action": "reply AUTH challenge",
+      "to": "ChallengeSent"
+    },
+    {
+      "from": "Connecting",
+      "event": "receive CONNECT valid",
+      "action": "reply CONNACK 0x00",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Connecting",
+      "event": "receive invalid token",
+      "action": "reply CONNACK 0x87",
+      "to": "Unauthorized"
+    },
+    {
+      "from": "Connecting",
+      "event": "receive CONNECT invalid",
+      "action": "close connection",
+      "to": "Disconnected"
+    },
+    {
+      "from": "ChallengeSent",
+      "event": "receive valid AUTH response",
+      "action": "reply CONNACK 0x00",
+      "to": "Authenticated"
+    },
+    {
+      "from": "ChallengeSent",
+      "event": "receive invalid AUTH response",
+      "action": "reply CONNACK 0x87",
+      "to": "Unauthorized"
+    },
+    {
+      "from": "ValidatingToken",
+      "event": "token validation success",
+      "action": "reply CONNACK 0x00",
+      "to": "Authenticated"
+    },
+    {
+      "from": "ValidatingToken",
+      "event": "token validation failure",
+      "action": "reply CONNACK 0x87",
+      "to": "Unauthorized"
+    },
+    {
+      "from": "Authenticated",
+      "event": "send PUBACK Not_authorized",
+      "action": "reply Not_authorized",
+      "to": "Reauthentication_Needed"
+    },
+    {
+      "from": "Authenticated",
+      "event": "send SUBACK Not_authorized",
+      "action": "reply Not_authorized",
+      "to": "Reauthentication_Needed"
+    },
+    {
+      "from": "Authenticated",
+      "event": "send DISCONNECT Not_authorized",
+      "action": "reply Not_authorized",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Authenticated",
+      "event": "recv PUBLISH unauthorized",
+      "action": "close connection",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Authenticated",
+      "event": "recv SUBSCRIBE unauthorized",
+      "action": "reply SUBACK 0x80",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "cond token expired",
+      "action": "close connection",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Reauthentication_Needed",
+      "event": "recv AUTH Reauthentication",
+      "action": "process AUTH",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Reauthentication_Needed",
+      "event": "cond reauthentication_failed",
+      "action": "send DISCONNECT Not_authorized",
+      "to": "Disconnected"
+    }
+  ]
+}

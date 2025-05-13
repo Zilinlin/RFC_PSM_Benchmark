@@ -9,7 +9,13 @@ import glob
 import os
 import requests
 
+from openai import OpenAI
+
 from prompt_generation import build_fsm_extraction_prompt, build_fsm_combination_prompt
+
+client = OpenAI(
+  api_key="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"
+)
 
 # def build_fsm_extraction_prompt(protocol_name: str,
 #                                 section_title: str,
@@ -157,24 +163,37 @@ def parse_json_from_response(response: str) -> Union[Any, None]:
 #     return prompt
 
 
+# def call_ollama(model, prompt, temperature=0.0, max_tokens=10000):
+#     """
+#     Calls the local Ollama HTTP API and returns the generated text.
+#     """
+#     url = "http://localhost:11434/v1/completions"
+#     payload = {
+#         "model": model,
+#         "prompt": prompt,
+#         "temperature": temperature,
+#         "max_tokens": max_tokens
+#     }
+#     resp = requests.post(url, json=payload)
+#     resp.raise_for_status()  # will raise an HTTPError if the call failed
+#     data = resp.json()
+#     # Ollama uses the OpenAI-compatible response format:
+#     # { "choices": [ { "text": "..." } ], ... }
+#     return data["choices"][0]["text"]
 
-def call_ollama(model, prompt, temperature=0.0, max_tokens=10000):
+def call_api(model, prompt, temperature=0.0, max_tokens=8192):
     """
-    Calls the local Ollama HTTP API and returns the generated text.
+    Calls the chatgpt API and returns the generated text.
     """
-    url = "http://localhost:11434/v1/completions"
-    payload = {
-        "model": model,
-        "prompt": prompt,
-        "temperature": temperature,
-        "max_tokens": max_tokens
-    }
-    resp = requests.post(url, json=payload)
-    resp.raise_for_status()  # will raise an HTTPError if the call failed
-    data = resp.json()
-    # Ollama uses the OpenAI-compatible response format:
-    # { "choices": [ { "text": "..." } ], ... }
-    return data["choices"][0]["text"]
+    completion = client.chat.completions.create(
+        model=model,
+        messages=[
+            {"role": "user", "content": prompt}
+        ],
+        temperature=temperature,
+        max_tokens=max_tokens
+    )
+    return completion.choices[0].message.content
 
 
 # ── Workflow ──────────────────────────────────────────────────────────────────
@@ -204,22 +223,22 @@ def process_protocol(protocol_dir, model, verbose=True):
             print(f"\n--- Section {idx}/{len(segments)}: {tag} ---")
             #print("PROMPT:\n")
 
-        resp = call_ollama(model, prompt, temperature=0.0, max_tokens=10000)
+        resp = call_api(model, prompt, temperature=0.0, max_tokens=8192)
 
         #if verbose:
             #print("RAW RESPONSE:\n", resp)
 
-        #fsm = parse_json_from_response(resp)
+        # fsm = parse_json_from_response(resp)
 
-        #if verbose:
-        #    print("PARSED FSM:\n", json.dumps(fsm, indent=2))
+        # if verbose:
+        #     print("PARSED FSM:\n", json.dumps(fsm, indent=2))
 
         # store per‐section details
         sections.append({
             "tag": tag,
             "prompt": prompt,
-            "response": resp,
-            #"partial_fsm": fsm
+            "response": resp
+            # "partial_fsm": fsm
         })
         partials.append(resp)
 
@@ -233,7 +252,7 @@ def process_protocol(protocol_dir, model, verbose=True):
     # combine step
     combine_prompt = build_fsm_combination_prompt(partial_fsms=partials)
 
-    final_resp = call_ollama(model, combine_prompt, temperature=0.0, max_tokens=10000)
+    final_resp = call_api(model, combine_prompt, temperature=0.0, max_tokens=8192)
     if verbose:
         print("COMBINED RAW RESPONSE:\n", final_resp)
 
@@ -281,15 +300,21 @@ if __name__ == "__main__":
     # prompt = build_fsm_combination_prompt(partials)
     # print(prompt)
     
+    # protocols = ["DCCP","DHCP", "FTP", "IMAP", 
+    #              "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP"]
+    
     protocols = ["DCCP","DHCP", "FTP", "IMAP", 
-                 "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP",
-                 "MQTT", "PPP", "PPTP", "BGP"]
+                  "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP",
+                   "MQTT", "PPP", "PPTP", "BGP"]
     
     # model = "deepseek-r1:14b"
     # models = ["deepseek-r1:32b","qwen3:32b","gemma3:27b"]
     # models = ["mistral-small3.1"] # this is 24b
+    # models = ["qwq"] # 32b
     
-    models = ["qwq","qwen3:32b","gemma3:27b","mistral-small3.1"] # 32b
+    # models = ["deepseek-reasoner"]
+    # models = ["gpt-4o-mini"]
+    models = ["gpt-4.1"]
     for m in models:
         for d in protocols:
             process_protocol(d, m, verbose=True)

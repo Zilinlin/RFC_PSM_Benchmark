@@ -312,13 +312,16 @@ if __name__ == "__main__":
     # protocols = ["DCCP","DHCP", "FTP", "IMAP", 
     #              "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP"]
     # for testing the results
-    protocols = ["MQTT", "PPP", "PPTP", "BGP"]
+    protocols = ["MQTT", "PPP", "PPTP", "BGP", "DCCP","DHCP", "FTP", "IMAP",
+                 "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP"]
     # model = "deepseek-r1:14b"
     # models = ["deepseek-r1:32b","qwen3:32b","gemma3:27b"]
     # models = ["mistral-small3.1"] # this is 24b
     # models = ["qwq"] # 32b
     
-    models = ["deepseek-reasoner"]
+    #["deepseek-reasoner"]
+    # DeepSeek-V3-0324
+    models = ["deepseek-chat"]
     for m in models:
         for d in protocols:
             process_protocol(d, m, verbose=True)

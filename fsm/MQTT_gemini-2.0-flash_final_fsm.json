@@ -1,0 +1,326 @@
+{
+  "states": [
+    "Initial",
+    "AwaitingConnect",
+    "TokenValidation",
+    "ASDiscovery",
+    "Authenticated",
+    "SessionEstablished",
+    "ErrorState",
+    "ChallengeSent",
+    "ChallengeResponseReceived",
+    "PublishReceived",
+    "AuthorizePublish",
+    "PublishAuthorized",
+    "PublishUnauthorized",
+    "SubscribeReceived",
+    "AuthorizeSubscribe",
+    "SubscribeAuthorized",
+    "SubscribeUnauthorized",
+    "ForwardPublish",
+    "ReauthenticationRequested",
+    "Reauthenticating",
+    "Disconnected",
+    "Connecting",
+    "AuthorizationFailed",
+    "Publishing",
+    "Subscribing",
+    "PublishingForward"
+  ],
+  "initial_state": "Initial",
+  "final_states": [
+    "ErrorState",
+    "Disconnected",
+    "AuthorizationFailed"
+  ],
+  "transitions": [
+    {
+      "from": "Initial",
+      "event": "receive CONNECT",
+      "action": "collect ConnectData",
+      "to": "AwaitingConnect"
+    },
+    {
+      "from": "AwaitingConnect",
+      "event": "cond token_present",
+      "action": "start TokenValidation",
+      "to": "TokenValidation"
+    },
+    {
+      "from": "AwaitingConnect",
+      "event": "cond token_absent",
+      "action": "start ASDiscovery",
+      "to": "ASDiscovery"
+    },
+    {
+      "from": "TokenValidation",
+      "event": "cond token_valid",
+      "action": "reply CONNACK success",
+      "to": "Authenticated"
+    },
+    {
+      "from": "TokenValidation",
+      "event": "cond token_invalid",
+      "action": "reply CONNACK not_authorized",
+      "to": "ErrorState"
+    },
+    {
+      "from": "ASDiscovery",
+      "event": "send AS_hints",
+      "action": "reply CONNACK as_hints",
+      "to": "ErrorState"
+    },
+    {
+      "from": "Authenticated",
+      "event": "cond session_new",
+      "action": "reply CONNACK session_new",
+      "to": "SessionEstablished"
+    },
+    {
+      "from": "Authenticated",
+      "event": "cond session_resume",
+      "action": "reply CONNACK session_resume",
+      "to": "SessionEstablished"
+    },
+    {
+      "from": "SessionEstablished",
+      "event": "receive PUBLISH or SUBSCRIBE",
+      "action": "check TokenScope",
+      "to": "SessionEstablished"
+    },
+    {
+      "from": "AwaitingConnect",
+      "event": "receive CONNECT with token",
+      "action": "validate Token",
+      "to": "TokenValidation"
+    },
+    {
+      "from": "AwaitingConnect",
+      "event": "receive CONNECT with token",
+      "action": "send AUTH continue",
+      "to": "ChallengeSent"
+    },
+    {
+      "from": "ChallengeSent",
+      "event": "receive AUTH response",
+      "action": "validate challenge_response",
+      "to": "ChallengeResponseReceived"
+    },
+    {
+      "from": "ChallengeResponseReceived",
+      "event": "cond challenge_valid",
+      "action": "reply CONNACK success",
+      "to": "Authenticated"
+    },
+    {
+      "from": "ChallengeResponseReceived",
+      "event": "cond challenge_invalid",
+      "action": "reply CONNACK not_authorized",
+      "to": "ErrorState"
+    },
+    {
+      "from": "PublishReceived",
+      "event": "receive PUBLISH",
+      "action": "authorize publish",
+      "to": "AuthorizePublish"
+    },
+    {
+      "from": "AuthorizePublish",
+      "event": "cond authorized",
+      "action": "forward publish",
+      "to": "PublishAuthorized"
+    },
+    {
+      "from": "AuthorizePublish",
+      "event": "cond unauthorized",
+      "action": "reply Not authorized",
+      "to": "PublishUnauthorized"
+    },
+    {
+      "from": "PublishAuthorized",
+      "event": "send PUBLISH",
+      "action": "none",
+      "to": "ForwardPublish"
+    },
+    {
+      "from": "PublishUnauthorized",
+      "event": "QoS >= 1",
+      "action": "reply PUBACK/PUBREC",
+      "to": "PublishReceived"
+    },
+    {
+      "from": "PublishUnauthorized",
+      "event": "QoS == 0",
+      "action": "send DISCONNECT",
+      "to": "PublishReceived"
+    },
+    {
+      "from": "SubscribeReceived",
+      "event": "receive SUBSCRIBE",
+      "action": "authorize subscribe",
+      "to": "AuthorizeSubscribe"
+    },
+    {
+      "from": "AuthorizeSubscribe",
+      "event": "cond authorized",
+      "action": "reply SUBACK success",
+      "to": "SubscribeAuthorized"
+    },
+    {
+      "from": "AuthorizeSubscribe",
+      "event": "cond unauthorized",
+      "action": "reply SUBACK failure",
+      "to": "SubscribeUnauthorized"
+    },
+    {
+      "from": "ForwardPublish",
+      "event": "cond unauthorized",
+      "action": "send DISCONNECT",
+      "to": "ForwardPublish"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive CONNECT, PUBLISH, or SUBSCRIBE",
+      "action": "check token expiration",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive PINGREQ",
+      "action": "check token expiration",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "cond token expired",
+      "action": "send DISCONNECT",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive PUBACK or SUBACK",
+      "action": "check authorization",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "cond authorization lost",
+      "action": "send AUTH",
+      "to": "ReauthenticationRequested"
+    },
+    {
+      "from": "Authenticated",
+      "event": "send AUTH",
+      "action": "request reauthentication",
+      "to": "ReauthenticationRequested"
+    },
+    {
+      "from": "ReauthenticationRequested",
+      "event": "receive AUTH packet",
+      "action": "start reauthentication",
+      "to": "Reauthenticating"
+    },
+    {
+      "from": "Reauthenticating",
+      "event": "cond reauthentication fails",
+      "action": "send DISCONNECT",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Reauthenticating",
+      "event": "cond reauthentication succeeds",
+      "action": "set authenticated true",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Disconnected",
+      "event": "receive CONNECT",
+      "action": "send CONNACK",
+      "to": "Connecting"
+    },
+    {
+      "from": "Connecting",
+      "event": "cond valid token",
+      "action": "set Session Present",
+      "to": "Connected"
+    },
+    {
+      "from": "Connecting",
+      "event": "cond invalid token",
+      "action": "close connection",
+      "to": "AuthorizationFailed"
+    },
+    {
+      "from": "Connected",
+      "event": "receive PUBLISH",
+      "action": "process publish",
+      "to": "Publishing"
+    },
+    {
+      "from": "Publishing",
+      "event": "cond authorized",
+      "action": "send PUBACK",
+      "to": "Connected"
+    },
+    {
+      "from": "Publishing",
+      "event": "cond not authorized",
+      "action": "ignore PUBLISH and close",
+      "to": "AuthorizationFailed"
+    },
+    {
+      "from": "Connected",
+      "event": "receive SUBSCRIBE",
+      "action": "send SUBACK",
+      "to": "Subscribing"
+    },
+    {
+      "from": "Subscribing",
+      "event": "cond authorized",
+      "action": "record subscription",
+      "to": "Connected"
+    },
+    {
+      "from": "Subscribing",
+      "event": "cond not authorized",
+      "action": "reply suback failure",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "cond token expired",
+      "action": "close connection",
+      "to": "AuthorizationFailed"
+    },
+    {
+      "from": "Connected",
+      "event": "forward PUBLISH",
+      "action": "process forward",
+      "to": "PublishingForward"
+    },
+    {
+      "from": "PublishingForward",
+      "event": "cond subscriber authorized",
+      "action": "send PUBLISH",
+      "to": "Connected"
+    },
+    {
+      "from": "PublishingForward",
+      "event": "cond subscriber not authorized",
+      "action": "close connection",
+      "to": "AuthorizationFailed"
+    },
+    {
+      "from": "SessionEstablished",
+      "event": "receive PUBLISH",
+      "action": "authorize publish",
+      "to": "AuthorizePublish"
+    },
+    {
+      "from": "SessionEstablished",
+      "event": "receive SUBSCRIBE",
+      "action": "authorize subscribe",
+      "to": "AuthorizeSubscribe"
+    }
+  ]
+}

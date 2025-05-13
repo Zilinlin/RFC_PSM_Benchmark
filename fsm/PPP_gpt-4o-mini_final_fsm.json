@@ -1,0 +1,229 @@
+{
+  "states": [
+    "Dead",
+    "Establish",
+    "Opened",
+    "Authenticate",
+    "Terminate",
+    "Closing",
+    "Initial",
+    "Starting",
+    "Closed",
+    "Stopped",
+    "ReqSent",
+    "AckRcvd",
+    "AckSent",
+    "ReceivingConfigureAck",
+    "ReceivingConfigureNak",
+    "ReceivingConfigureReject",
+    "Authenticated",
+    "WaitingForConfigureRequest",
+    "SendingConfigureRequest"
+  ],
+  "initial_state": "Dead",
+  "final_states": [
+    "Dead",
+    "Stopped",
+    "Authenticated"
+  ],
+  "transitions": [
+    {
+      "from": "Dead",
+      "event": "Up",
+      "action": "open link",
+      "to": "Establish"
+    },
+    {
+      "from": "Establish",
+      "event": "recv Configure-Ack",
+      "action": "set link opened",
+      "to": "Opened"
+    },
+    {
+      "from": "Opened",
+      "event": "recv Authenticate",
+      "action": "set link authenticating",
+      "to": "Authenticate"
+    },
+    {
+      "from": "Authenticate",
+      "event": "recv success",
+      "action": "set link authenticated",
+      "to": "Opened"
+    },
+    {
+      "from": "Authenticate",
+      "event": "recv failure",
+      "action": "set link terminating",
+      "to": "Closing"
+    },
+    {
+      "from": "Opened",
+      "event": "recv Terminate",
+      "action": "set link closing",
+      "to": "Closing"
+    },
+    {
+      "from": "Closing",
+      "event": "recv Terminate-Ack",
+      "action": "disconnect physical layer",
+      "to": "Dead"
+    },
+    {
+      "from": "Initial",
+      "event": "receive Up",
+      "action": "set irc,send Configure-Request",
+      "to": "Starting"
+    },
+    {
+      "from": "Starting",
+      "event": "receive Up",
+      "action": "set 1",
+      "to": "Starting"
+    },
+    {
+      "from": "Starting",
+      "event": "receive Down",
+      "action": "log 0",
+      "to": "Closed"
+    },
+    {
+      "from": "Starting",
+      "event": "receive Open",
+      "action": "set This-Layer-Started",
+      "to": "Starting"
+    },
+    {
+      "from": "Closed",
+      "event": "receive Down",
+      "action": "set 0",
+      "to": "Initial"
+    },
+    {
+      "from": "Closed",
+      "event": "receive Open",
+      "action": "set This-Layer-Started,send Configure-Request",
+      "to": "Stopped"
+    },
+    {
+      "from": "Stopped",
+      "event": "receive Up",
+      "action": "set 3",
+      "to": "Stopped"
+    },
+    {
+      "from": "Stopped",
+      "event": "receive Close",
+      "action": "set 2",
+      "to": "Closed"
+    },
+    {
+      "from": "Closing",
+      "event": "receive Up",
+      "action": "set 4",
+      "to": "Closed"
+    },
+    {
+      "from": "ReqSent",
+      "event": "receive Up",
+      "action": "set 6",
+      "to": "ReqSent"
+    },
+    {
+      "from": "AckRcvd",
+      "event": "receive Up",
+      "action": "set 7",
+      "to": "AckRcvd"
+    },
+    {
+      "from": "AckSent",
+      "event": "receive Up",
+      "action": "set 8",
+      "to": "AckSent"
+    },
+    {
+      "from": "Opened",
+      "event": "receive Up",
+      "action": "set 9",
+      "to": "Opened"
+    },
+    {
+      "from": "Opened",
+      "event": "receive Configure-Request",
+      "action": "reply Configure-Ack",
+      "to": "Opened"
+    },
+    {
+      "from": "Opened",
+      "event": "receive Configure-Request",
+      "action": "reply Configure-Nak",
+      "to": "Opened"
+    },
+    {
+      "from": "Opened",
+      "event": "receive Configure-Request",
+      "action": "reply Configure-Reject",
+      "to": "Opened"
+    },
+    {
+      "from": "Opened",
+      "event": "receive Terminate-Request",
+      "action": "reply Terminate-Ack",
+      "to": "Closed"
+    },
+    {
+      "from": "Opened",
+      "event": "receive Echo-Request",
+      "action": "reply Echo-Reply",
+      "to": "Opened"
+    },
+    {
+      "from": "Opened",
+      "event": "receive Code-Reject",
+      "action": "log problem",
+      "to": "Closed"
+    },
+    {
+      "from": "Closed",
+      "event": "receive Terminate-Ack",
+      "action": "log closure",
+      "to": "Stopped"
+    },
+    {
+      "from": "WaitingForConfigureRequest",
+      "event": "receive Configure-Request",
+      "action": "send Configure-Ack",
+      "to": "ReceivingConfigureAck"
+    },
+    {
+      "from": "WaitingForConfigureRequest",
+      "event": "receive Configure-Request with invalid Length",
+      "action": "send Configure-Nak",
+      "to": "ReceivingConfigureNak"
+    },
+    {
+      "from": "WaitingForConfigureRequest",
+      "event": "receive Configure-Request with Magic-Number",
+      "action": "send Configure-Nak with different Magic-Number",
+      "to": "ReceivingConfigureNak"
+    },
+    {
+      "from": "ReceivingConfigureAck",
+      "event": "receive Configure-Ack",
+      "action": "set authenticated true",
+      "to": "Authenticated"
+    },
+    {
+      "from": "ReceivingConfigureNak",
+      "event": "receive Configure-Nak",
+      "action": "set new Magic-Number",
+      "to": "SendingConfigureRequest"
+    },
+    {
+      "from": "ReceivingConfigureReject",
+      "event": "receive Configure-Reject",
+      "action": "log rejection",
+      "to": "WaitingForConfigureRequest"
+    }
+  ]
+}

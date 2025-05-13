@@ -1,0 +1,625 @@
+{
+  "states": [
+    "Idle",
+    "Connect",
+    "Active",
+    "OpenSent",
+    "OpenConfirm",
+    "Established",
+    "DecisionProcessPhase1",
+    "DecisionProcessPhase2",
+    "DecisionProcessPhase3"
+  ],
+  "initial_state": "Idle",
+  "final_states": [
+    "DecisionProcessPhase3"
+  ],
+  "transitions": [
+    {
+      "from": "Idle",
+      "event": "ManualStart",
+      "action": "initiate TCP connection",
+      "to": "Connect"
+    },
+    {
+      "from": "Idle",
+      "event": "AutomaticStart",
+      "action": "initiate TCP connection",
+      "to": "Connect"
+    },
+    {
+      "from": "Idle",
+      "event": "ManualStart_with_PassiveTcpEstablishment",
+      "action": "listen for connection",
+      "to": "Active"
+    },
+    {
+      "from": "Idle",
+      "event": "AutomaticStart_with_PassiveTcpEstablishment",
+      "action": "listen for connection",
+      "to": "Active"
+    },
+    {
+      "from": "Connect",
+      "event": "ManualStop",
+      "action": "drop TCP connection",
+      "to": "Idle"
+    },
+    {
+      "from": "Connect",
+      "event": "ConnectRetryTimer_Expires",
+      "action": "restart ConnectRetryTimer",
+      "to": "Connect"
+    },
+    {
+      "from": "Connect",
+      "event": "DelayOpenTimer_Expires",
+      "action": "send OPEN message",
+      "to": "OpenSent"
+    },
+    {
+      "from": "Connect",
+      "event": "TcpConnection_Valid",
+      "action": "process TCP connection",
+      "to": "Connect"
+    },
+    {
+      "from": "Connect",
+      "event": "Tcp_CR_Invalid",
+      "action": "reject TCP connection",
+      "to": "Connect"
+    },
+    {
+      "from": "Connect",
+      "event": "TcpConnectionConfirmed",
+      "action": "stop ConnectRetryTimer",
+      "to": "Connect"
+    },
+    {
+      "from": "Connect",
+      "event": "TcpConnectionConfirmed",
+      "action": "send OPEN message",
+      "to": "OpenSent"
+    },
+    {
+      "from": "Connect",
+      "event": "Tcp_CR_Acked",
+      "action": "stop ConnectRetryTimer",
+      "to": "Connect"
+    },
+    {
+      "from": "Connect",
+      "event": "Tcp_CR_Acked",
+      "action": "send OPEN message",
+      "to": "OpenSent"
+    },
+    {
+      "from": "Connect",
+      "event": "TcpConnectionFails",
+      "action": "restart ConnectRetryTimer",
+      "to": "Active"
+    },
+    {
+      "from": "Connect",
+      "event": "TcpConnectionFails",
+      "action": "drop TCP connection",
+      "to": "Idle"
+    },
+    {
+      "from": "Connect",
+      "event": "BGPOpen with DelayOpenTimer running",
+      "action": "stop ConnectRetryTimer",
+      "to": "OpenConfirm"
+    },
+    {
+      "from": "Connect",
+      "event": "BGPHeaderErr",
+      "action": "send NOTIFICATION message",
+      "to": "Idle"
+    },
+    {
+      "from": "Connect",
+      "event": "BGPOpenMsgErr",
+      "action": "send NOTIFICATION message",
+      "to": "Idle"
+    },
+    {
+      "from": "Connect",
+      "event": "NotifMsgVerErr",
+      "action": "drop TCP connection",
+      "to": "Idle"
+    },
+    {
+      "from": "Connect",
+      "event": "NotifMsgVerErr",
+      "action": "increment ConnectRetryCounter",
+      "to": "Idle"
+    },
+    {
+      "from": "Connect",
+      "event": "NotifMsg",
+      "action": "increment ConnectRetryCounter",
+      "to": "Idle"
+    },
+    {
+      "from": "Connect",
+      "event": "KeepAliveMsg",
+      "action": "increment ConnectRetryCounter",
+      "to": "Idle"
+    },
+    {
+      "from": "Connect",
+      "event": "UpdateMsg",
+      "action": "increment ConnectRetryCounter",
+      "to": "Idle"
+    },
+    {
+      "from": "Connect",
+      "event": "UpdateMsgErr",
+      "action": "increment ConnectRetryCounter",
+      "to": "Idle"
+    },
+    {
+      "from": "Active",
+      "event": "ManualStop",
+      "action": "send NOTIFICATION Cease",
+      "to": "Idle"
+    },
+    {
+      "from": "Active",
+      "event": "ConnectRetryTimer_Expires",
+      "action": "restart ConnectRetryTimer",
+      "to": "Connect"
+    },
+    {
+      "from": "Active",
+      "event": "DelayOpenTimer_Expires",
+      "action": "send OPEN message",
+      "to": "OpenSent"
+    },
+    {
+      "from": "Active",
+      "event": "TcpConnection_Valid",
+      "action": "process TCP connection",
+      "to": "Active"
+    },
+    {
+      "from": "Active",
+      "event": "Tcp_CR_Invalid",
+      "action": "reject TCP connection",
+      "to": "Active"
+    },
+    {
+      "from": "Active",
+      "event": "TcpConnectionConfirmed",
+      "action": "stop ConnectRetryTimer",
+      "to": "Active"
+    },
+    {
+      "from": "Active",
+      "event": "TcpConnectionConfirmed",
+      "action": "send OPEN message",
+      "to": "OpenSent"
+    },
+    {
+      "from": "Active",
+      "event": "Tcp_CR_Acked",
+      "action": "stop ConnectRetryTimer",
+      "to": "Active"
+    },
+    {
+      "from": "Active",
+      "event": "Tcp_CR_Acked",
+      "action": "send OPEN message",
+      "to": "OpenSent"
+    },
+    {
+      "from": "Active",
+      "event": "TcpConnectionFails",
+      "action": "restart ConnectRetryTimer",
+      "to": "Idle"
+    },
+    {
+      "from": "Active",
+      "event": "BGPOpen with DelayOpenTimer running",
+      "action": "stop ConnectRetryTimer",
+      "to": "OpenConfirm"
+    },
+    {
+      "from": "Active",
+      "event": "BGPHeaderErr",
+      "action": "send NOTIFICATION message",
+      "to": "Idle"
+    },
+    {
+      "from": "Active",
+      "event": "BGPOpenMsgErr",
+      "action": "send NOTIFICATION message",
+      "to": "Idle"
+    },
+    {
+      "from": "Active",
+      "event": "NotifMsgVerErr",
+      "action": "drop TCP connection",
+      "to": "Idle"
+    },
+    {
+      "from": "Active",
+      "event": "NotifMsgVerErr",
+      "action": "increment ConnectRetryCounter",
+      "to": "Idle"
+    },
+    {
+      "from": "Active",
+      "event": "NotifMsg",
+      "action": "increment ConnectRetryCounter",
+      "to": "Idle"
+    },
+    {
+      "from": "Active",
+      "event": "KeepAliveMsg",
+      "action": "increment ConnectRetryCounter",
+      "to": "Idle"
+    },
+    {
+      "from": "Active",
+      "event": "UpdateMsg",
+      "action": "increment ConnectRetryCounter",
+      "to": "Idle"
+    },
+    {
+      "from": "Active",
+      "event": "UpdateMsgErr",
+      "action": "increment ConnectRetryCounter",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenSent",
+      "event": "ManualStop",
+      "action": "send NOTIFICATION Cease",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenSent",
+      "event": "AutomaticStop",
+      "action": "send NOTIFICATION Cease",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenSent",
+      "event": "HoldTimer_Expires",
+      "action": "send NOTIFICATION Expired",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenSent",
+      "event": "TcpConnectionFails",
+      "action": "restart ConnectRetryTimer",
+      "to": "Active"
+    },
+    {
+      "from": "OpenSent",
+      "event": "BGPOpen",
+      "action": "send KEEPALIVE message",
+      "to": "OpenConfirm"
+    },
+    {
+      "from": "OpenSent",
+      "event": "BGPHeaderErr",
+      "action": "send NOTIFICATION message",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenSent",
+      "event": "BGPOpenMsgErr",
+      "action": "send NOTIFICATION message",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenSent",
+      "event": "OpenCollisionDump",
+      "action": "send NOTIFICATION Cease",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenSent",
+      "event": "NotifMsgVerErr",
+      "action": "drop TCP connection",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenSent",
+      "event": "NotifMsg",
+      "action": "send NOTIFICATION Error",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenSent",
+      "event": "KeepAliveMsg",
+      "action": "send NOTIFICATION Error",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenSent",
+      "event": "UpdateMsg",
+      "action": "send NOTIFICATION Error",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenSent",
+      "event": "UpdateMsgErr",
+      "action": "send NOTIFICATION Error",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "ManualStop",
+      "action": "send NOTIFICATION message",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "AutomaticStop",
+      "action": "send NOTIFICATION message",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "HoldTimer_Expires",
+      "action": "send NOTIFICATION Expired",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "KeepaliveTimer_Expires",
+      "action": "send KEEPALIVE message",
+      "to": "OpenConfirm"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "TcpConnectionFails",
+      "action": "drop TCP connection",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "NotifMsgVerErr",
+      "action": "drop TCP connection",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "BGPOpen",
+      "action": "send NOTIFICATION Cease",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "BGPHeaderErr",
+      "action": "send NOTIFICATION message",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "BGPOpenMsgErr",
+      "action": "send NOTIFICATION message",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "OpenCollisionDump",
+      "action": "send NOTIFICATION Cease",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "KeepAliveMsg",
+      "action": "restart HoldTimer",
+      "to": "Established"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "NotifMsg",
+      "action": "send NOTIFICATION Error",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "UpdateMsg",
+      "action": "send NOTIFICATION Error",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "UpdateMsgErr",
+      "action": "send NOTIFICATION Error",
+      "to": "Idle"
+    },
+    {
+      "from": "Established",
+      "event": "ManualStop",
+      "action": "send NOTIFICATION message",
+      "to": "Idle"
+    },
+    {
+      "from": "Established",
+      "event": "AutomaticStop",
+      "action": "send NOTIFICATION Cease",
+      "to": "Idle"
+    },
+    {
+      "from": "Established",
+      "event": "HoldTimer_Expires",
+      "action": "send NOTIFICATION Expired",
+      "to": "Idle"
+    },
+    {
+      "from": "Established",
+      "event": "KeepaliveTimer_Expires",
+      "action": "send KEEPALIVE message",
+      "to": "Established"
+    },
+    {
+      "from": "Established",
+      "event": "BGPOpen",
+      "action": "send NOTIFICATION Cease",
+      "to": "Idle"
+    },
+    {
+      "from": "Established",
+      "event": "OpenCollisionDump",
+      "action": "send NOTIFICATION Cease",
+      "to": "Idle"
+    },
+    {
+      "from": "Established",
+      "event": "NotifMsgVerErr",
+      "action": "drop TCP connection",
+      "to": "Idle"
+    },
+    {
+      "from": "Established",
+      "event": "TcpConnectionFails",
+      "action": "drop TCP connection",
+      "to": "Idle"
+    },
+    {
+      "from": "Established",
+      "event": "NotifMsg",
+      "action": "drop TCP connection",
+      "to": "Idle"
+    },
+    {
+      "from": "Established",
+      "event": "KeepAliveMsg",
+      "action": "restart HoldTimer",
+      "to": "Established"
+    },
+    {
+      "from": "Established",
+      "event": "UpdateMsg",
+      "action": "restart HoldTimer",
+      "to": "Established"
+    },
+    {
+      "from": "Established",
+      "event": "UpdateMsgErr",
+      "action": "send NOTIFICATION Update",
+      "to": "Idle"
+    },
+    {
+      "from": "Established",
+      "event": "BGPHeaderErr",
+      "action": "send NOTIFICATION Error",
+      "to": "Idle"
+    },
+    {
+      "from": "Established",
+      "event": "BGPOpenMsgErr",
+      "action": "send NOTIFICATION Error",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "receive OPEN with collision and localBGPIdentifier < remoteBGPIdentifier",
+      "action": "close existing connection",
+      "to": "Connect"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "receive OPEN with collision and localBGPIdentifier >= remoteBGPIdentifier",
+      "action": "close newly created connection",
+      "to": "OpenConfirm"
+    },
+    {
+      "from": "OpenSent",
+      "event": "receive OPEN with collision and localBGPIdentifier < remoteBGPIdentifier",
+      "action": "close existing connection",
+      "to": "Connect"
+    },
+    {
+      "from": "OpenSent",
+      "event": "receive OPEN with collision and localBGPIdentifier >= remoteBGPIdentifier",
+      "action": "close newly created connection",
+      "to": "OpenSent"
+    },
+    {
+      "from": "Established",
+      "event": "receive OPEN with collision",
+      "action": "close newly created connection",
+      "to": "Established"
+    },
+    {
+      "from": "Established",
+      "event": "receive UPDATE message",
+      "action": "check validity",
+      "to": "Established"
+    },
+    {
+      "from": "Established",
+      "event": "receive UPDATE message with withdrawn routes",
+      "action": "remove routes from Adj-RIB-In",
+      "to": "Established"
+    },
+    {
+      "from": "Established",
+      "event": "receive UPDATE message with feasible route",
+      "action": "update Adj-RIB-In",
+      "to": "Established"
+    },
+    {
+      "from": "Established",
+      "event": "Adj-RIB-In updated",
+      "action": "run Decision Process",
+      "to": "Established"
+    },
+    {
+      "from": "Established",
+      "event": "receive new route, replacement route, or withdrawn routes",
+      "action": "invoke Phase 1",
+      "to": "DecisionProcessPhase1"
+    },
+    {
+      "from": "DecisionProcessPhase1",
+      "event": "Phase 1 completes",
+      "action": "invoke Phase 2",
+      "to": "DecisionProcessPhase2"
+    },
+    {
+      "from": "DecisionProcessPhase2",
+      "event": "Phase 2 completes",
+      "action": "invoke Phase 3",
+      "to": "DecisionProcessPhase3"
+    },
+    {
+      "from": "DecisionProcessPhase2",
+      "event": "immediate next-hop or IGP cost changes",
+      "action": "perform Phase 2",
+      "to": "DecisionProcessPhase2"
+    },
+    {
+      "from": "DecisionProcessPhase3",
+      "event": "routes in Loc-RIB to local destinations changed",
+      "action": "invoke Phase 3",
+      "to": "DecisionProcessPhase3"
+    },
+    {
+      "from": "DecisionProcessPhase3",
+      "event": "locally generated routes changed",
+      "action": "invoke Phase 3",
+      "to": "DecisionProcessPhase3"
+    },
+    {
+      "from": "DecisionProcessPhase3",
+      "event": "new BGP speaker connection established",
+      "action": "invoke Phase 3",
+      "to": "DecisionProcessPhase3"
+    },
+    {
+      "from": "DecisionProcessPhase3",
+      "event": "updating Adj-RIBs-Out and Routing Table complete",
+      "action": "run Update-Send process",
+      "to": "DecisionProcessPhase3"
+    }
+  ]
+}

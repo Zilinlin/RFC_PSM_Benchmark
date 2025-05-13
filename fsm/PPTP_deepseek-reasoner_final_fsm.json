@@ -1,0 +1,127 @@
+{
+  "states": [
+    "idle",
+    "wait_ctl_reply",
+    "established",
+    "wait_stop_reply",
+    "wait_reply",
+    "wait_disconnect",
+    "wait_connect",
+    "wait_cs_ans"
+  ],
+  "initial_state": "idle",
+  "final_states": [
+    "wait_connect",
+    "wait_cs_ans"
+  ],
+  "transitions": [
+    {
+      "from": "idle",
+      "event": "send Start-Control-Connection-Request",
+      "action": "send Start-Control-Connection-Request",
+      "to": "wait_ctl_reply"
+    },
+    {
+      "from": "idle",
+      "event": "receive Start-Control-Connection-Request version OK",
+      "action": "send Start-Control-Connection-Reply",
+      "to": "established"
+    },
+    {
+      "from": "wait_ctl_reply",
+      "event": "receive Start-Control-Connection-Reply version OK",
+      "action": "none",
+      "to": "established"
+    },
+    {
+      "from": "wait_ctl_reply",
+      "event": "receive Start-Control-Connection-Reply version not OK",
+      "action": "send Stop-Control-Connection-Request",
+      "to": "wait_stop_reply"
+    },
+    {
+      "from": "established",
+      "event": "local terminate",
+      "action": "send Stop-Control-Connection-Request",
+      "to": "wait_stop_reply"
+    },
+    {
+      "from": "established",
+      "event": "receive Stop-Control-Connection-Request",
+      "action": "send Stop-Control-Connection-Reply",
+      "to": "idle"
+    },
+    {
+      "from": "wait_stop_reply",
+      "event": "receive Stop-Control-Connection-Reply",
+      "action": "close TCP",
+      "to": "idle"
+    },
+    {
+      "from": "idle",
+      "event": "receive Incoming-Call-Request",
+      "action": "send Incoming-Call-Request",
+      "to": "wait_reply"
+    },
+    {
+      "from": "wait_reply",
+      "event": "receive Incoming-Call-Reply not accepting",
+      "action": "none",
+      "to": "idle"
+    },
+    {
+      "from": "wait_reply",
+      "event": "receive Incoming-Call-Reply accepting",
+      "action": "send Incoming-Call-Connected",
+      "to": "established"
+    },
+    {
+      "from": "established",
+      "event": "telco disconnect",
+      "action": "send Call-Disconnect-Notify",
+      "to": "idle"
+    },
+    {
+      "from": "idle",
+      "event": "send Outgoing-Call-Request",
+      "action": "send Outgoing-Call-Request",
+      "to": "wait_reply"
+    },
+    {
+      "from": "wait_reply",
+      "event": "receive Outgoing-Call-Reply error",
+      "action": "none",
+      "to": "idle"
+    },
+    {
+      "from": "wait_reply",
+      "event": "receive Outgoing-Call-Reply success",
+      "action": "none",
+      "to": "established"
+    },
+    {
+      "from": "established",
+      "event": "send Call-Clear-Request",
+      "action": "send Call-Clear-Request",
+      "to": "wait_disconnect"
+    },
+    {
+      "from": "wait_disconnect",
+      "event": "receive Call-Disconnect-Notify",
+      "action": "none",
+      "to": "idle"
+    },
+    {
+      "from": "idle",
+      "event": "receive Start-Control-Connection-Request",
+      "action": "reply Start-Control-Connection-Reply",
+      "to": "established"
+    },
+    {
+      "from": "established",
+      "event": "send Stop-Control-Connection-Request",
+      "action": "none",
+      "to": "wait_stop_reply"
+    }
+  ]
+}

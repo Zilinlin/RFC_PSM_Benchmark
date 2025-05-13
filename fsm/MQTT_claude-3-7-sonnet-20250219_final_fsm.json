@@ -1,0 +1,289 @@
+{
+  "states": [
+    "Disconnected",
+    "Connecting",
+    "Connected",
+    "AuthInProgress",
+    "Authenticated",
+    "Subscribing",
+    "Publishing",
+    "Reauthenticating",
+    "Disconnecting",
+    "WillMessagePending",
+    "Subscribed"
+  ],
+  "initial_state": "Disconnected",
+  "final_states": [],
+  "transitions": [
+    {
+      "from": "Disconnected",
+      "event": "send CONNECT",
+      "action": "send authentication data",
+      "to": "Connecting"
+    },
+    {
+      "from": "Disconnected",
+      "event": "send CONNECT with token",
+      "action": "set TLS connection",
+      "to": "Connected"
+    },
+    {
+      "from": "Disconnected",
+      "event": "send CONNECT without token",
+      "action": "close connection",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Connecting",
+      "event": "receive CONNACK",
+      "action": "process connection result",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "send AUTH",
+      "action": "send authentication method",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Connected",
+      "event": "receive CONNECT with token only",
+      "action": "send AUTH with challenge",
+      "to": "AuthInProgress"
+    },
+    {
+      "from": "Connected",
+      "event": "receive CONNECT with token+PoP",
+      "action": "validate token",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "cond token_valid",
+      "action": "send CONNACK success",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Connected",
+      "event": "cond token_invalid",
+      "action": "send CONNACK not authorized",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Connected",
+      "event": "cond token_expired",
+      "action": "send DISCONNECT",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Connected",
+      "event": "receive DISCONNECT",
+      "action": "set SessionExpiryInterval",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Connected",
+      "event": "receive PUBLISH",
+      "action": "store RetainedMessage",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "cond NetworkError",
+      "action": "set WillMessagePending",
+      "to": "WillMessagePending"
+    },
+    {
+      "from": "Connected",
+      "event": "cond ProtocolError",
+      "action": "set WillMessagePending",
+      "to": "WillMessagePending"
+    },
+    {
+      "from": "Connected",
+      "event": "send PINGREQ",
+      "action": "request ping response",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "receive PINGRESP",
+      "action": "reset keep alive timer",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "send DISCONNECT",
+      "action": "close connection",
+      "to": "Disconnecting"
+    },
+    {
+      "from": "Connected",
+      "event": "send PUBLISH",
+      "action": "send application message",
+      "to": "Publishing"
+    },
+    {
+      "from": "AuthInProgress",
+      "event": "receive AUTH with response",
+      "action": "validate token",
+      "to": "AuthInProgress"
+    },
+    {
+      "from": "AuthInProgress",
+      "event": "cond token_valid",
+      "action": "send CONNACK success",
+      "to": "Authenticated"
+    },
+    {
+      "from": "AuthInProgress",
+      "event": "cond token_invalid",
+      "action": "send CONNACK not authorized",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Authenticated",
+      "event": "send SUBSCRIBE",
+      "action": "request topic subscription",
+      "to": "Subscribing"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive PUBLISH",
+      "action": "check topic permissions",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive SUBSCRIBE",
+      "action": "check topic permissions",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive PUBLISH QoS>=1",
+      "action": "reply PUBACK/PUBREC 0x87",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive PUBLISH QoS=0",
+      "action": "send DISCONNECT 0x87",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Authenticated",
+      "event": "cond unauthorized_publish",
+      "action": "close NetworkConnection",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Authenticated",
+      "event": "cond unauthorized_subscriber",
+      "action": "send DISCONNECT 0x87",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive SUBSCRIBE",
+      "action": "reply SUBACK 0x87",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "cond token_expired",
+      "action": "send PUBACK_NotAuthorized",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "cond token_expired",
+      "action": "send SUBACK_NotAuthorized",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive AUTH_Reauthentication",
+      "action": "verify token",
+      "to": "Reauthenticating"
+    },
+    {
+      "from": "Authenticated",
+      "event": "send PUBLISH unauthorized",
+      "action": "close connection",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Authenticated",
+      "event": "send PUBLISH authorized",
+      "action": "send message",
+      "to": "Publishing"
+    },
+    {
+      "from": "Authenticated",
+      "event": "cond token_expired",
+      "action": "close connection",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Subscribing",
+      "event": "receive SUBACK",
+      "action": "process subscription result",
+      "to": "Connected"
+    },
+    {
+      "from": "Publishing",
+      "event": "receive PUBACK",
+      "action": "process publish result",
+      "to": "Connected"
+    },
+    {
+      "from": "Publishing",
+      "event": "receive PUBREC",
+      "action": "send PUBREL",
+      "to": "Publishing"
+    },
+    {
+      "from": "Reauthenticating",
+      "event": "cond auth_success",
+      "action": "set authenticated true",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Reauthenticating",
+      "event": "cond auth_failure",
+      "action": "send DISCONNECT_NotAuthorized",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Disconnecting",
+      "event": "cond connection_closed",
+      "action": "log disconnection",
+      "to": "Disconnected"
+    },
+    {
+      "from": "WillMessagePending",
+      "event": "cond WillExists",
+      "action": "publish WillMessage",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Disconnected",
+      "event": "cond TokenExpired",
+      "action": "discard RetainedMessage",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Disconnected",
+      "event": "cond MessageExpiryInterval",
+      "action": "discard RetainedMessage",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Subscribed",
+      "event": "receive SUBACK 0x80",
+      "action": "log authorization failure",
+      "to": "Authenticated"
+    }
+  ]
+}

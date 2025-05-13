@@ -1,0 +1,134 @@
+{
+  "states": [
+    "Idle",
+    "Connect",
+    "Active",
+    "OpenSent",
+    "OpenConfirm",
+    "Established"
+  ],
+  "initial_state": "Idle",
+  "final_states": [],
+  "transitions": [
+    {
+      "from": "Idle",
+      "event": "ManualStart",
+      "action": "start ConnectRetryTimer, initiate TCP",
+      "to": "Connect"
+    },
+    {
+      "from": "Idle",
+      "event": "AutomaticStart",
+      "action": "start ConnectRetryTimer, initiate TCP",
+      "to": "Connect"
+    },
+    {
+      "from": "Idle",
+      "event": "ManualStart_with_PassiveTcpEstablishment",
+      "action": "start ConnectRetryTimer, listen",
+      "to": "Active"
+    },
+    {
+      "from": "Idle",
+      "event": "AutomaticStart_with_PassiveTcpEstablishment",
+      "action": "start ConnectRetryTimer, listen",
+      "to": "Active"
+    },
+    {
+      "from": "Connect",
+      "event": "ManualStop",
+      "action": "drop TCP, release resources",
+      "to": "Idle"
+    },
+    {
+      "from": "Connect",
+      "event": "ConnectRetryTimer_Expires",
+      "action": "restart ConnectRetryTimer, reconnect",
+      "to": "Connect"
+    },
+    {
+      "from": "Connect",
+      "event": "DelayOpenTimer_Expires",
+      "action": "send OPEN, set HoldTimer",
+      "to": "OpenSent"
+    },
+    {
+      "from": "Connect",
+      "event": "TcpConnectionConfirmed",
+      "action": "send OPEN, set HoldTimer",
+      "to": "OpenSent"
+    },
+    {
+      "from": "Connect",
+      "event": "BGPOpenMsgErr",
+      "action": "send NOTIFICATION, release resources",
+      "to": "Idle"
+    },
+    {
+      "from": "Active",
+      "event": "ConnectRetryTimer_Expires",
+      "action": "restart ConnectRetryTimer, connect",
+      "to": "Connect"
+    },
+    {
+      "from": "Active",
+      "event": "TcpConnectionConfirmed",
+      "action": "send OPEN, set HoldTimer",
+      "to": "OpenSent"
+    },
+    {
+      "from": "Active",
+      "event": "BGPOpen",
+      "action": "send KEEPALIVE, start timers",
+      "to": "OpenConfirm"
+    },
+    {
+      "from": "OpenSent",
+      "event": "BGPOpen",
+      "action": "send KEEPALIVE, start timers",
+      "to": "OpenConfirm"
+    },
+    {
+      "from": "OpenSent",
+      "event": "HoldTimer_Expires",
+      "action": "send NOTIFICATION, release resources",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "KeepAliveMsg",
+      "action": "restart HoldTimer",
+      "to": "Established"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "HoldTimer_Expires",
+      "action": "send NOTIFICATION, release resources",
+      "to": "Idle"
+    },
+    {
+      "from": "Established",
+      "event": "ManualStop",
+      "action": "send NOTIFICATION, release resources",
+      "to": "Idle"
+    },
+    {
+      "from": "Established",
+      "event": "KeepAliveMsg",
+      "action": "restart HoldTimer",
+      "to": "Established"
+    },
+    {
+      "from": "Established",
+      "event": "UpdateMsg",
+      "action": "process UPDATE, restart HoldTimer",
+      "to": "Established"
+    },
+    {
+      "from": "Established",
+      "event": "HoldTimer_Expires",
+      "action": "send NOTIFICATION, release resources",
+      "to": "Idle"
+    }
+  ]
+}

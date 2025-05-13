@@ -1,0 +1,689 @@
+{
+  "states": [
+    "Dead",
+    "Establish",
+    "Authenticate",
+    "Network",
+    "Terminate",
+    "Initial",
+    "Starting",
+    "Closed",
+    "Stopped",
+    "Closing",
+    "Stopping",
+    "Req_Sent",
+    "Ack_Rcvd",
+    "Ack_Sent",
+    "Opened"
+  ],
+  "initial_state": "Initial",
+  "final_states": [],
+  "transitions": [
+    {
+      "from": "Dead",
+      "event": "UP",
+      "action": "signal Up",
+      "to": "Establish"
+    },
+    {
+      "from": "Establish",
+      "event": "OPENED",
+      "action": "start authentication",
+      "to": "Authenticate"
+    },
+    {
+      "from": "Establish",
+      "event": "FAIL",
+      "action": "terminate link",
+      "to": "Dead"
+    },
+    {
+      "from": "Authenticate",
+      "event": "SUCCESS/NONE",
+      "action": "start NCP",
+      "to": "Network"
+    },
+    {
+      "from": "Authenticate",
+      "event": "FAIL",
+      "action": "terminate link",
+      "to": "Dead"
+    },
+    {
+      "from": "Network",
+      "event": "CLOSING",
+      "action": "send Terminate",
+      "to": "Terminate"
+    },
+    {
+      "from": "Terminate",
+      "event": "DOWN",
+      "action": "disconnect",
+      "to": "Dead"
+    },
+    {
+      "from": "Initial",
+      "event": "up",
+      "action": "",
+      "to": "Closed"
+    },
+    {
+      "from": "Initial",
+      "event": "open",
+      "action": "signal layer started",
+      "to": "Starting"
+    },
+    {
+      "from": "Starting",
+      "event": "up",
+      "action": "initialize restart count, send Configure-Request",
+      "to": "Req_Sent"
+    },
+    {
+      "from": "Starting",
+      "event": "down",
+      "action": "signal layer finished",
+      "to": "Initial"
+    },
+    {
+      "from": "Starting",
+      "event": "open",
+      "action": "",
+      "to": "Starting"
+    },
+    {
+      "from": "Starting",
+      "event": "close",
+      "action": "signal layer finished",
+      "to": "Initial"
+    },
+    {
+      "from": "Closed",
+      "event": "open",
+      "action": "initialize restart count, send Configure-Request",
+      "to": "Req_Sent"
+    },
+    {
+      "from": "Closed",
+      "event": "close",
+      "action": "",
+      "to": "Closed"
+    },
+    {
+      "from": "Closed",
+      "event": "receive Configure-Request Good",
+      "action": "send Terminate-Ack",
+      "to": "Closed"
+    },
+    {
+      "from": "Closed",
+      "event": "receive Configure-Request Bad",
+      "action": "send Terminate-Ack",
+      "to": "Closed"
+    },
+    {
+      "from": "Closed",
+      "event": "receive Configure-Ack",
+      "action": "send Terminate-Ack",
+      "to": "Closed"
+    },
+    {
+      "from": "Closed",
+      "event": "receive Configure-Nak/Rej",
+      "action": "send Terminate-Ack",
+      "to": "Closed"
+    },
+    {
+      "from": "Closed",
+      "event": "receive Terminate-Request",
+      "action": "send Terminate-Ack",
+      "to": "Closed"
+    },
+    {
+      "from": "Closed",
+      "event": "receive Terminate-Ack",
+      "action": "",
+      "to": "Closed"
+    },
+    {
+      "from": "Closed",
+      "event": "receive unknown code",
+      "action": "send Code-Reject",
+      "to": "Closed"
+    },
+    {
+      "from": "Closed",
+      "event": "receive Code-Reject permitted",
+      "action": "",
+      "to": "Closed"
+    },
+    {
+      "from": "Closed",
+      "event": "receive Code-Reject catastrophic",
+      "action": "signal layer finished",
+      "to": "Closed"
+    },
+    {
+      "from": "Closed",
+      "event": "receive Echo-Request",
+      "action": "",
+      "to": "Closed"
+    },
+    {
+      "from": "Stopped",
+      "event": "down",
+      "action": "signal layer started",
+      "to": "Starting"
+    },
+    {
+      "from": "Stopped",
+      "event": "open",
+      "action": "",
+      "to": "Stopped"
+    },
+    {
+      "from": "Stopped",
+      "event": "close",
+      "action": "",
+      "to": "Stopped"
+    },
+    {
+      "from": "Stopped",
+      "event": "receive Configure-Request Good",
+      "action": "initialize restart count, send Configure-Request, send Configure-Ack",
+      "to": "Ack_Sent"
+    },
+    {
+      "from": "Stopped",
+      "event": "receive Configure-Request Bad",
+      "action": "initialize restart count, send Configure-Request, send Configure-Nak/Rej",
+      "to": "Req_Sent"
+    },
+    {
+      "from": "Stopped",
+      "event": "receive Configure-Ack",
+      "action": "send Terminate-Ack",
+      "to": "Stopped"
+    },
+    {
+      "from": "Stopped",
+      "event": "receive Configure-Nak/Rej",
+      "action": "send Terminate-Ack",
+      "to": "Stopped"
+    },
+    {
+      "from": "Stopped",
+      "event": "receive Terminate-Request",
+      "action": "send Terminate-Ack",
+      "to": "Stopped"
+    },
+    {
+      "from": "Stopped",
+      "event": "receive Terminate-Ack",
+      "action": "",
+      "to": "Stopped"
+    },
+    {
+      "from": "Stopped",
+      "event": "receive unknown code",
+      "action": "send Code-Reject",
+      "to": "Stopped"
+    },
+    {
+      "from": "Stopped",
+      "event": "receive Code-Reject permitted",
+      "action": "",
+      "to": "Stopped"
+    },
+    {
+      "from": "Stopped",
+      "event": "receive Code-Reject catastrophic",
+      "action": "signal layer finished",
+      "to": "Stopped"
+    },
+    {
+      "from": "Stopped",
+      "event": "receive Echo-Request",
+      "action": "",
+      "to": "Stopped"
+    },
+    {
+      "from": "Closing",
+      "event": "timeout restart >0",
+      "action": "send Terminate-Request",
+      "to": "Closing"
+    },
+    {
+      "from": "Closing",
+      "event": "timeout restart expired",
+      "action": "signal layer finished",
+      "to": "Closed"
+    },
+    {
+      "from": "Closing",
+      "event": "receive Configure-Request Good",
+      "action": "send Terminate-Ack",
+      "to": "Closing"
+    },
+    {
+      "from": "Closing",
+      "event": "receive Configure-Request Bad",
+      "action": "send Terminate-Ack",
+      "to": "Closing"
+    },
+    {
+      "from": "Closing",
+      "event": "receive Configure-Ack",
+      "action": "send Terminate-Ack",
+      "to": "Closing"
+    },
+    {
+      "from": "Closing",
+      "event": "receive Configure-Nak/Rej",
+      "action": "send Terminate-Ack",
+      "to": "Closing"
+    },
+    {
+      "from": "Closing",
+      "event": "receive Terminate-Request",
+      "action": "send Terminate-Ack",
+      "to": "Closing"
+    },
+    {
+      "from": "Closing",
+      "event": "receive Terminate-Ack",
+      "action": "signal layer finished",
+      "to": "Closed"
+    },
+    {
+      "from": "Closing",
+      "event": "receive unknown code",
+      "action": "send Code-Reject",
+      "to": "Closing"
+    },
+    {
+      "from": "Closing",
+      "event": "receive Code-Reject permitted",
+      "action": "",
+      "to": "Closing"
+    },
+    {
+      "from": "Closing",
+      "event": "receive Code-Reject catastrophic",
+      "action": "signal layer finished",
+      "to": "Closed"
+    },
+    {
+      "from": "Closing",
+      "event": "receive Echo-Request",
+      "action": "",
+      "to": "Closing"
+    },
+    {
+      "from": "Stopping",
+      "event": "timeout restart >0",
+      "action": "send Terminate-Request",
+      "to": "Stopping"
+    },
+    {
+      "from": "Stopping",
+      "event": "timeout restart expired",
+      "action": "signal layer finished",
+      "to": "Stopped"
+    },
+    {
+      "from": "Stopping",
+      "event": "receive Configure-Request Good",
+      "action": "send Terminate-Ack",
+      "to": "Stopping"
+    },
+    {
+      "from": "Stopping",
+      "event": "receive Configure-Request Bad",
+      "action": "send Terminate-Ack",
+      "to": "Stopping"
+    },
+    {
+      "from": "Stopping",
+      "event": "receive Configure-Ack",
+      "action": "send Terminate-Ack",
+      "to": "Stopping"
+    },
+    {
+      "from": "Stopping",
+      "event": "receive Configure-Nak/Rej",
+      "action": "send Terminate-Ack",
+      "to": "Stopping"
+    },
+    {
+      "from": "Stopping",
+      "event": "receive Terminate-Request",
+      "action": "send Terminate-Ack",
+      "to": "Stopping"
+    },
+    {
+      "from": "Stopping",
+      "event": "receive Terminate-Ack",
+      "action": "signal layer finished",
+      "to": "Stopped"
+    },
+    {
+      "from": "Stopping",
+      "event": "receive unknown code",
+      "action": "send Code-Reject",
+      "to": "Stopping"
+    },
+    {
+      "from": "Stopping",
+      "event": "receive Code-Reject permitted",
+      "action": "",
+      "to": "Stopping"
+    },
+    {
+      "from": "Stopping",
+      "event": "receive Code-Reject catastrophic",
+      "action": "signal layer finished",
+      "to": "Stopped"
+    },
+    {
+      "from": "Stopping",
+      "event": "receive Echo-Request",
+      "action": "",
+      "to": "Stopping"
+    },
+    {
+      "from": "Req_Sent",
+      "event": "timeout restart >0",
+      "action": "send Configure-Request",
+      "to": "Req_Sent"
+    },
+    {
+      "from": "Req_Sent",
+      "event": "timeout restart expired",
+      "action": "signal layer finished",
+      "to": "Stopped"
+    },
+    {
+      "from": "Req_Sent",
+      "event": "receive Configure-Request Good",
+      "action": "send Configure-Ack",
+      "to": "Ack_Sent"
+    },
+    {
+      "from": "Req_Sent",
+      "event": "receive Configure-Request Bad",
+      "action": "send Configure-Nak/Rej",
+      "to": "Req_Sent"
+    },
+    {
+      "from": "Req_Sent",
+      "event": "receive Configure-Ack",
+      "action": "initialize restart count",
+      "to": "Ack_Rcvd"
+    },
+    {
+      "from": "Req_Sent",
+      "event": "receive Configure-Nak/Rej",
+      "action": "initialize restart count, send Configure-Request",
+      "to": "Req_Sent"
+    },
+    {
+      "from": "Req_Sent",
+      "event": "receive Terminate-Request",
+      "action": "send Terminate-Ack",
+      "to": "Req_Sent"
+    },
+    {
+      "from": "Req_Sent",
+      "event": "receive Terminate-Ack",
+      "action": "",
+      "to": "Req_Sent"
+    },
+    {
+      "from": "Req_Sent",
+      "event": "receive unknown code",
+      "action": "send Code-Reject",
+      "to": "Req_Sent"
+    },
+    {
+      "from": "Req_Sent",
+      "event": "receive Code-Reject permitted",
+      "action": "",
+      "to": "Req_Sent"
+    },
+    {
+      "from": "Req_Sent",
+      "event": "receive Code-Reject catastrophic",
+      "action": "signal layer finished",
+      "to": "Stopped"
+    },
+    {
+      "from": "Req_Sent",
+      "event": "receive Echo-Request",
+      "action": "",
+      "to": "Req_Sent"
+    },
+    {
+      "from": "Ack_Rcvd",
+      "event": "timeout restart >0",
+      "action": "send Configure-Request",
+      "to": "Ack_Rcvd"
+    },
+    {
+      "from": "Ack_Rcvd",
+      "event": "timeout restart expired",
+      "action": "signal layer finished",
+      "to": "Stopped"
+    },
+    {
+      "from": "Ack_Rcvd",
+      "event": "receive Configure-Request Good",
+      "action": "send Configure-Ack, signal layer up",
+      "to": "Opened"
+    },
+    {
+      "from": "Ack_Rcvd",
+      "event": "receive Configure-Request Bad",
+      "action": "send Configure-Nak/Rej",
+      "to": "Ack_Rcvd"
+    },
+    {
+      "from": "Ack_Rcvd",
+      "event": "receive Configure-Ack",
+      "action": "send Configure-Request",
+      "to": "Req_Sent"
+    },
+    {
+      "from": "Ack_Rcvd",
+      "event": "receive Configure-Nak/Rej",
+      "action": "send Configure-Request",
+      "to": "Req_Sent"
+    },
+    {
+      "from": "Ack_Rcvd",
+      "event": "receive Terminate-Request",
+      "action": "send Terminate-Ack",
+      "to": "Ack_Rcvd"
+    },
+    {
+      "from": "Ack_Rcvd",
+      "event": "receive Terminate-Ack",
+      "action": "",
+      "to": "Ack_Rcvd"
+    },
+    {
+      "from": "Ack_Rcvd",
+      "event": "receive unknown code",
+      "action": "send Code-Reject",
+      "to": "Ack_Rcvd"
+    },
+    {
+      "from": "Ack_Rcvd",
+      "event": "receive Code-Reject permitted",
+      "action": "",
+      "to": "Ack_Rcvd"
+    },
+    {
+      "from": "Ack_Rcvd",
+      "event": "receive Code-Reject catastrophic",
+      "action": "signal layer finished",
+      "to": "Stopped"
+    },
+    {
+      "from": "Ack_Rcvd",
+      "event": "receive Echo-Request",
+      "action": "",
+      "to": "Ack_Rcvd"
+    },
+    {
+      "from": "Ack_Sent",
+      "event": "timeout restart >0",
+      "action": "send Configure-Request",
+      "to": "Ack_Sent"
+    },
+    {
+      "from": "Ack_Sent",
+      "event": "timeout restart expired",
+      "action": "signal layer finished",
+      "to": "Stopped"
+    },
+    {
+      "from": "Ack_Sent",
+      "event": "receive Configure-Request Good",
+      "action": "send Configure-Ack",
+      "to": "Ack_Sent"
+    },
+    {
+      "from": "Ack_Sent",
+      "event": "receive Configure-Request Bad",
+      "action": "send Configure-Nak/Rej",
+      "to": "Req_Sent"
+    },
+    {
+      "from": "Ack_Sent",
+      "event": "receive Configure-Ack",
+      "action": "initialize restart count, signal layer up",
+      "to": "Opened"
+    },
+    {
+      "from": "Ack_Sent",
+      "event": "receive Configure-Nak/Rej",
+      "action": "initialize restart count, send Configure-Request",
+      "to": "Ack_Sent"
+    },
+    {
+      "from": "Ack_Sent",
+      "event": "receive Terminate-Request",
+      "action": "send Terminate-Ack",
+      "to": "Ack_Sent"
+    },
+    {
+      "from": "Ack_Sent",
+      "event": "receive Terminate-Ack",
+      "action": "",
+      "to": "Ack_Sent"
+    },
+    {
+      "from": "Ack_Sent",
+      "event": "receive unknown code",
+      "action": "send Code-Reject",
+      "to": "Ack_Sent"
+    },
+    {
+      "from": "Ack_Sent",
+      "event": "receive Code-Reject permitted",
+      "action": "",
+      "to": "Ack_Sent"
+    },
+    {
+      "from": "Ack_Sent",
+      "event": "receive Code-Reject catastrophic",
+      "action": "signal layer finished",
+      "to": "Stopped"
+    },
+    {
+      "from": "Ack_Sent",
+      "event": "receive Echo-Request",
+      "action": "",
+      "to": "Ack_Sent"
+    },
+    {
+      "from": "Opened",
+      "event": "down",
+      "action": "signal layer down",
+      "to": "Starting"
+    },
+    {
+      "from": "Opened",
+      "event": "open",
+      "action": "",
+      "to": "Opened"
+    },
+    {
+      "from": "Opened",
+      "event": "close",
+      "action": "signal layer down, initialize restart count, send Terminate-Request",
+      "to": "Closing"
+    },
+    {
+      "from": "Opened",
+      "event": "receive Configure-Request Good",
+      "action": "signal layer down, send Configure-Request, send Configure-Ack",
+      "to": "Ack_Sent"
+    },
+    {
+      "from": "Opened",
+      "event": "receive Configure-Request Bad",
+      "action": "signal layer down, send Configure-Request, send Configure-Nak/Rej",
+      "to": "Req_Sent"
+    },
+    {
+      "from": "Opened",
+      "event": "receive Configure-Ack",
+      "action": "signal layer down, send Configure-Request",
+      "to": "Req_Sent"
+    },
+    {
+      "from": "Opened",
+      "event": "receive Configure-Nak/Rej",
+      "action": "signal layer down, send Configure-Request",
+      "to": "Req_Sent"
+    },
+    {
+      "from": "Opened",
+      "event": "receive Terminate-Request",
+      "action": "signal layer down, zero restart count, send Terminate-Ack",
+      "to": "Stopping"
+    },
+    {
+      "from": "Opened",
+      "event": "receive Terminate-Ack",
+      "action": "signal layer down, send Configure-Request",
+      "to": "Req_Sent"
+    },
+    {
+      "from": "Opened",
+      "event": "receive unknown code",
+      "action": "send Code-Reject",
+      "to": "Opened"
+    },
+    {
+      "from": "Opened",
+      "event": "receive Code-Reject permitted",
+      "action": "",
+      "to": "Opened"
+    },
+    {
+      "from": "Opened",
+      "event": "receive Code-Reject catastrophic",
+      "action": "signal layer down, initialize restart count, send Terminate-Request",
+      "to": "Stopping"
+    },
+    {
+      "from": "Opened",
+      "event": "receive Echo-Request",
+      "action": "send Echo-Reply",
+      "to": "Opened"
+    }
+  ]
+}
