@@ -89,5 +89,66 @@
     }
   ],
   "final_response": "<think>\nOkay, let's see. The user provided a section from an RFC document's Appendix C, which is the Reply Code Index for POP3. The task is to determine if there's any FSM (Finite State Machine) related information here and, if so, extract it into a structured JSON format.\n\nFirst, I need to check if the given section contains any information about states, transitions, diagrams, reply codes, or sequences. The section lists various POP3 reply codes like +OK, -ERR, etc., each with a page number. But looking at this list alone, there's no explicit mention of states or transitions. The reply codes are just listed with their references.\n\nThe POP3 protocol typically has states like Authorization, Transaction, and Update. However, the given section is a reply code index, which is more of a reference than a state machine description. The reply codes here are part of different states. For example, +OK and -ERR are used in various states to indicate success or failure. However, the index itself doesn't explain the state transitions. It just lists the reply codes.\n\nSince the user's instruction is to check if the provided section has FSM info, and this section is just a list of reply codes without any transitions, states, or sequences, there's no FSM data here. The answer should be \"None\" because there's no explicit FSM information in the given section. The user might be expecting a state machine based on POP3's general knowledge, but the provided section doesn't include that. So, the correct response is to return <json>None</json>.\n</think>\n\n<json>None</json>",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "Authorization",
+      "Transaction",
+      "Update",
+      "Closed"
+    ],
+    "initial_state": "Authorization",
+    "final_states": [
+      "Closed"
+    ],
+    "transitions": [
+      {
+        "from": "Authorization",
+        "event": "receive AUTH_COMMAND",
+        "action": "reply +OK",
+        "to": "Transaction"
+      },
+      {
+        "from": "Transaction",
+        "event": "receive QUIT",
+        "action": "remove deleted messages, reply +OK, close connection",
+        "to": "Closed"
+      },
+      {
+        "from": "Transaction",
+        "event": "receive STAT",
+        "action": "reply +OK",
+        "to": "Transaction"
+      },
+      {
+        "from": "Transaction",
+        "event": "receive LIST",
+        "action": "reply +OK",
+        "to": "Transaction"
+      },
+      {
+        "from": "Transaction",
+        "event": "receive RETR",
+        "action": "reply +OK message follows",
+        "to": "Transaction"
+      },
+      {
+        "from": "Transaction",
+        "event": "receive DELE",
+        "action": "reply +OK",
+        "to": "Transaction"
+      },
+      {
+        "from": "Authorization",
+        "event": "timeout",
+        "action": "close connection",
+        "to": "Closed"
+      },
+      {
+        "from": "Transaction",
+        "event": "timeout",
+        "action": "close connection",
+        "to": "Closed"
+      }
+    ]
+  }
 }

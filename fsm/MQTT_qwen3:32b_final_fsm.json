@@ -1,0 +1,57 @@
+{
+  "states": [
+    "ProcessingPublish",
+    "ProcessingSubscribe",
+    "Disconnected",
+    "PublishProcessed",
+    "SubscribeProcessed",
+    "Authenticated",
+    "NotAuthorized"
+  ],
+  "initial_state": "ProcessingPublish",
+  "final_states": [
+    "Disconnected",
+    "PublishProcessed",
+    "SubscribeProcessed",
+    "Authenticated",
+    "NotAuthorized"
+  ],
+  "transitions": [
+    {
+      "from": "ProcessingPublish",
+      "event": "cond authorized",
+      "action": "send PUBACK",
+      "to": "PublishProcessed"
+    },
+    {
+      "from": "ProcessingPublish",
+      "event": "cond not authorized",
+      "action": "reply 0x80",
+      "to": "Disconnected"
+    },
+    {
+      "from": "ProcessingSubscribe",
+      "event": "cond authorized",
+      "action": "reply 0x00",
+      "to": "SubscribeProcessed"
+    },
+    {
+      "from": "ProcessingSubscribe",
+      "event": "cond not authorized",
+      "action": "reply 0x80",
+      "to": "SubscribeProcessed"
+    },
+    {
+      "from": "Authenticated",
+      "event": "cond token_expired",
+      "action": "send DISCONNECT 0x87",
+      "to": "NotAuthorized"
+    },
+    {
+      "from": "NotAuthorized",
+      "event": "send AUTH 0x19",
+      "action": "reply with reauthentication request",
+      "to": "Authenticated"
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "states": [
+    "NotAuthenticated",
+    "Authenticated",
+    "Selected",
+    "Logout",
+    "StartTLS",
+    "Enabled",
+    "SelectingInbox",
+    "FetchingMessage",
+    "StoringFlags",
+    "LoggingOut"
+  ],
+  "initial_state": "NotAuthenticated",
+  "final_states": [
+    "Logout",
+    "LoggingOut"
+  ],
+  "transitions": [
+    {
+      "from": "NotAuthenticated",
+      "event": "receive LOGIN",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive AUTHENTICATE",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive preauthentication",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive SELECT",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive EXAMINE",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive ENABLE",
+      "action": "reply OK",
+      "to": "Enabled"
+    },
+    {
+      "from": "Selected",
+      "event": "receive CLOSE",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Selected",
+      "event": "receive UNSELECT",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Selected",
+      "event": "receive LOGOUT",
+      "action": "reply OK",
+      "to": "Logout"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive LOGOUT",
+      "action": "reply OK",
+      "to": "Logout"
+    },
+    {
+      "from": "Logout",
+      "event": "send BYE",
+      "action": "close connection",
+      "to": "Logout"
+    },
+    {
+      "from": "Initial",
+      "event": "receive starttls",
+      "action": "reply OK",
+      "to": "StartTLS"
+    },
+    {
+      "from": "StartTLS",
+      "event": "receive AUTHENTICATE",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Enabled",
+      "event": "receive SELECT",
+      "action": "reply OK",
+      "to": "SelectingInbox"
+    },
+    {
+      "from": "SelectingInbox",
+      "event": "receive FETCH",
+      "action": "reply OK",
+      "to": "FetchingMessage"
+    },
+    {
+      "from": "FetchingMessage",
+      "event": "receive STORE",
+      "action": "reply OK",
+      "to": "StoringFlags"
+    },
+    {
+      "from": "StoringFlags",
+      "event": "receive LOGOUT",
+      "action": "reply OK",
+      "to": "LoggingOut"
+    }
+  ]
+}

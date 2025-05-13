@@ -79,5 +79,57 @@
     }
   ],
   "final_response": "```json\n{\n  \"states\": [\"Initial\", \"AwaitingEhlo\", \"AwaitingMailFrom\", \"AwaitingRcptTo\", \"AwaitingData\", \"TransferInProgress\", \"ClosingConnection\"],\n  \"initial_state\": \"Initial\",\n  \"final_states\": [\"ClosingConnection\"],\n  \"transitions\": [\n    {\n      \"from\": \"Initial\",\n      \"event\": \"receive EHLO\",\n      \"action\": \"reply 220\",\n      \"to\": \"AwaitingEhlo\"\n    },\n    {\n      \"from\": \"AwaitingEhlo\",\n      \"event\": \"receive MAIL FROM\",\n      \"action\": \"reply 250\",\n      \"to\": \"AwaitingRcptTo\"\n    },\n    {\n      \"from\": \"AwaitingRcptTo\",\n      \"event\": \"receive RCPT TO\",\n      \"action\": \"reply 250\",\n      \"to\": \"AwaitingRcptTo\"\n    },\n    {\n      \"from\": \"AwaitingRcptTo\",\n      \"event\": \"receive DATA\",\n      \"action\": \"reply 354\",\n      \"to\": \"AwaitingData\"\n    },\n    {\n      \"from\": \"AwaitingData\",\n      \"event\": \"receive end of data\",\n      \"action\": \"reply 250\",\n      \"to\": \"TransferInProgress\"\n    },\n    {\n      \"from\": \"TransferInProgress\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"reply 221\",\n      \"to\": \"ClosingConnection\"\n    }\n  ]\n}\n```",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "Initial",
+      "AwaitingEhlo",
+      "AwaitingMailFrom",
+      "AwaitingRcptTo",
+      "AwaitingData",
+      "TransferInProgress",
+      "ClosingConnection"
+    ],
+    "initial_state": "Initial",
+    "final_states": [
+      "ClosingConnection"
+    ],
+    "transitions": [
+      {
+        "from": "Initial",
+        "event": "receive EHLO",
+        "action": "reply 220",
+        "to": "AwaitingEhlo"
+      },
+      {
+        "from": "AwaitingEhlo",
+        "event": "receive MAIL FROM",
+        "action": "reply 250",
+        "to": "AwaitingRcptTo"
+      },
+      {
+        "from": "AwaitingRcptTo",
+        "event": "receive RCPT TO",
+        "action": "reply 250",
+        "to": "AwaitingRcptTo"
+      },
+      {
+        "from": "AwaitingRcptTo",
+        "event": "receive DATA",
+        "action": "reply 354",
+        "to": "AwaitingData"
+      },
+      {
+        "from": "AwaitingData",
+        "event": "receive end of data",
+        "action": "reply 250",
+        "to": "TransferInProgress"
+      },
+      {
+        "from": "TransferInProgress",
+        "event": "receive QUIT",
+        "action": "reply 221",
+        "to": "ClosingConnection"
+      }
+    ]
+  }
 }

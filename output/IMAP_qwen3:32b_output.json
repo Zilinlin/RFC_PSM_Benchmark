@@ -59,5 +59,42 @@
     }
   ],
   "final_response": "<think>\nOkay, let's see. The user provided a section from an RFC document's Author's Note for the IMAP protocol. The task is to check if this section contains any Finite State Machine (FSM) related information. The steps are to determine if there's FSM info and, if so, extract it into a specific JSON format. If not, return \"None\".\n\nLooking at the given content, it's a list of various commands, response codes, and status items related to an email protocol. There are mentions of \"states\" and \"transitions\" in the context of the document's structure, but the actual content here doesn't describe any specific states or transitions of the protocol itself. The section is more about the document's organization and the elements it includes, like commands and response codes, rather than the state machine of the protocol.\n\nThe user's instructions specify that if there's no FSM-related information, I should reply with <json>None</json>. Since this section doesn't discuss the protocol's state machine, states, transitions, or related terms, there's nothing to extract here. Therefore, the correct response is to return \"None\".\n</think>\n\n<json>None</json>",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "NotAuthenticated",
+      "Authenticated",
+      "Selected",
+      "Terminated"
+    ],
+    "initial_state": "NotAuthenticated",
+    "final_states": [
+      "Terminated"
+    ],
+    "transitions": [
+      {
+        "from": "NotAuthenticated",
+        "event": "receive STARTTLS",
+        "action": "send OK",
+        "to": "NotAuthenticated"
+      },
+      {
+        "from": "NotAuthenticated",
+        "event": "receive AUTHENTICATE",
+        "action": "send OK",
+        "to": "Authenticated"
+      },
+      {
+        "from": "Authenticated",
+        "event": "receive SELECT",
+        "action": "send OK",
+        "to": "Selected"
+      },
+      {
+        "from": "Selected",
+        "event": "receive LOGOUT",
+        "action": "send OK",
+        "to": "Terminated"
+      }
+    ]
+  }
 }

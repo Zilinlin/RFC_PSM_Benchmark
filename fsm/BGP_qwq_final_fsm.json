@@ -1,0 +1,58 @@
+{
+  "states": [
+    "Idle",
+    "Connect",
+    "Active",
+    "OpenSent",
+    "OpenConfirm",
+    "Established"
+  ],
+  "initial_state": "Idle",
+  "final_states": [
+    "Idle"
+  ],
+  "transitions": [
+    {
+      "from": "Idle",
+      "event": "receive OPEN",
+      "action": "send OPEN",
+      "to": "OpenSent"
+    },
+    {
+      "from": "OpenSent",
+      "event": "receive OPEN",
+      "action": "compare BGP IDs",
+      "to": "OpenConfirm"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "receive KEEPALIVE",
+      "action": "restart HoldTimer",
+      "to": "Established"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "receive UPDATE",
+      "action": "process message and restart HoldTimer",
+      "to": "Established"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "receive UPDATE with error",
+      "action": "send NOTIFICATION",
+      "to": "Idle"
+    },
+    {
+      "from": "Established",
+      "event": "Hold Timer expires",
+      "action": "transition to Idle",
+      "to": "Idle"
+    },
+    {
+      "from": "Established",
+      "event": "receive NOTIFICATION",
+      "action": "send NOTIFICATION",
+      "to": "Idle"
+    }
+  ]
+}

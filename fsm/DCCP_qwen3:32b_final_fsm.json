@@ -1,0 +1,112 @@
+{
+  "states": [
+    "Established",
+    "Closing",
+    "Closed",
+    "2MSLWait",
+    "Negotiating",
+    "REQUEST",
+    "RESPOND",
+    "PARTOPEN",
+    "OPEN",
+    "CLOSING",
+    "TIMEWAIT"
+  ],
+  "initial_state": "REQUEST",
+  "final_states": [
+    "Closed",
+    "TIMEWAIT"
+  ],
+  "transitions": [
+    {
+      "from": "Established",
+      "event": "receive DCCP-CloseReq",
+      "action": "send DCCP-Close",
+      "to": "Closing"
+    },
+    {
+      "from": "Closing",
+      "event": "receive DCCP-Reset",
+      "action": "hold state for 2MSL",
+      "to": "2MSLWait"
+    },
+    {
+      "from": "Established",
+      "event": "send DCCP-Close",
+      "action": "await DCCP-Reset",
+      "to": "Closing"
+    },
+    {
+      "from": "Closing",
+      "event": "receive DCCP-Reset",
+      "action": "clear connection state",
+      "to": "Closed"
+    },
+    {
+      "from": "2MSLWait",
+      "event": "timeout 2MSL",
+      "action": "clear state",
+      "to": "Closed"
+    },
+    {
+      "from": "Negotiating",
+      "event": "receive invalid Confirm option",
+      "action": "reset connection",
+      "to": "Closed"
+    },
+    {
+      "from": "Negotiating",
+      "event": "receive Mandatory Change option with unknown feature",
+      "action": "reset connection",
+      "to": "Closed"
+    },
+    {
+      "from": "Negotiating",
+      "event": "receive Mandatory Change option with invalid value and no shared entry",
+      "action": "reset connection",
+      "to": "Closed"
+    },
+    {
+      "from": "REQUEST",
+      "event": "receive Response",
+      "action": "send Ack",
+      "to": "PARTOPEN"
+    },
+    {
+      "from": "RESPOND",
+      "event": "receive Request",
+      "action": "send Response",
+      "to": "OPEN"
+    },
+    {
+      "from": "PARTOPEN",
+      "event": "receive Response",
+      "action": "send Ack",
+      "to": "OPEN"
+    },
+    {
+      "from": "PARTOPEN",
+      "event": "receive non-Sync",
+      "action": "set OSR",
+      "to": "OPEN"
+    },
+    {
+      "from": "OPEN",
+      "event": "receive CloseReq",
+      "action": "send Close",
+      "to": "CLOSING"
+    },
+    {
+      "from": "OPEN",
+      "event": "receive Close",
+      "action": "send Reset",
+      "to": "TIMEWAIT"
+    },
+    {
+      "from": "OPEN",
+      "event": "receive Reset",
+      "action": "tear down",
+      "to": "TIMEWAIT"
+    }
+  ]
+}

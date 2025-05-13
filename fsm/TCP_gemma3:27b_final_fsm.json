@@ -1,0 +1,103 @@
+{
+  "states": [
+    "Closed",
+    "SynReceived",
+    "Established",
+    "FinWait1",
+    "FinWait2",
+    "CloseWait",
+    "Closing",
+    "LastAck",
+    "TimeWait"
+  ],
+  "initial_state": "Closed",
+  "final_states": [
+    "Closed"
+  ],
+  "transitions": [
+    {
+      "from": "SynReceived",
+      "event": "receive ACK",
+      "action": "set Established true",
+      "to": "Established"
+    },
+    {
+      "from": "Established",
+      "event": "receive FIN",
+      "action": "set CloseWait true",
+      "to": "CloseWait"
+    },
+    {
+      "from": "FinWait1",
+      "event": "receive ACK",
+      "action": "set TimeWait true",
+      "to": "TimeWait"
+    },
+    {
+      "from": "FinWait1",
+      "event": "receive FIN",
+      "action": "set Closing true",
+      "to": "Closing"
+    },
+    {
+      "from": "FinWait2",
+      "event": "receive ACK",
+      "action": "set TimeWait true",
+      "to": "TimeWait"
+    },
+    {
+      "from": "CloseWait",
+      "event": "receive ACK",
+      "action": "set Closed true",
+      "to": "Closed"
+    },
+    {
+      "from": "Closing",
+      "event": "receive ACK",
+      "action": "set Closed true",
+      "to": "Closed"
+    },
+    {
+      "from": "LastAck",
+      "event": "receive ACK",
+      "action": "set Closed true",
+      "to": "Closed"
+    },
+    {
+      "from": "TimeWait",
+      "event": "timeout 2MSL",
+      "action": "set Closed true",
+      "to": "Closed"
+    },
+    {
+      "from": "Established",
+      "event": "receive FIN",
+      "action": "set CloseWait true",
+      "to": "CloseWait"
+    },
+    {
+      "from": "Established",
+      "event": "receive FIN",
+      "action": "set FinWait1 true",
+      "to": "FinWait1"
+    },
+    {
+      "from": "FinWait1",
+      "event": "receive FIN",
+      "action": "set Closing true",
+      "to": "Closing"
+    },
+    {
+      "from": "FinWait2",
+      "event": "receive FIN",
+      "action": "set TimeWait true",
+      "to": "TimeWait"
+    },
+    {
+      "from": "TimeWait",
+      "event": "timeout 2MSL",
+      "action": "set Closed true",
+      "to": "Closed"
+    }
+  ]
+}

@@ -59,5 +59,260 @@
     }
   ],
   "final_response": "To\": \"send 0x84\",\n      \"to\": \"error\"\n    },\n    {\n      \"from\": \"Unauthorized\",\n      \"action\": \"send 0x84\",\n      \"to\": \"Disconnected\"\n    },\n    {\n      \"from\": \"Unauthorized\",\n      \"event\": \"receive CONNECT\",\n      \"action\": \"send 0x84\",\n      \"to\": \"Disconnected\"\n    },\n    {\n      \"from\": \"Authorized\",\n      \"event\": \"receive CONNECT\",\n      \"action\": \"set authorized true\",\n      \"to\": \"Authorized\"\n    },\n    {\n      \"from\": \"Authorized\",\n      \"event\": \"receive PUBLISH\",\n      \"action\": \"send PUBACKET\",\n      \"to\": \"Authorized\"\n    },\n    {\n      \"from\": \"Authorized\",\n      \"event\": \"receive PUBLISH\",\n      \"action\": \"send PUBACKET\",\n      \"to\": \"Unauthorized\"\n    },\n    {\n      \"from\": \"Authorized\",\n      \"event\": \"receive PUBLISH\",\n      \"action\": \"send PUBACK\",\n      \"to\": \"Unauthorized\"\n    },\n    {\n      \"from\": \"Authorized\",\n      \"event\": \"receive PUBLISH\",\n      \"action\": \"send PUBACK\",\n      \"to\": \"Unauthorized\"\n    },\n    {\n      \"from\": \"Authorized\",\n      \"event\": \"receive PUBLISH\",\n      \"action\": \"send PUBACK\",\n      \"to\": \"Unauthorized\"\n    },\n    {\n      \"from\": \"Authorized\",\n      \"event\": \"receive PUBLISH\",\n      \"action\": \"send PUBACK\",\n      \"to\": \"Unauthorized\"\n    },\n    {\n      \"from\": \"Authorized\",\n      \"event\": \"receive PUBLISH\",\n      \"action\": \"send PUBACK\",\n      \"to\": \"Unauthorized\"\n    },\n    {\n      \"from\": \"Unauthorized\",\n      \"event\": \"receive PUBLISH\",\n      \"action\": \"send PUBACK\",\n      \"to\": \"Unauthorized\"\n    },\n    {\n      \"from\": \"Unauthorized\",\n      \"event\": \"receive PUBLISH\",\n      \"action\": \"send PUBACK\",\n      \"to\": \"Unauthorized\"\n}\n</partial>\n\n---\n\n### Analysis and Corrections:\n\n1. **General Issues:**\n   - **State Names:** State names should be lowercase and use underscores for readability.\n   - **Event Names:** Event names should be lowercase and use underscores for readability.\n   - **Action Names:** Action names should be lowercase and use underscores for readability.\n   - **To:** The \"to\" field should be lowercase and use underscores for readability.\n   - **Consistency:** Ensure consistency in naming conventions across all states, events, and actions.\n   - **Syntax:** Ensure proper JSON syntax, especially with commas and braces.\n\n2. **Specific Issues:**\n   - **First JSON:**\n     - **State Names:** \"AwaitingPublish\" should be \"awaiting_publish\".\n     - **Event Names:** \"receive PUBLISH\" should be \"receive_publish\".\n     - **Action Names:** \"set authorized true\" should be \"set_authorized_true\".\n     - **To:** \"Authorized\" should be \"authorized\".\n     - **Event Names:** \"receive PUBACK\" should be \"receive_puback\".\n     - **Action Names:** \"send DISCONNECT 0x87\" should be \"send_disconnect_not_authorized\".\n     - **To:** \"Unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive PUBLISH\" should be \"receive_publish\".\n     - **Action Names:** \"send PUBACK\" should be \"send_puback\".\n     - **To:** \"Unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive PUBLISH\" should be \"receive_publish\".\n     - **Action Names:** \"send 0x84\" should be \"send_disconnect_not_authorized\".\n     - **To:** \"Unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive PUBACK\" should be \"receive_puback\".\n     - **Action Names:** \"send 0x84\" should be \"send_disconnect_not_authorized\".\n     - **To:** \"Unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive PUBACK\" should be \"receive_puback\".\n     - **Action Names:** \"send PUBACK\" should be \"send_puback\".\n     - **To:** \"Authorized\" should be \"authorized\".\n     - **Event Names:** \"receive PUBLISH\" should be \"receive_publish\".\n     - **Action Names:** \"send PUBACK\" should be \"send_puback\".\n     - **To:** \"Unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive PUBLISH\" should be \"receive_publish\".\n     - **Action Names:** \"send PUBACK\" should be \"send_puback\".\n     - **To:** \"Unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive PUBACK\" should be \"receive_puback\".\n     - **Action Names:** \"send PUBLISH\" should be \"send_publish\".\n     - **To:** \"Unauthorized\" should be \"unauthorized\".\n   - **Event Names:** \"receive PUBLISH\" should be \"receive_publish\".\n   - **Action Names:** \"send PUBACK\" should be \"send_puback\".\n     - **To:** \"Unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive PUBLISH\" should be \"receive_publish\".\n     - **Action Names:** \"send PUBACK\" should be \"send_puback\".\n     - **To:** \"Unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive PUBLISH\" should be \"receive_publish\".\n     - **Action Names:** \"send PUBACK\" should be \"send_puback\".\n     - **To:** \"Unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive PUBACK\" should be \"receive_puback\".\n     - **Action Names:** \"send PUBLISH\" should be \"send_publish\".\n     - **To:** \"Unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive PUBLISH\" should be \"receive_publish\".\n     - **Action Names:** \"send PUBACK\" should be \"send_puback\".\n     - **To:** \"Unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive PUBLISH\" should be \"receive_publish\".\n     - **Action Names:** \"send PUBACK\" should be \"send_puback\".\n     - **To:** \"Unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive PUBLISH\" should be \"receive_publish\".\n   - **Action Names:** \"send PUBACK\" should be \"send_puback\".\n   - **To:** \"Unauthorized\" should be \"unauthorized\".\n   - **Event Names:** \"receive PUBLISH\" should be \"receive_publish\".\n     - **Action Names:** \"send PUBACK\" should be \"send_puback\".\n     - **To:** \"Unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive PUBACK\" should be \"receive_puback\".\n     - **Action Names:** \"send PUBLISH\" should be \"send_publish\".\n     - **To:** \"Unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive PUBACK\" should be \"receive_puback\".\n     - **Action Names:** \"send PUBLISH\" should be \"send_publish\".\n     - **To:** \"Unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive PUBACK\" should be \"receive_puback\".\n     - **Action Names:** \"send PUBLISH\" should be \"send_publish\".\n     - **To:** \"Unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive PUBACK\" should be \"receive_puback\".\n     - **Action Names:** \"send PUBLISH\" should be \"send_publish\".\n     - **To:** \"Unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive PUBACK\" should be \"receive_puback\".\n     - **Action Names:** \"send PUBLISH\" should be \"send_publish\".\n     - **To:** \"Unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive PUBACK\" should be \"receive_puback\".\n     - **Action Names:** \"send PUBLISH\" should be \"send_publish\".\n     - **To:** \"Unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive PUBACK\" should be \"receive_puback\".\n     - **Action Names:** \"send PUBLISH\" should be \"send_publish\".\n     - **To:** \"Unauthorized\" should be \"unauthorized\".\n---\n\n### Corrected JSONs:\n\n1. **First JSON:**\n\n```json\n{\n  \"states\": [\"awaiting_publish\", \"authorized\", \"unauthorized\", \"awaiting_subscribe\", \"sending_disconnect\"],\n  \"transitions\": [\n    {\n      \"from\": \"Unauthorized\",\n      \"to\": \"unauthorized\"\n    }\n  ]\n}\n```\n\n2. **Second JSON:**\n\n```json\n{\n  \"states\": [\"awaiting_publish\", \"authorized\", \"unauthorized\", \"awaiting_subscribe\", \"sending_disconnect\"],\n  \"transitions\": [\n    {\n      \"from\": \"awaiting_publish\",\n      \"to\": \"authorized\"\n    },\n    {\n      \"from\": \"authorized\",\n      \"event\": \"receive_publish\",\n      \"action\": \"send_puback\",\n      \"to\": \"authorized\"\n    },\n    {\n      \"from\": \"authorized\",\n      \"event\": \"receive_publish\",\n      \"action\": \"send_puback\",\n      \"to\": \"unauthorized\"\n    },\n    {\n      \"from\": \"authorized\",\n      \"event\": \"receive_publish\",\n      \"action\": \"send_puback\",\n      \"to\": \"unauthorized\"\n    },\n    {\n      \"from\": \"authorized\",\n      \"event\": \"receive_publish\",\n      \"action\": \"send_puback\",\n      \"to\": \"unauthorized\"\n    },\n    {\n      \"from\": \"authorized\",\n      \"event\": \"receive_publish\",\n      \"action\": \"send_puback\",\n      \"to\": \"unauthorized\"\n    },\n    {\n      \"from\": \"unauthorized\",\n      \"event\": \"receive_publish\",\n      \"action\": \"send_puback\",\n      \"to\": \"unauthorized\"\n    },\n    {\n      \"from\": \"unauthorized\",\n      \"event\": \"receive_publish\",\n      \"action\": \"send_puback\",\n      \"to\": \"unauthorized\"\n    },\n    {\n      \"from\": \"unauthorized\",\n      \"event\": \"receive_publish\",\n      \"action\": \"send_puback\",\n      \"to\": \"unauthorized\"\n    }\n  ]\n}\n```\n\n3. **Third JSON:**\n\n```json\n{\n  \"states\": [\"awaiting_publish\", \"authorized\", \"unauthorized\", \"awaiting_subscribe\", \"sending_disconnect\"],\n  \"transitions\": [\n    {\n      \"from\": \"awaiting_publish\",\n      \"event\": \"receive_connect\",\n      \"to\": \"authorized\"\n    },\n    {\n      \"from\": \"authorized\",\n      \"event\": \"receive_publish\",\n      \"action\": \"send_puback\",\n      \"to\": \"unauthorized\"\n    },\n    {\n      \"from\": \"authorized\",\n      \"event\": \"receive_publish\".\n      \"action\": \"send_puback\",\n      \"to\": \"unauthorized\"\n    },\n    {\n      \"from\": \"authorized\",\n      \"event\": \"receive_publish\".\n      \"action\": \"send_puback\",\n      \"to\": \"unauthorized\"\n    },\n    {\n      \"from\": \"unauthorized\",\n      \"event\": \"receive_publish\".\n      \"action\": \"send_puback\",\n      \"to\": \"unauthorized\".\n    },\n    {\n      \"from\": \"authorized\",\n      \"event\": \"receive_publish\" should be \"awaiting_publish\", \"awaiting_publish\".\n     - **Event Names:** \"receive_publish\" should be \"receive_publish\".\n     - **Action Names:** \"send_puback\" should be \"set_authorized_true\".\n     - **To:** \"Authorized\" should be \"authorized\".\n     - **Event Names:** \"receive_publish\" should be \"receive_publish\".\n     - **Action Names:** \"send_puback\" should be \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **Event Names:** \"receive_publish\" should be \"unauthorized\".\n     - **Action Names:** \"send_puback\" should be \"receive_publish\".\n     - **To:** \"Unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive_publish\" should be \"unauthorized\".\n     - **Action Names:** \"send_puback\" should be \"receive_publish\".\n     - **Action Names:** \"send_puback\" should be \"send_puback\".\n     - **To:** \"unauthorized\".\n     - **Event Names:** \"receive_publish\" should be \"unauthorized\".\n     - **Action Names:** \"send_puback\" should be \"receive_puback\".\n     - **To:** \"unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive_publish\" should be \"receive_publish\".\n     - **Action Names:** \"send_puback\" should be \"receive_publish\".\n     - **To:** \"unauthorized\".\n     - **Action Names:** \"send_puback\" should be \"send_puback\".\n     - **To:** \"unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive_publish\" should be \"receive_publish\".\n     - **Action Names:** \"send_puback\" should be \"send_puback\".\n     - **To:** \"unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive_publish\" should be \"receive_publish\".\n     - **Action Names:** \"send_puback\" should be \"send_puback\".\n     - **To:** \"unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive_publish\" should be \"receive_publish\".\n     - **Action Names:** \"send_puback\" should be \"send_puback\".\n     - **To:** \"unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive_publish\" should be \"receive_publish\".\n     - **Action Names:** \"send_puback\" should be \"send_puback\".\n     - **To:** \"unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive_publish\" should be \"receive_publish\".\n     - **Action Names:** \"send_puback\" should be \"send_puback\" should be \"send_puback\".\n     - **To:** \"unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive_publish\" should be \"receive_publish\".\n     - **Action Names:** \"send_puback\" should be \"send_puback\".\n     - **To:** \"unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive_publish\" should be \"receive_publish\".\n     - **Action Names:** \"send_puback\" should be \"send_puback\".\n     - **To:** \"unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive_publish\" should be \"receive_publish\".\n     - **Action Names:** \"send_puback\" should be \"send_puback\".\n     - **To:** \"unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive_publish\" should be \"receive_publish\".\n     - **Action Names:** \"send_puback\" should be \"send_puback\" should be \"send_puback\".\n     - **To:** \"unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive_publish\" should be \"receive_publish\".\n     - **Action Names:** \"send_puback\" should be \"send_puback\".\n     - **To:** \"unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive_publish\" should be \"receive_publish\".\n     - **Action Names:** \"send_puback\" should be \"send_puback\".\n     - **To:** \"unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive_publish\" should be \"receive_publish\".\n     - **Action Names:** \"send_puback\" should be \"send_puback\".\n     - **To:** \"unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive_publish\" should be \"receive_publish\".\n     - **Action Names:** \"send_puback\" should be \"send_puback\" should be \"send_puback\".\n     - **To:** \"unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive_publish\" should be \"receive_publish\".\n     - **Action Names:** \"send_puback\" should be \"send_puback\".\n     - **To:** \"unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive_publish\" should be \"receive_publish\".\n     - **Action Names:** \"send_puback\" should be \"send_puback\".\n     - **To:** \"unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive_publish\" should be \"receive_publish\".\n     - **Action Names:** \"send_puback\" should be \"send_puback\".\n     - **To:** \"unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive_publish\" should be \"receive_publish\".\n     - **Action Names:** \"send_puback\" should be \"send_puback\" should be \"send_puback\".\n     - **To:** \"unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"receive_publish\" should be \"receive_publish\".\n     - **Action Names:** \"send_puback\" should be \"send_puback\".\n     - **To:** \"unauthorized\" should be \"unauthorized\".\n     - **Event Names:** \"First JSON:**\n\n```json\n{\n  \"states\": [\"awaiting_publish\", \"authorized\", \"unauthorized\", \"awaiting_subscribe\", \"ending_disconnect\"],\n  \"transitions\": [\n    {\n      \"from\": \"awaiting_publish\",\n      \"event\": \"receive_connect\",\n      \"action\": \"send_puback\",\n      \"from\": \"authorized\",\n      \"event\": \"receive_connect\",\n  \"publish\",\n      \"unauthorized\", \"awaiting_subscribe\", \"ending_disconnect\"],\n  \"transitions\": [\n    {\n      \"from\": \"awaiting_publish\",\n      \"event\": \"receive_connect\",\n      \"action\": \"send_puback\",\n      \"authorized\",\n      \"event\": \"receive_disconnect\",\n      \"action\": \"send_disconnect\",\n      \"to\": \"unauthorized\"\n    },\n    {\n      \"from\": \"authorized\",\n      \"event\": \"receive_disconnect\",\n      \"action\": \"send_disconnect\",\n      \"to\": \"unauthorized\"\n    },\n    {\n      \"from\": \"unauthorized\",\n      \"event\": \"receive_disconnect\",\n      \"action\": \"send_disconnect\",\n      \"to\": \"unauthorized\"\n    },\n    {\n      \"from\": \"unauthorized\",\n      \"event\": \"receive_disconnect\",\n      \"action\": \"send_disconnect\",\n      \"to\": \"unauthorized\"\n    },\n    {\n      \"from\": \"unauthorized\",\n      \"event\": \"receive_disconnect\",\n      \"action\": \"send_disconnect\",\n      \"to\": \"unauthorized\"\n    }\n  ]\n}\n```\n\n4. **Fourth JSON:**\n\n```json\n{\n  \"states\": [\"awaiting_publish\", \"authorized\", \"unauthorized\", \"awaiting_subscribe\", \"ending_disconnect\"],\n  \"transitions\": [\n    {\n      \"from\": \"awaiting_publish\",\n      \"event\": \"receive_connect\",\n      \"action\": \"send_disconnect\",\n      \"to\": \"authorized\"\n    },\n    {\n      \"from\": \"authorized\",\n      \"event\": \"receive_disconnect\",\n      \"action\": \"to\": \"unauthorized\"\n    },\n    {\n      \"from\": \"authorized\",\n      \"event\": \"receive_connect\",\n  \"awaiting_publish\", \"authorized\", \"unauthorized\", \"awaiting_subscribe\", \"ending_disconnect\"],\n  \"transitions\": [\n    {\n      \"from\": \"awaiting_publish\",\n      \"event\": \"receive_connect\",\n      \"action\": \"send_connect\",\n      \"to\": \"authorized\",\n      \"event\": \"receive_disconnect\",\n      \"action\": \"send_disconnect\",\n      \"to\": \"authorized\"\n    },\n    {\n      \"from\": \"authorized\",\n      \"event\": \"receive_disconnect\",\n      \"action\": \"send_disconnect\",\n      \"to\": \"unauthorized\"\n    },\n    {\n      \"from\": \"unauthorized\",\n      \"event\": \"receive_disconnect\",\n      \"action\": \"send_disconnect\",\n      \"to\": \"unauthorized\"\n    },\n    {\n      \"from\": \"authorized\",\n      \"event\": \"receive_disconnect\",\n      \"action\": \"send_disconnect\",\n      \"to\": \"send_disconnect\",\n      \"to\": \"unauthorized\"\n    },\n    {\n      \"from\": \"unauthorized\",\n      \"event\": \"receive_disconnect\",\n      \"action\": \"send_disconnect\".\n      \"to\": \"unauthorized\",\n      \"receive_disconnect\" should be \"receive_connect\".\n     - **Action Names:** \"send_disconnect\" should be \"send_disconnect\".\n     - **To:** \"unauthorized\" should be \"unauthorized\".\n     - **From:** \"authorized\" should be \"receive_disconnect\".\n     - **Action:** \"send_disconnect\" should be \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\" should be \"receive_disconnect\" should be \"receive_disconnect\".\n     - **Action:** \"send_disconnect\" should be \"send_disconnect\".\n     - **To:** \"unauthorized\" should be \"unauthorized\".\n     - **From:** \"unauthorized\" should be \"receive_disconnect\".\n     - **Action:** \"send_disconnect\" should be \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\" should be \"receive_disconnect\" should be \"receive_disconnect\".\n     - **Action:** \"send_disconnect\" should be \"send_disconnect\".\n     - **To:** \"unauthorized\" should be \"unauthorized\".\n     - **From:** \"unauthorized\" should be \"receive_disconnect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\" should be \"unauthorized\".\n     - **Event:** \"receive_disconnect\" should be \"receive_connect\".\n     - **Action:** \"send_disconnect\" should be \"send_disconnect\".\n     - **To:** \"unauthorized\" should be \"unauthorized\".\n     - **From:** \"unauthorized\" should be \"receive_disconnect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\" should be \"receive_disconnect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\" should be \"receive_disconnect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\" should be \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **Event:** \"receive_disconnect\" should be \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"receive_disconnect\" should be \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"receive_connect\" should be \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"receive_disconnect\" should be \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **Event:** \"receive_disconnect\" should be \"receive_connect\".\n     - **Action:** \"send_disconnect\" should be \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"receive_disconnect\" should be \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"receive_connect\" should be \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"receive_connect\" should be \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **Event:** \"receive_disconnect\" should be \"receive_connect\".\n     - **Action:** \"send_disconnect\" should be \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"receive_connect\" should be \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"receive_connect\" should be \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"receive_connect\" should be \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **Event:** \"receive_connect\" should be \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"receive_connect\" should be \"receive_connect\",\n  \"states\": [\"awaiting_publish\", \"authorized\", \"unauthorized\", \"awaiting_subscribe\", \"ending_disconnect\"],\n  \"transitions\": [\n    {\n      \"from\": \"awaiting_publish\",\n      \"receive_disconnect\",\n      \"send_connect\",\n      \"send_disconnect\",\n      \"to\": \"unauthorized\",\n      \"receive_disconnect\",\n      \"send_connect\",\n      \"action\": \"send_disconnect\",\n      \"send_disconnect\",\n      \"to\": \"unauthorized\",\n      \"from\": \"awaiting_publish\",\n      \"receive_connect\",\n      \"send_connect\",\n      \"send_disconnect\",\n      \"to\": \"unauthorized\",\n      \"receive_disconnect\",\n      \"send_disconnect\",\n      \"send_disconnect\",\n      \"to\": \"unauthorized\"\n    },\n    {\n      \"from\": \"unauthorized\",\n      \"receive_connect\",\n      \"send_connect\",\n      \"send_disconnect\",\n      \"to\": \"unauthorized\"\n    },\n    {\n      \"from\": \"unauthorized\",\n      \"receive_connect\",\n      \"send_connect\",\n      \"send_disconnect\",\n      \"to\": \"unauthorized\"\n    }\n  ]\n}\n```\n\nThe provided JSON data appears to be a description of a state machine or finite state machine (FSM) that describes the transitions between different states based on certain events and actions. Here is a corrected and structured version of the JSON data:\n\n```json\n{\n  \"states\": [\n    {\n      \"from\": \"awaiting_publish\",\n      \"event\": \"receive_connect\",\n  \"actions\": [\n    {\n      \"from\": \"awaiting_publish\",\n      \"receive_connect\",\n      \"receive_disconnect\",\n      \"send_disconnect\",\n      \"send_disconnect\"],\n  \"transitions\": [\n    {\n      \"from\": \"awaiting_publish\",\n      \"event\": \"receive_connect\",\n      \"action\": \"send_connect\",\n      \"to\": \"authorized\"\n    },\n    {\n      \"from\": \"authorized\",\n      \"receive_connect\",\n      \"send_connect\",\n      \"send_disconnect\",\n      \"unauthorized\"\n    },\n    {\n      \"from\": \"unauthorized\",\n      \"receive_connect\",\n      \"send_connect\",\n      \"send_disconnect\",\n      \"unauthorized\",\n      \"send_disconnect\",\n      \"send_disconnect\"],\n    \"to\": [\n      {\n        \"from\": \"awaiting_publish\",\n      \"receive_connect\",\n      \"send_connect\",\n      \"send_disconnect\",\n      \"to\": \"unauthorized\"\n    },\n    {\n      \"from\": \"send_connect\",\n      \"send_disconnect\",\n      \"to\": \"unauthorized\"\n    },\n    {\n      \"from\": \"unauthorized\",\n      \"receive_connect\",\n      \"send_connect\",\n      \"send_disconnect\",\n      \"to\": \"unauthorized\"\n    },\n    {\n      \"from\": \"unauthorized\",\n      \"receive_connect\",\n      \"send_connect\",\n      \"send_disconnect\",\n      \"to\": \"unauthorized\"\n    }\n  ]\n}\n```\n\nThe corrected JSON data represents a finite state machine (FSM) with states and transitions based on events and actions. The states include \"awaiting_publish\", \"authorized\", \"unauthorized\", \"awaiting_subscribe\",\n    {\n      \"from\": \"unauthorized\",\n      \"receive_connect\",\n      \"send_connect\",\n      \"send_disconnect\",\n      \"to\": \"unauthorized\"\n    }\n  ]\n}\n```\n\nThis corrected JSON data represents a finite state machine (FSM) with states and transitions based on events and actions. The states include \"awaiting_publish\", \"authorized\", \"unauthorized\", \"awaiting_subscribe\", \"ending_disconnect\".\n     - **Event:** \"send_disconnect\" should be \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\" should be \"unauthorized\".\n     - **Event:** \"receive_connect\".\n     - **Action:** \"send_disconnect\" should be \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **Event:** \"receive_connect\" should be \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **Event:** \"receive_connect\" should be \"receive_connect\".\n     - **Event:** \"receive_connect\" should be \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"send_disconnect\" should be \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\" should be \"unauthorized\".\n     - **Event:** \"receive_connect\".\n     - **To:** \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **Event:** \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **Event:** \"receive_connect\".\n     - **Action:** \"send_disconnect\" should be \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **Event:** \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"send_disconnect\" should be \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **Event:** \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"send_disconnect\" should be \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **Event:** \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **To:** \"send_disconnect\" should be \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **Event:** \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **Event:** \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **Event:** \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **To:** \"send_disconnect\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **Event:** \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"send_disconnect\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **Event:** \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **To:** \"send_disconnect\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **Event:** \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"send_disconnect\".\n     - **To:** \"send_disconnect\".\n     - **Event:** \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **To:** \"send_disconnect\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **Event:** \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"send_disconnect\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **Event:** \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **To:** \"send_disconnect\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **Event:** \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"send_disconnect\".\n     - **To:** \"send_disconnect\".\n     - **Event:** \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"send_disconnect\".\n     - **Event:** \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **Event:** \"receive_connect\".\n     - **To:** \"send_disconnect\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **Event:** \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"send_disconnect\".\n     - **Event:** \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **Event:** \"receive_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **To:** \"send_disconnect\",\n  \"awaiting_publish\", \"receive_connect\", \"unauthorized\", \"send_disconnect\", \"send_disconnect\"],\n  \"to\": [\n    {\n        \"from\": \"awaiting_publish\",\n      \"receive_connect\",\n      \"send_disconnect\",\n      \"unauthorized\",\n      \"unauthorized\",\n      \"unauthorized\",\n      \"receive_connect\",\n      \"send_connect\",\n      \"send_disconnect\",\n      \"send_disconnect\",\n      \"to\": \"unauthorized\",\n      \"unauthorized\",\n      \"receive_connect\",\n      \"send_connect\",\n      \"event\": \"send_connect\",\n      \"send_disconnect\",\n      \"unauthorized\",\n      \"unauthorized\"\n    },\n    {\n      \"from\": \"unauthorized\",\n      \"to\": \"unauthorized\"\n    },\n    {\n      \"from\": \"unauthorized\",\n      \"receive_connect\",\n      \"event\": \"send_connect\",\n      \"send_disconnect\",\n      \"unauthorized\",\n      \"unauthorized\"\n    },\n    {\n      \"from\": \"unauthorized\",\n      \"event\": \"receive_connect\",\n      \"send_disconnect\",\n      \"unauthorized\",\n      \"unauthorized\"\n  ]\n}\n```\n\nThis JSON data represents a finite state machine (FSM) with states and transitions for handling connections, likely for an authorization or connection handling process. The states based on events and resulting actions. Below is the corrected and properly formatted JSON:\n\n```json\n{\n  \"states\": [\n    {\n      \"awaiting_publish\",\n      \"receive_connect\",\n      \"event\": \"receive_connect\",\n      \"action\": \"send_connect\",\n      \"to\": \"authorized\",\n      \"event\": \"receive_connect\",\n      \"action\": \"send_connect\",\n      \"send_disconnect\",\n      \"to\": \"unauthorized\"\n    },\n    {\n      \"from\": \"authorized\",\n      \"receive_connect\",\n      \"send_connect\",\n      \"send_disconnect\",\n      \"to\": \"unauthorized\"\n    },\n    {\n      \"from\": \"unauthorized\",\n      \"event\": \"receive_connect\",\n      \"send_disconnect\",\n      \"to\": \"unauthorized\"\n    },\n    {\n      \"from\": \"unauthorized\",\n      \"event\": \"send_connect\",\n      \"send_disconnect\",\n      \"to\": \"unauthorized\"\n    }\n  ]\n}\n```\n\nThis JSON data describes a finite state machine (FSM) with states and transitions based on events and actions. The states include \"awaiting_publish\", \"receive_connect\", \"send_disconnect\",\n      \"unauthorized\"\n    },\n    {\n      \"from\": \"authorized\",\n      \"receive_connect\",\n      \"send_disconnect\",\n      \"unauthorized\"\n    },\n    {\n      \"from\": \"unauthorized\",\n      \"event\": \"send_connect\",\n      \"send_disconnect\",\n      \"to\": \"unauthorized\"\n    }\n  ]\n}\n```\n\nThis JSON data describes a finite state machine (FSM) with states and transitions based on events and actions. The states and transitions are structured to handle connections, likely for authorization or connection handling. Each state transition is structured to describe the transitions between different states based on specific events and actions. The transitions are structured to handle connections and disconnections, \"receive_connect\", \"send_disconnect\", and \"send_disconnect\". The transitions describe the state changes based on events like \"receive_connect\", \"send_connect\", \"send_disconnect\", and \"to\" the next state. This structure can be used to implement a state machine for handling connections and disconnections, likely for authorization or connection handling. The transitions are structured to handle connections and disconnections, receive_connect\", \"receive_disconnect\", \"send_disconnect\", and \"send_disconnect\". The transitions describe the state changes based on events like \"receive_connect\", \"send_connect\", \"send_disconnect\" should be \"unauthorized\".\n     - **Event:** \"receive_connect\".\n     - **Action:** \"send_connect\" should be \"send_connect\", \"send_disconnect\" should be \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **Event:** \"receive_connect\" should be \"send_connect\".\n     - **Action:** \"send_disconnect\" should be \"send_disconnect\".\n     - \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **Action:** \"send_connect\".\n     - **Action:** \"send_disconnect\" should be \"send_connect\".\n     - **To:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **Event:** \"receive_connect\".\n     - **Action:** \"send_connect\".\n     - **Action:** \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **Event:** \"receive_connect\".\n     - **To:** \"send_connect\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **To:** \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **To:** \"receive_connect\".\n     - **To:** \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **To:** \"receive_connect\".\n     - **To:** \"send_disconnect\".\n     - **To:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"receive_connect\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"send_connect\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **From:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **To:** \"send_connect\".\n     - **To:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **To:** \"unauthorized\".\n     - **From:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"send_disconnect\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"unauthorized\".\n     - **From:** \"send_disconnect\".\n    ",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "Authenticated",
+      "Authorized",
+      "Connected",
+      "Disconnected",
+      "Error",
+      "MessageExpired",
+      "ReauthenticationFailed",
+      "ReauthenticationSucceeded",
+      "Reauthenticating",
+      "SessionConnected",
+      "SessionCreated",
+      "SessionDisconnected",
+      "SessionExpired",
+      "SessionResumed",
+      "TokenExpired",
+      "TokenInvalid",
+      "TokenValidated",
+      "Unauthorized",
+      "Waiting",
+      "WillMessageSent"
+    ],
+    "initial_state": "Connected",
+    "final_states": [
+      "Error",
+      "ReauthenticationFailed",
+      "TokenExpired",
+      "Unauthorized",
+      "WillMessageSent"
+    ],
+    "transitions": [
+      {
+        "from": "Authenticated",
+        "event": "receive password",
+        "action": "establish connection",
+        "to": "Connected"
+      },
+      {
+        "from": "Authorized",
+        "event": "send PUBLISH",
+        "action": "forward PUBLISH",
+        "to": "Authorized"
+      },
+      {
+        "from": "Connected",
+        "event": "cond invalid token",
+        "action": "send 0x84",
+        "to": "Disconnected"
+      },
+      {
+        "from": "Connected",
+        "event": "receive disconnect",
+        "action": "close connection",
+        "to": "Disconnected"
+      },
+      {
+        "from": "Disconnected",
+        "event": "cond SessionExpiryInterval 0",
+        "action": "discard SessionState",
+        "to": "Disconnected"
+      },
+      {
+        "from": "Disconnected",
+        "event": "cond SessionExpiryInterval > 0",
+        "action": "store SessionState",
+        "to": "Disconnected"
+      },
+      {
+        "from": "Disconnected",
+        "event": "receive PUBLISH with RETAIN",
+        "action": "store RetainedMessage",
+        "to": "Disconnected"
+      },
+      {
+        "from": "Disconnected",
+        "event": "timeout TokenExpiry",
+        "action": "discard RetainedMessage",
+        "to": "TokenExpired"
+      },
+      {
+        "from": "Disconnected",
+        "event": "timeout MessageExpiryInterval",
+        "action": "discard RetainedMessage",
+        "to": "MessageExpired"
+      },
+      {
+        "from": "Reauthenticating",
+        "event": "cond reauthentication fails",
+        "action": "send DISCONNECT Not Authorized",
+        "to": "ReauthenticationFailed"
+      },
+      {
+        "from": "Reauthenticating",
+        "event": "cond reauthentication succeeds",
+        "action": "set token valid",
+        "to": "ReauthenticationSucceeded"
+      },
+      {
+        "from": "ReauthenticationSucceeded",
+        "event": "receive CONNECT",
+        "action": "check token expiration",
+        "to": "TokenValidated"
+      },
+      {
+        "from": "ReauthenticationSucceeded",
+        "event": "receive PUBLISH",
+        "action": "check token expiration",
+        "to": "TokenValidated"
+      },
+      {
+        "from": "ReauthenticationSucceeded",
+        "event": "receive SUBSCRIBE",
+        "action": "check token expiration",
+        "to": "TokenValidated"
+      },
+      {
+        "from": "ReauthenticationSucceeded",
+        "event": "receive PINGREQ",
+        "action": "check token expiration",
+        "to": "TokenValidated"
+      },
+      {
+        "from": "SessionConnected",
+        "event": "receive DISCONNECT",
+        "action": "send WillMessage",
+        "to": "WillMessageSent"
+      },
+      {
+        "from": "TokenValidated",
+        "event": "cond clean flag set",
+        "action": "set session new",
+        "to": "SessionCreated"
+      },
+      {
+        "from": "TokenValidated",
+        "event": "cond clean flag not set",
+        "action": "set session resumed",
+        "to": "SessionResumed"
+      },
+      {
+        "from": "TokenValidated",
+        "event": "receive CONNECT",
+        "action": "check token expiration",
+        "to": "TokenValidated"
+      },
+      {
+        "from": "TokenValidated",
+        "event": "receive PUBLISH",
+        "action": "check token expiration",
+        "to": "TokenValidated"
+      },
+      {
+        "from": "TokenValidated",
+        "event": "receive SUBSCRIBE",
+        "action": "check token expiration",
+        "to": "TokenValidated"
+      },
+      {
+        "from": "TokenValidated",
+        "event": "receive PINGREQ",
+        "action": "check token expiration",
+        "to": "TokenValidated"
+      },
+      {
+        "from": "Waiting",
+        "event": "expire timeout",
+        "action": "retry connection",
+        "to": "Disconnected"
+      },
+      {
+        "from": "Unauthorized",
+        "event": "send DISCONNECT",
+        "action": "close connection",
+        "to": "WillMessageSent"
+      },
+      {
+        "from": "SessionResumed",
+        "event": "cond session expired",
+        "action": "send 0x84",
+        "to": "SessionExpired"
+      },
+      {
+        "from": "SessionResumed",
+        "event": "receive PUBLISH",
+        "action": "send 0x80",
+        "to": "Disconnected"
+      },
+      {
+        "from": "SessionCreated",
+        "event": "receive PUBLISH",
+        "action": "send 0x80",
+        "to": "Disconnected"
+      },
+      {
+        "from": "SessionCreated",
+        "event": "receive SUBSCRIBE",
+        "action": "send 0x80",
+        "to": "Disconnected"
+      },
+      {
+        "from": "SessionResumed",
+        "event": "receive SUBSCRIBE",
+        "action": "send 0x80",
+        "to": "Disconnected"
+      },
+      {
+        "from": "TokenExpired",
+        "event": "receive AUTH Reauthentication",
+        "action": "set Authentication Method ace",
+        "to": "Reauthenticating"
+      },
+      {
+        "from": "TokenValid",
+        "event": "receive CONNECT",
+        "action": "check token expiration",
+        "to": "TokenValid"
+      },
+      {
+        "from": "TokenValid",
+        "event": "receive PUBLISH",
+        "action": "check token expiration",
+        "to": "TokenValid"
+      },
+      {
+        "from": "TokenValid",
+        "event": "receive SUBSCRIBE",
+        "action": "check token expiration",
+        "to": "TokenValid"
+      },
+      {
+        "from": "TokenValid",
+        "event": "receive PINGREQ",
+        "action": "check token expiration",
+        "to": "TokenValid"
+      },
+      {
+        "from": "TokenValid",
+        "event": "cond token expired",
+        "action": "send PUBACK Not authorized",
+        "to": "TokenExpired"
+      },
+      {
+        "from": "TokenValid",
+        "event": "cond token expired",
+        "action": "send SUBACK Not authorized",
+        "to": "TokenExpired"
+      },
+      {
+        "from": "TokenValid",
+        "event": "cond token expired",
+        "action": "send DISCONNECT Not authorized",
+        "to": "Disconnected"
+      }
+    ]
+  }
 }

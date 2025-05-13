@@ -1,0 +1,197 @@
+{
+  "states": [
+    "Unauthenticated",
+    "AwaitingPassword",
+    "Authenticated",
+    "Transaction",
+    "Update",
+    "Closed",
+    "MessageListed",
+    "MessageRetrieved",
+    "MessageDeleted",
+    "SessionEnded",
+    "WaitingForConnection",
+    "Connected"
+  ],
+  "initial_state": "WaitingForConnection",
+  "final_states": [
+    "Closed",
+    "SessionEnded"
+  ],
+  "transitions": [
+    {
+      "from": "WaitingForConnection",
+      "event": "receive open connection",
+      "action": "reply +OK POP3 server ready",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "receive APOP",
+      "action": "reply +OK maildrop has 2 messages",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Unauthenticated",
+      "event": "receive USER",
+      "action": "reply 334",
+      "to": "AwaitingPassword"
+    },
+    {
+      "from": "AwaitingPassword",
+      "event": "receive PASS",
+      "action": "reply 230",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive STAT",
+      "action": "reply 211",
+      "to": "Transaction"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive LIST",
+      "action": "reply 211",
+      "to": "Transaction"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive RETR",
+      "action": "reply 220",
+      "to": "Transaction"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive TOP",
+      "action": "reply 220",
+      "to": "Transaction"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive UIDL",
+      "action": "reply 211",
+      "to": "Transaction"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive DELE",
+      "action": "reply 250",
+      "to": "Transaction"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive NOOP",
+      "action": "reply 200",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive RSET",
+      "action": "reply 250",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "Update"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive QUIT",
+      "action": "reply +OK",
+      "to": "Update"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive STAT",
+      "action": "reply +OK nn mm",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive LIST",
+      "action": "reply +OK scan listing follows",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive LIST [msg]",
+      "action": "reply +OK scan listing follows",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive RETR msg",
+      "action": "reply +OK message follows",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive DELE msg",
+      "action": "reply +OK message deleted",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive NOOP",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive RSET",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive TOP",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive UIDL",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Update",
+      "event": "receive QUIT",
+      "action": "reply +OK",
+      "to": "Update"
+    },
+    {
+      "from": "Update",
+      "event": "send 221",
+      "action": "close connection",
+      "to": "Unauthenticated"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive QUIT",
+      "action": "reply OK",
+      "to": "Closed"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive valid_credentials",
+      "action": "reply OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Update",
+      "event": "send goodbye",
+      "action": "close connection",
+      "to": "Authorization"
+    },
+    {
+      "from": "Authorization",
+      "event": "timeout 10m",
+      "action": "close connection",
+      "to": "Authorization"
+    }
+  ]
+}

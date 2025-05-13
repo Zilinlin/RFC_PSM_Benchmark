@@ -164,5 +164,239 @@
     }
   ],
   "final_response": "It seems like you're dealing with state machines for RTSP (Real-Time Streaming Protocol) servers. Let's break down the information provided and clarify the state transitions and actions for better understanding.\n\n### State Machines for RTSP Servers\n\n#### First State Machine\n\n**States:**\n1. `PlayState`\n2. `RTSP1.0`\n3. `RTSP2.0`\n4. `RTSP1.0Server`\n5. `RTSP2.0Server`\n\n**Transitions:**\n\n1. **From `RTSP2.0Server`:**\n   - **Event:** receive RTSP/1.0 request\"\n   - **Action:** reply 505\"\n   - **To:** `RTSP1.0Server`\n\n2. **From `RTSP2.0Server`:**\n   - **Event:** receive RTSP/1.0 request\"\n   - **Action:** reply RTSP/1.0\"\n   - **To:** `RTSP1.0Server`\n\n3. **From `RTSP2.0Server`:**\n   - **Event:** receive RTSP/2.0 request\"\n   - **Action:** reply RTSP/2.0\"\n   - **To:** `RTSP2.0Server`\n\n4. **From `RTSP1.0Server`:**\n   - **Event:** receive RTSP/2.0 request\"\n   - **Action:** reply 505\"\n   - **To:** `RTSP1.0Server`\n\n5. **From `PlayState`:**\n   - **Event:** receive PLAY\"\n   - **Action:** replace previous PLAY\"\n   - **To:** `PlayState`\n\n#### Second State Machine\n\n**States:**\n1. `Idle`\n2. `SessionEstablished`\n3. `MediaStreaming`\n4. `SessionTerminated`\n\n**Transitions:**\n\n1. **From `Idle`:**\n   - **Event:** receive SETUP\"\n   - **Action:** reply 200\"\n   - **To:** `SessionEstablished`\n\n2. **From `SessionEstablished`:**\n   - **Event:** receive PLAY\"\n   - **Action:** reply 200\"\n   - **To:** `MediaStreaming`\n\n3. **From `MediaStreaming`:**\n   - **Event:** receive TEARDOWN\"\n   - **Action:** reply 200\"\n   - **To:** `SessionTerminated`\n\n### Summary\n\n- **First State Machine:** Handles different versions of RTSP requests and transitions between server states based on the version of the request received.\n- **Second State Machine:** Manages the lifecycle of an RTSP session, from idle to established, media streaming, and finally termination.\n\nThese state machines ensure that the RTSP server can handle different versions of the protocol and manage sessions appropriately, providing a structured way to handle various events and transitions. If you have any specific questions or need further clarification on any part of these state machines, feel free to ask!\n```",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "SessionCreated",
+      "SessionActive",
+      "SessionTimedOut",
+      "SessionRemoved",
+      "Idle",
+      "ProcessingRequest",
+      "SendingResponse",
+      "HandlingInformationalResponse",
+      "HandlingSuccessResponse",
+      "HandlingRedirectionResponse",
+      "HandlingClientErrorResponse",
+      "HandlingServerErrorResponse",
+      "WaitingForNextRequest",
+      "Setup",
+      "Playing",
+      "SendingData",
+      "RTSP1.0Server",
+      "RTSP2.0Server",
+      "PlayState",
+      "SessionEstablished",
+      "MediaStreaming",
+      "SessionTerminated"
+    ],
+    "initial_state": "Idle",
+    "final_states": [
+      "SessionRemoved",
+      "SessionTimedOut",
+      "HandlingServerErrorResponse",
+      "HandlingClientErrorResponse",
+      "SendingResponse",
+      "SessionTerminated"
+    ],
+    "transitions": [
+      {
+        "from": "SessionCreated",
+        "event": "receive SETUP",
+        "action": "reply 200 OK",
+        "to": "SessionActive"
+      },
+      {
+        "from": "SessionActive",
+        "event": "timeout 30s",
+        "action": "close session",
+        "to": "SessionTimedOut"
+      },
+      {
+        "from": "SessionActive",
+        "event": "receive TEARDOWN",
+        "action": "reply 200 OK",
+        "to": "SessionRemoved"
+      },
+      {
+        "from": "Idle",
+        "event": "receive request",
+        "action": "set processingRequest true",
+        "to": "ProcessingRequest"
+      },
+      {
+        "from": "ProcessingRequest",
+        "event": "cond informational response",
+        "action": "reply 100",
+        "to": "HandlingInformationalResponse"
+      },
+      {
+        "from": "ProcessingRequest",
+        "event": "cond success response",
+        "action": "reply 200",
+        "to": "HandlingSuccessResponse"
+      },
+      {
+        "from": "ProcessingRequest",
+        "event": "cond redirection response",
+        "action": "reply 301",
+        "to": "HandlingRedirectionResponse"
+      },
+      {
+        "from": "ProcessingRequest",
+        "event": "cond client error response",
+        "action": "reply 400",
+        "to": "HandlingClientErrorResponse"
+      },
+      {
+        "from": "ProcessingRequest",
+        "event": "cond server error response",
+        "action": "reply 500",
+        "to": "HandlingServerErrorResponse"
+      },
+      {
+        "from": "HandlingInformationalResponse",
+        "event": "send 100",
+        "action": "set sendingResponse true",
+        "to": "SendingResponse"
+      },
+      {
+        "from": "HandlingSuccessResponse",
+        "event": "send 200",
+        "action": "set sendingResponse true",
+        "to": "SendingResponse"
+      },
+      {
+        "from": "HandlingRedirectionResponse",
+        "event": "send 301",
+        "action": "set sendingResponse true",
+        "to": "SendingResponse"
+      },
+      {
+        "from": "HandlingInformationalResponse",
+        "event": "send 100",
+        "action": "reply 100",
+        "to": "HandlingSuccessResponse"
+      },
+      {
+        "from": "HandlingInformationalResponse",
+        "event": "send 301",
+        "action": "reply 301",
+        "to": "HandlingRedirectionResponse"
+      },
+      {
+        "from": "HandlingRedirectionResponse",
+        "event": "send 400",
+        "action": "reply 400",
+        "to": "HandlingClientErrorResponse"
+      },
+      {
+        "from": "HandlingClientErrorResponse",
+        "event": "send 500",
+        "action": "reply 500",
+        "to": "HandlingServerErrorResponse"
+      },
+      {
+        "from": "HandlingServerErrorResponse",
+        "event": "send 501",
+        "action": "reply 501",
+        "to": "Idle"
+      },
+      {
+        "from": "Idle",
+        "event": "receive Request",
+        "action": "set ProcessingRequest true",
+        "to": "ProcessingRequest"
+      },
+      {
+        "from": "ProcessingRequest",
+        "event": "cond request processed",
+        "action": "set WaitingForNextRequest true",
+        "to": "WaitingForNextRequest"
+      },
+      {
+        "from": "WaitingForNextRequest",
+        "event": "receive NextRequest",
+        "action": "set ProcessingRequest true",
+        "to": "ProcessingRequest"
+      },
+      {
+        "from": "ProcessingRequest",
+        "event": "cond response ready",
+        "action": "send Response",
+        "to": "SendingResponse"
+      },
+      {
+        "from": "SendingResponse",
+        "event": "send Response",
+        "action": "set Idle true",
+        "to": "Idle"
+      },
+      {
+        "from": "Idle",
+        "event": "receive SETUP",
+        "action": "reply 200",
+        "to": "Setup"
+      },
+      {
+        "from": "Setup",
+        "event": "receive PLAY",
+        "action": "reply 200",
+        "to": "Playing"
+      },
+      {
+        "from": "Playing",
+        "event": "send RTP packet",
+        "action": "send RTP packet",
+        "to": "SendingData"
+      },
+      {
+        "from": "SendingData",
+        "event": "send RTCP packet",
+        "action": "send RTCP packet",
+        "to": "SendingData"
+      },
+      {
+        "from": "RTSP2.0Server",
+        "event": "receive RTSP/1.0 request",
+        "action": "reply 505",
+        "to": "RTSP1.0Server"
+      },
+      {
+        "from": "RTSP2.0Server",
+        "event": "receive RTSP/1.0 request",
+        "action": "reply RTSP/1.0",
+        "to": "RTSP1.0Server"
+      },
+      {
+        "from": "RTSP2.0Server",
+        "event": "receive RTSP/2.0 request",
+        "action": "reply RTSP/2.0",
+        "to": "RTSP2.0Server"
+      },
+      {
+        "from": "RTSP1.0Server",
+        "event": "receive RTSP/2.0 request",
+        "action": "reply 505",
+        "to": "RTSP1.0Server"
+      },
+      {
+        "from": "PlayState",
+        "event": "receive PLAY",
+        "action": "replace previous PLAY",
+        "to": "PlayState"
+      },
+      {
+        "from": "SessionEstablished",
+        "event": "receive PLAY",
+        "action": "reply 200",
+        "to": "MediaStreaming"
+      },
+      {
+        "from": "MediaStreaming",
+        "event": "receive TEARDOWN",
+        "action": "reply 200",
+        "to": "SessionTerminated"
+      }
+    ]
+  }
 }

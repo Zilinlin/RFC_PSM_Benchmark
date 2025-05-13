@@ -1,0 +1,50 @@
+{
+  "states": [
+    "Idle",
+    "WaitingReply",
+    "Established",
+    "WaitDisconnect"
+  ],
+  "initial_state": "Idle",
+  "final_states": [
+    "Idle"
+  ],
+  "transitions": [
+    {
+      "from": "Idle",
+      "event": "send OutgoingCallRequest",
+      "action": "reply None",
+      "to": "WaitingReply"
+    },
+    {
+      "from": "WaitingReply",
+      "event": "receive OutgoingCallReply with Error",
+      "action": "reply None",
+      "to": "Idle"
+    },
+    {
+      "from": "WaitingReply",
+      "event": "receive OutgoingCallReply No Error",
+      "action": "reply None",
+      "to": "Established"
+    },
+    {
+      "from": "Established",
+      "event": "receive CallDisconnectNotify",
+      "action": "reply None",
+      "to": "Idle"
+    },
+    {
+      "from": "Established",
+      "event": "send CallClearRequest",
+      "action": "reply None",
+      "to": "WaitDisconnect"
+    },
+    {
+      "from": "WaitDisconnect",
+      "event": "receive CallDisconnectNotify",
+      "action": "reply None",
+      "to": "Idle"
+    }
+  ]
+}

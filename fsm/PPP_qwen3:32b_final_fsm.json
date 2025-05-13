@@ -1,0 +1,147 @@
+{
+  "states": [
+    "LinkDead",
+    "LinkEstablishment",
+    "Authentication",
+    "NetworkLayerProtocol",
+    "LinkTermination",
+    "Initial",
+    "RequirePAP",
+    "AuthenticateOnly",
+    "Authenticated",
+    "Opened",
+    "Closed"
+  ],
+  "initial_state": "LinkDead",
+  "final_states": [
+    "Closed"
+  ],
+  "transitions": [
+    {
+      "from": "LinkDead",
+      "event": "cond link_initiated",
+      "action": "open LCP",
+      "to": "LinkEstablishment"
+    },
+    {
+      "from": "LinkEstablishment",
+      "event": "cond LCP_success",
+      "action": "start Authentication",
+      "to": "Authentication"
+    },
+    {
+      "from": "Authentication",
+      "event": "cond auth_success",
+      "action": "open NCP",
+      "to": "NetworkLayerProtocol"
+    },
+    {
+      "from": "NetworkLayerProtocol",
+      "event": "receive Terminate-Request",
+      "action": "send Terminate-Ack",
+      "to": "LinkTermination"
+    },
+    {
+      "from": "LinkTermination",
+      "event": "cond disconnected",
+      "action": "signal physical disconnect",
+      "to": "LinkDead"
+    },
+    {
+      "from": "Authentication",
+      "event": "cond auth_failure",
+      "action": "send Terminate-Request",
+      "to": "LinkTermination"
+    },
+    {
+      "from": "LinkEstablishment",
+      "event": "cond link_failure",
+      "action": "send Terminate-Request",
+      "to": "LinkTermination"
+    },
+    {
+      "from": "NetworkLayerProtocol",
+      "event": "cond NCP_failure",
+      "action": "send Terminate-Request",
+      "to": "LinkTermination"
+    },
+    {
+      "from": "Initial",
+      "event": "receive ConfigureAck",
+      "action": "send TerminateRequest",
+      "to": "AuthenticateOnly"
+    },
+    {
+      "from": "Initial",
+      "event": "receive ConfigureNak",
+      "action": "set auth_method PAP",
+      "to": "RequirePAP"
+    },
+    {
+      "from": "Initial",
+      "event": "timeout",
+      "action": "log failure",
+      "to": "Closed"
+    },
+    {
+      "from": "RequirePAP",
+      "event": "receive TerminateAck",
+      "action": "send TerminateAck",
+      "to": "Closed"
+    },
+    {
+      "from": "RequirePAP",
+      "event": "receive PAPRequest",
+      "action": "authenticate PAP",
+      "to": "Authenticated"
+    },
+    {
+      "from": "AuthenticateOnly",
+      "event": "receive TerminateAck",
+      "action": "send TerminateAck",
+      "to": "Closed"
+    },
+    {
+      "from": "AuthenticateOnly",
+      "event": "authentication success",
+      "action": "send ConfigureAck",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive ConfigureRequest",
+      "action": "send ConfigureAck",
+      "to": "Opened"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive TerminateRequest",
+      "action": "send TerminateAck",
+      "to": "Closed"
+    },
+    {
+      "from": "Opened",
+      "event": "receive TerminateRequest",
+      "action": "send TerminateAck",
+      "to": "Closed"
+    },
+    {
+      "from": "Closed",
+      "event": "receive ConfigureRequest",
+      "action": "send TerminateRequest",
+      "to": "Initial"
+    },
+    {
+      "from": "Opened",
+      "event": "receive ECHO_REQUEST",
+      "action": "reply ECHO_REPLY",
+      "to": "Opened"
+    },
+    {
+      "from": "Opened",
+      "event": "receive DISCARD_REQUEST",
+      "action": "discard",
+      "to": "Opened"
+    }
+  ]
+}

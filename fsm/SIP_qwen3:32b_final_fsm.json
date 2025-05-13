@@ -1,0 +1,89 @@
+{
+  "states": [
+    "AwaitingFinalResponse",
+    "FinalResponseSent",
+    "TransactionExists",
+    "TransactionDoesNotExist",
+    "RequestTerminated",
+    "SessionActive",
+    "ReceivingReInvite",
+    "AwaitingACK",
+    "SessionTerminated",
+    "Proceeding",
+    "Completed"
+  ],
+  "initial_state": "AwaitingFinalResponse",
+  "final_states": [
+    "RequestTerminated",
+    "SessionTerminated",
+    "Completed"
+  ],
+  "transitions": [
+    {
+      "from": "AwaitingFinalResponse",
+      "event": "receive CANCEL",
+      "action": "reply 487",
+      "to": "RequestTerminated"
+    },
+    {
+      "from": "FinalResponseSent",
+      "event": "receive CANCEL",
+      "action": "reply 200 OK",
+      "to": "FinalResponseSent"
+    },
+    {
+      "from": "TransactionExists",
+      "event": "receive CANCEL",
+      "action": "reply 200 OK",
+      "to": "FinalResponseSent"
+    },
+    {
+      "from": "TransactionDoesNotExist",
+      "event": "receive CANCEL",
+      "action": "reply 481",
+      "to": "TransactionDoesNotExist"
+    },
+    {
+      "from": "SessionActive",
+      "event": "receive re-INVITE",
+      "action": "process session description",
+      "to": "ReceivingReInvite"
+    },
+    {
+      "from": "ReceivingReInvite",
+      "event": "session description changed",
+      "action": "reply 2xx with offer",
+      "to": "AwaitingACK"
+    },
+    {
+      "from": "ReceivingReInvite",
+      "event": "unacceptable session description",
+      "action": "reply 488",
+      "to": "SessionTerminated"
+    },
+    {
+      "from": "AwaitingACK",
+      "event": "timeout (no ACK received)",
+      "action": "send BYE",
+      "to": "SessionTerminated"
+    },
+    {
+      "from": "Proceeding",
+      "event": "send 200-699",
+      "action": "send response",
+      "to": "Completed"
+    },
+    {
+      "from": "Proceeding",
+      "event": "transport error",
+      "action": "inform TU",
+      "to": "Terminated"
+    },
+    {
+      "from": "Completed",
+      "event": "timeout Timer J",
+      "action": "transition",
+      "to": "Terminated"
+    }
+  ]
+}

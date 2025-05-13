@@ -59,5 +59,141 @@
     }
   ],
   "final_response": "```json\n{\n  \"states\": [\"Disconnected\", \"Authenticating\", \"Connected\", \"Idle\", \"Publishing\", \"Subscribing\", \"Authorized\", \"Unauthorized\", \"Reauthenticating\", \"NotAuthorized\"],\n  \"initial_state\": \"Disconnected\",\n  \"final_states\": [\"Disconnected\", \"Unauthorized\"],\n  \"transitions\": [\n    {\n      \"from\": \"Disconnected\",\n      \"event\": \"receive CONNECT\",\n      \"action\": \"reply 0x00\",\n      \"to\": \"Authenticating\"\n    },\n    {\n      \"from\": \"Authenticating\",\n      \"event\": \"cond valid_token\",\n      \"action\": \"reply 0x00\",\n      \"to\": \"Connected\"\n    },\n    {\n      \"from\": \"Authenticating\",\n      \"event\": \"cond invalid_token\",\n      \"action\": \"reply error_code\",\n      \"to\": \"Disconnected\"\n    },\n    {\n      \"from\": \"Connected\",\n      \"event\": \"receive PUBLISH\",\n      \"action\": \"check token\",\n      \"to\": \"NotAuthorized\"\n    },\n    {\n      \"from\": \"Connected\",\n      \"event\": \"receive SUBSCRIBE\",\n      \"action\": \"check token\",\n      \"to\": \"NotAuthorized\"\n    },\n    {\n      \"from\": \"Idle\",\n      \"event\": \"receive PUBLISH\",\n      \"action\": \"check token\",\n      \"to\": \"Publishing\"\n    },\n    {\n      \"from\": \"Idle\",\n      \"event\": \"receive SUBSCRIBE\",\n      \"action\": \"check token\",\n      \"to\": \"Subscribing\"\n    },\n    {\n      \"from\": \"Publishing\",\n      \"event\": \"cond topic authorized\",\n      \"action\": \"publish message\",\n      \"to\": \"Authorized\"\n    },\n    {\n      \"from\": \"Publishing\",\n      \"event\": \"cond topic unauthorized\",\n      \"action\": \"reply 0x87\",\n      \"to\": \"Unauthorized\"\n    },\n    {\n      \"from\": \"Subscribing\",\n      \"event\": \"cond filter authorized\",\n      \"action\": \"reply success\",\n      \"to\": \"Authorized\"\n    },\n    {\n      \"from\": \"Subscribing\",\n      \"event\": \"cond filter unauthorized\",\n      \"action\": \"reply 0x87\",\n      \"to\": \"Unauthorized\"\n    },\n    {\n      \"from\": \"Authorized\",\n      \"event\": \"send DISCONNECT\",\n      \"action\": \"close connection\",\n      \"to\": \"Idle\"\n    },\n    {\n      \"from\": \"Unauthorized\",\n      \"event\": \"send DISCONNECT\",\n      \"action\": \"close connection\",\n      \"to\": \"Idle\"\n    },\n    {\n      \"from\": \"NotAuthorized\",\n      \"event\": \"receive AUTH\",\n      \"action\": \"set reauthenticating\",\n      \"to\": \"Reauthenticating\"\n    },\n    {\n      \"from\": \"Reauthenticating\",\n      \"event\": \"cond valid_pop\",\n      \"action\": \"set Authenticated\",\n      \"to\": \"Authenticated\"\n    },\n    {\n      \"from\": \"Reauthenticating\",\n      \"event\": \"cond invalid_pop\",\n      \"action\": \"send DISCONNECT\",\n      \"to\": \"NotAuthorized\"\n    }\n  ]\n}\n```",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "Disconnected",
+      "Authenticating",
+      "Connected",
+      "Idle",
+      "Publishing",
+      "Subscribing",
+      "Authorized",
+      "Unauthorized",
+      "Authenticated",
+      "NotAuthorized",
+      "Reauthenticating"
+    ],
+    "initial_state": "Disconnected",
+    "final_states": [
+      "Disconnected",
+      "Unauthorized",
+      "NotAuthorized"
+    ],
+    "transitions": [
+      {
+        "from": "Disconnected",
+        "event": "receive CONNECT",
+        "action": "reply 0x00",
+        "to": "Authenticating"
+      },
+      {
+        "from": "Authenticating",
+        "event": "cond valid_token",
+        "action": "reply 0x00",
+        "to": "Connected"
+      },
+      {
+        "from": "Authenticating",
+        "event": "cond invalid_token",
+        "action": "reply error_code",
+        "to": "Disconnected"
+      },
+      {
+        "from": "Connected",
+        "event": "receive PUBLISH",
+        "action": "process PUBLISH",
+        "to": "Connected"
+      },
+      {
+        "from": "Connected",
+        "event": "receive SUBSCRIBE",
+        "action": "process SUBSCRIBE",
+        "to": "Connected"
+      },
+      {
+        "from": "Connected",
+        "event": "receive DISCONNECT",
+        "action": "close connection",
+        "to": "Disconnected"
+      },
+      {
+        "from": "Idle",
+        "event": "receive PUBLISH",
+        "action": "check token",
+        "to": "Publishing"
+      },
+      {
+        "from": "Publishing",
+        "event": "cond topic authorized",
+        "action": "publish message",
+        "to": "Authorized"
+      },
+      {
+        "from": "Publishing",
+        "event": "cond topic unauthorized",
+        "action": "reply 0x87",
+        "to": "Unauthorized"
+      },
+      {
+        "from": "Idle",
+        "event": "receive SUBSCRIBE",
+        "action": "check token",
+        "to": "Subscribing"
+      },
+      {
+        "from": "Subscribing",
+        "event": "cond filter authorized",
+        "action": "reply success",
+        "to": "Authorized"
+      },
+      {
+        "from": "Subscribing",
+        "event": "cond filter unauthorized",
+        "action": "reply 0x87",
+        "to": "Unauthorized"
+      },
+      {
+        "from": "Authenticated",
+        "event": "receive PUBLISH",
+        "action": "check token",
+        "to": "NotAuthorized"
+      },
+      {
+        "from": "Authenticated",
+        "event": "receive SUBSCRIBE",
+        "action": "check token",
+        "to": "NotAuthorized"
+      },
+      {
+        "from": "Authenticated",
+        "event": "receive CONNECT",
+        "action": "check token",
+        "to": "NotAuthorized"
+      },
+      {
+        "from": "Authenticated",
+        "event": "receive PINGREQ",
+        "action": "check token",
+        "to": "NotAuthorized"
+      },
+      {
+        "from": "NotAuthorized",
+        "event": "receive AUTH",
+        "action": "set reauthenticating",
+        "to": "Reauthenticating"
+      },
+      {
+        "from": "Reauthenticating",
+        "event": "cond valid_pop",
+        "action": "set Authenticated",
+        "to": "Authenticated"
+      },
+      {
+        "from": "Reauthenticating",
+        "event": "cond invalid_pop",
+        "action": "send DISCONNECT",
+        "to": "NotAuthorized"
+      }
+    ]
+  }
 }

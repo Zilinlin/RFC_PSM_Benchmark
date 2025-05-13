@@ -1,0 +1,50 @@
+{
+  "states": [
+    "Idle",
+    "Wait-Reply",
+    "Established",
+    "Wait-Disconnect"
+  ],
+  "initial_state": "Idle",
+  "final_states": [
+    "Idle"
+  ],
+  "transitions": [
+    {
+      "from": "Idle",
+      "event": "send OutgoingCallRequest",
+      "action": "send OutgoingCallRequest",
+      "to": "Wait-Reply"
+    },
+    {
+      "from": "Wait-Reply",
+      "event": "receive OutgoingCallReply with error",
+      "action": "reply error",
+      "to": "Idle"
+    },
+    {
+      "from": "Wait-Reply",
+      "event": "receive OutgoingCallReply without error",
+      "action": "connect telco call",
+      "to": "Established"
+    },
+    {
+      "from": "Established",
+      "event": "receive CallDisconnectNotify",
+      "action": "reply disconnect",
+      "to": "Idle"
+    },
+    {
+      "from": "Established",
+      "event": "send CallClearRequest",
+      "action": "send CallClearRequest",
+      "to": "Wait-Disconnect"
+    },
+    {
+      "from": "Wait-Disconnect",
+      "event": "receive CallDisconnectNotify",
+      "action": "reply disconnect",
+      "to": "Idle"
+    }
+  ]
+}

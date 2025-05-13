@@ -1,0 +1,107 @@
+{
+  "states": [
+    "Initial",
+    "AwaitingQuit",
+    "ClosingConnection",
+    "AwaitingArticle",
+    "Transferring",
+    "Duplicate",
+    "Rejected",
+    "Failed",
+    "ListingHeaders"
+  ],
+  "initial_state": "Initial",
+  "final_states": [
+    "ClosingConnection",
+    "Duplicate",
+    "Rejected",
+    "Failed",
+    "ListingHeaders"
+  ],
+  "transitions": [
+    {
+      "from": "Initial",
+      "event": "receive MODE_READER",
+      "action": "reply 200",
+      "to": "Initial"
+    },
+    {
+      "from": "Initial",
+      "event": "receive MODE_READER",
+      "action": "reply 201",
+      "to": "Initial"
+    },
+    {
+      "from": "Initial",
+      "event": "receive QUIT",
+      "action": "reply 205",
+      "to": "ClosingConnection"
+    },
+    {
+      "from": "ClosingConnection",
+      "event": "send 205",
+      "action": "close connection",
+      "to": "ClosingConnection"
+    },
+    {
+      "from": "Initial",
+      "event": "receive IHAVE",
+      "action": "reply 335",
+      "to": "AwaitingArticle"
+    },
+    {
+      "from": "AwaitingArticle",
+      "event": "receive ArticleData",
+      "action": "reply 230",
+      "to": "Transferring"
+    },
+    {
+      "from": "Transferring",
+      "event": "send 230",
+      "action": "reply 230",
+      "to": "Initial"
+    },
+    {
+      "from": "Initial",
+      "event": "receive IHAVE",
+      "action": "reply 435",
+      "to": "Duplicate"
+    },
+    {
+      "from": "Initial",
+      "event": "receive IHAVE",
+      "action": "reply 437",
+      "to": "Rejected"
+    },
+    {
+      "from": "Initial",
+      "event": "receive IHAVE",
+      "action": "reply 436",
+      "to": "Failed"
+    },
+    {
+      "from": "Initial",
+      "event": "receive LIST HEADERS",
+      "action": "reply 250",
+      "to": "ListingHeaders"
+    },
+    {
+      "from": "ListingHeaders",
+      "event": "receive LIST HEADERS RANGE",
+      "action": "reply 250",
+      "to": "ListingHeaders"
+    },
+    {
+      "from": "ListingHeaders",
+      "event": "receive LIST HEADERS MSGID",
+      "action": "reply 250",
+      "to": "ListingHeaders"
+    },
+    {
+      "from": "ListingHeaders",
+      "event": "receive LIST HEADERS",
+      "action": "reply 250",
+      "to": "ListingHeaders"
+    }
+  ]
+}

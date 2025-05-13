@@ -114,5 +114,132 @@
     }
   ],
   "final_response": "```json\n{\n  \"states\": [\n    \"Closed\",\n    \"Listening\",\n    \"Established\",\n    \"Stable\",\n    \"Unstable\",\n    \"Negotiating\",\n    \"Respond\",\n    \"PartOpen\",\n    \"Open\",\n    \"Closing\"\n  ],\n  \"initial_state\": \"Closed\",\n  \"final_states\": [\n    \"Closed\",\n    \"Unstable\"\n  ],\n  \"transitions\": [\n    {\n      \"from\": \"Listening\",\n      \"event\": \"receive DCCP_CloseReq\",\n      \"action\": \"reply DCCP_Close\",\n      \"to\": \"Established\"\n    },\n    {\n      \"from\": \"Listening\",\n      \"event\": \"receive DCCP_Close\",\n      \"action\": \"generate Reset\",\n      \"to\": \"Closed\"\n    },\n    {\n      \"from\": \"Established\",\n      \"event\": \"receive DCCP_CloseReq\",\n      \"action\": \"generate Close\",\n      \"to\": \"Closing\"\n    },\n    {\n      \"from\": \"Established\",\n      \"event\": \"receive DCCP_Close\",\n      \"action\": \"generate Reset\",\n      \"to\": \"Closed\"\n    },\n    {\n      \"from\": \"Closing\",\n      \"event\": \"receive DCCP_Close\",\n      \"action\": \"generate Reset\",\n      \"to\": \"Closed\"\n    },\n    {\n      \"from\": \"Stable\",\n      \"event\": \"receive Mandatory Change option\",\n      \"action\": \"set negotiating\",\n      \"to\": \"Negotiating\"\n    },\n    {\n      \"from\": \"Stable\",\n      \"event\": \"receive Change option\",\n      \"action\": \"set negotiating\",\n      \"to\": \"Negotiating\"\n    },\n    {\n      \"from\": \"Negotiating\",\n      \"event\": \"receive invalid Change option\",\n      \"action\": \"reply empty Confirm option\",\n      \"to\": \"Stable\"\n    },\n    {\n      \"from\": \"Negotiating\",\n      \"event\": \"receive invalid Confirm option\",\n      \"action\": \"reset connection\",\n      \"to\": \"Unstable\"\n    },\n    {\n      \"from\": \"Negotiating\",\n      \"event\": \"receive Mandatory Change option with unknown feature\",\n      \"action\": \"reset connection\",\n      \"to\": \"Unstable\"\n    },\n    {\n      \"from\": \"Negotiating\",\n      \"event\": \"receive Mandatory Change option with invalid value\",\n      \"action\": \"reset connection\",\n      \"to\": \"Unstable\"\n    },\n    {\n      \"from\": \"Negotiating\",\n      \"event\": \"receive Mandatory Change option with no shared entry\",\n      \"action\": \"reset connection\",\n      \"to\": \"Unstable\"\n    },\n    {\n      \"from\": \"Respond\",\n      \"event\": \"receive Request\",\n      \"action\": \"send Response\",\n      \"to\": \"Respond\"\n    },\n    {\n      \"from\": \"Respond\",\n      \"event\": \"receive Request\",\n      \"action\": \"set OSR seqno\",\n      \"to\": \"Open\"\n    },\n    {\n      \"from\": \"PartOpen\",\n      \"event\": \"receive Response\",\n      \"action\": \"send Ack\",\n      \"to\": \"PartOpen\"\n    },\n    {\n      \"from\": \"PartOpen\",\n      \"event\": \"receive Sync\",\n      \"action\": \"set OSR seqno\",\n      \"to\": \"Open\"\n    },\n    {\n      \"from\": \"Open\",\n      \"event\": \"receive CloseReq\",\n      \"action\": \"generate Close\",\n      \"to\": \"Closing\"\n    },\n    {\n      \"from\": \"Open\",\n      \"event\": \"receive Close\",\n      \"action\": \"generate Reset\",\n      \"to\": \"Closed\"\n    },\n    {\n      \"from\": \"Closing\",\n      \"event\": \"receive Close\",\n      \"action\": \"generate Reset\",\n      \"to\": \"Closed\"\n    }\n  ]\n}\n```",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "Closed",
+      "Listening",
+      "Established",
+      "Stable",
+      "Unstable",
+      "Negotiating",
+      "Respond",
+      "PartOpen",
+      "Open",
+      "Closing"
+    ],
+    "initial_state": "Listening",
+    "final_states": [
+      "Closed"
+    ],
+    "transitions": [
+      {
+        "from": "Listening",
+        "event": "receive DCCP_CloseReq",
+        "action": "reply DCCP_Close",
+        "to": "Established"
+      },
+      {
+        "from": "Established",
+        "event": "receive DCCP_Close",
+        "action": "reply DCCP_Reset",
+        "to": "Closed"
+      },
+      {
+        "from": "Established",
+        "event": "receive DCCP_CloseReq",
+        "action": "reply DCCP_Close",
+        "to": "Established"
+      },
+      {
+        "from": "Listening",
+        "event": "receive DCCP_Close",
+        "action": "reply DCCP_Reset",
+        "to": "Closed"
+      },
+      {
+        "from": "Stable",
+        "event": "receive Change option",
+        "action": "set negotiating",
+        "to": "Negotiating"
+      },
+      {
+        "from": "Negotiating",
+        "event": "receive invalid Change option",
+        "action": "reply empty Confirm option",
+        "to": "Stable"
+      },
+      {
+        "from": "Negotiating",
+        "event": "receive invalid Confirm option",
+        "action": "reset connection",
+        "to": "Unstable"
+      },
+      {
+        "from": "Stable",
+        "event": "receive Mandatory Change option",
+        "action": "set negotiating",
+        "to": "Negotiating"
+      },
+      {
+        "from": "Negotiating",
+        "event": "receive Mandatory Change option with unknown feature",
+        "action": "reset connection",
+        "to": "Unstable"
+      },
+      {
+        "from": "Negotiating",
+        "event": "receive Mandatory Change option with invalid value",
+        "action": "reset connection",
+        "to": "Unstable"
+      },
+      {
+        "from": "Negotiating",
+        "event": "receive Mandatory Change option with no shared entry",
+        "action": "reset connection",
+        "to": "Unstable"
+      },
+      {
+        "from": "Respond",
+        "event": "receive Request",
+        "action": "send Response",
+        "to": "Respond"
+      },
+      {
+        "from": "Respond",
+        "event": "receive Request",
+        "action": "set OSR seqno",
+        "to": "Open"
+      },
+      {
+        "from": "PartOpen",
+        "event": "receive Response",
+        "action": "send Ack",
+        "to": "PartOpen"
+      },
+      {
+        "from": "PartOpen",
+        "event": "receive Sync",
+        "action": "set OSR seqno",
+        "to": "Open"
+      },
+      {
+        "from": "Open",
+        "event": "receive CloseReq",
+        "action": "generate Close",
+        "to": "Closing"
+      },
+      {
+        "from": "Open",
+        "event": "receive Close",
+        "action": "generate Reset",
+        "to": "Closed"
+      },
+      {
+        "from": "Closing",
+        "event": "receive Close",
+        "action": "generate Reset",
+        "to": "Closed"
+      }
+    ]
+  }
 }

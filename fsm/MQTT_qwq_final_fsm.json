@@ -1,0 +1,133 @@
+{
+  "states": [
+    "Disconnected",
+    "Connected",
+    "AwaitingPing",
+    "WillSent",
+    "Disconnecting",
+    "Authenticating",
+    "Authorized",
+    "NotAuthorized",
+    "SessionNew",
+    "SessionExisting",
+    "HandlingPublish",
+    "HandlingSubscribe",
+    "SendingResponse",
+    "ErrorState"
+  ],
+  "initial_state": "Disconnected",
+  "final_states": [
+    "Disconnected",
+    "NotAuthorized"
+  ],
+  "transitions": [
+    {
+      "from": "Disconnected",
+      "event": "receive CONNECT",
+      "action": "set session state",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "send PINGREQ",
+      "action": "await PINGRESP",
+      "to": "AwaitingPing"
+    },
+    {
+      "from": "AwaitingPing",
+      "event": "receive PINGRESP",
+      "action": "reset timer",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "send DISCONNECT",
+      "action": "close connection",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Connected",
+      "event": "detect abnormal disconnection",
+      "action": "send Will message",
+      "to": "WillSent"
+    },
+    {
+      "from": "WillSent",
+      "event": "send DISCONNECT",
+      "action": "close connection",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Authenticating",
+      "event": "receive CONNECT",
+      "action": "start authentication",
+      "to": "Authenticating"
+    },
+    {
+      "from": "Authenticating",
+      "event": "cond authorization_success",
+      "action": "send CONNACK 0x00",
+      "to": "Authorized"
+    },
+    {
+      "from": "Authenticating",
+      "event": "cond authorization_failure",
+      "action": "send CONNACK 0x87",
+      "to": "NotAuthorized"
+    },
+    {
+      "from": "Authorized",
+      "event": "receive PUBLISH",
+      "action": "process message",
+      "to": "HandlingPublish"
+    },
+    {
+      "from": "HandlingPublish",
+      "event": "cond authorized",
+      "action": "forward to subscribers",
+      "to": "Connected"
+    },
+    {
+      "from": "HandlingPublish",
+      "event": "cond unauthorized",
+      "action": "send DISCONNECT 0x87",
+      "to": "NotAuthorized"
+    },
+    {
+      "from": "Connected",
+      "event": "receive SUBSCRIBE",
+      "action": "check authorization",
+      "to": "HandlingSubscribe"
+    },
+    {
+      "from": "HandlingSubscribe",
+      "event": "cond authorized",
+      "action": "send SUBACK",
+      "to": "Connected"
+    },
+    {
+      "from": "HandlingSubscribe",
+      "event": "cond unauthorized",
+      "action": "send SUBACK 0x80",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "receive PUBLISH with RETAIN",
+      "action": "store message",
+      "to": "RetainedMessageActive"
+    },
+    {
+      "from": "RetainedMessageActive",
+      "event": "cond token_expired",
+      "action": "remove message",
+      "to": "RetainedMessageDiscarded"
+    },
+    {
+      "from": "RetainedMessageActive",
+      "event": "cond message_expired",
+      "action": "remove message",
+      "to": "RetainedMessageDiscarded"
+    }
+  ]
+}

@@ -34,5 +34,76 @@
     }
   ],
   "final_response": "```json\n{\n  \"states\": [\n    \"LinkDead\",\n    \"LinkTermination\",\n    \"Configuring\",\n    \"Terminating\",\n    \"LcpOpen\",\n    \"Authenticated\"\n  ],\n  \"initial_state\": \"LinkDead\",\n  \"final_states\": [\n    \"LinkDead\",\n    \"LinkTermination\",\n    \"Configuring\",\n    \"Terminating\",\n    \"LcpOpen\",\n    \"Authenticated\"\n  ],\n  \"transitions\": [\n    {\n      \"from\": \"LinkDead\",\n      \"event\": \"receive COMMAND\",\n      \"action\": \"reply CODE\",\n      \"to\": \"LinkTermination\"\n    },\n    {\n      \"from\": \"LinkTermination\",\n      \"event\": \"receive COMMAND\",\n      \"action\": \"reply CODE\",\n      \"to\": \"LinkDead\"\n    },\n    {\n      \"from\": \"Configuring\",\n      \"event\": \"send ConfigureRequest\",\n      \"action\": \"set MaxConfigure\",\n      \"to\": \"Configuring\"\n    },\n    {\n      \"from\": \"Configuring\",\n      \"event\": \"receive ConfigureAck\",\n      \"action\": \"reply Ack\",\n      \"to\": \"Configuring\"\n    },\n    {\n      \"from\": \"Configuring\",\n      \"event\": \"receive ConfigureNak\",\n      \"action\": \"reply Nak\",\n      \"to\": \"Configuring\"\n    },\n    {\n      \"from\": \"Configuring\",\n      \"event\": \"receive ConfigureReject\",\n      \"action\": \"reply Reject\",\n      \"to\": \"Configuring\"\n    },\n    {\n      \"from\": \"Terminating\",\n      \"event\": \"send TerminateRequest\",\n      \"action\": \"set MaxTerminate\",\n      \"to\": \"Terminating\"\n    },\n    {\n      \"from\": \"Terminating\",\n      \"event\": \"receive TerminateAck\",\n      \"action\": \"reply Ack\",\n      \"to\": \"Terminating\"\n    },\n    {\n      \"from\": \"LcpOpen\",\n      \"event\": \"receive Protocol\",\n      \"action\": \"reply CODE\",\n      \"to\": \"Authenticated\"\n    }\n  ]\n}\n```",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "LinkDead",
+      "LinkTermination",
+      "Configuring",
+      "Terminating",
+      "LCP_Open",
+      "Authenticated"
+    ],
+    "initial_state": "LinkDead",
+    "final_states": [
+      "LinkDead",
+      "Configuring",
+      "Terminating"
+    ],
+    "transitions": [
+      {
+        "from": "LinkDead",
+        "event": "receive COMMAND",
+        "action": "reply CODE",
+        "to": "LinkTermination"
+      },
+      {
+        "from": "LinkTermination",
+        "event": "receive COMMAND",
+        "action": "reply CODE",
+        "to": "LinkDead"
+      },
+      {
+        "from": "Configuring",
+        "event": "send ConfigureRequest",
+        "action": "set MaxConfigure",
+        "to": "Configuring"
+      },
+      {
+        "from": "Configuring",
+        "event": "receive ConfigureAck",
+        "action": "reply Ack",
+        "to": "Configuring"
+      },
+      {
+        "from": "Configuring",
+        "event": "receive ConfigureNak",
+        "action": "reply Nak",
+        "to": "Configuring"
+      },
+      {
+        "from": "Configuring",
+        "event": "receive ConfigureReject",
+        "action": "reply Reject",
+        "to": "Configuring"
+      },
+      {
+        "from": "Terminating",
+        "event": "send TerminateRequest",
+        "action": "set MaxTerminate",
+        "to": "Terminating"
+      },
+      {
+        "from": "Terminating",
+        "event": "receive TerminateAck",
+        "action": "reply Ack",
+        "to": "Terminating"
+      },
+      {
+        "from": "LCP_Open",
+        "event": "receive Protocol",
+        "action": "reply CODE",
+        "to": "Authenticated"
+      }
+    ]
+  }
 }

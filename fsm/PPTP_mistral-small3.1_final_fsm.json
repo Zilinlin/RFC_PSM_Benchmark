@@ -1,0 +1,89 @@
+{
+  "states": [
+    "Idle",
+    "ControlConnectionEstablished",
+    "SessionEstablished",
+    "SessionTerminated",
+    "wait_connect",
+    "established"
+  ],
+  "initial_state": "Idle",
+  "final_states": [
+    "SessionTerminated",
+    "established"
+  ],
+  "transitions": [
+    {
+      "from": "Idle",
+      "event": "receive Start-Control-Connection-Request",
+      "action": "send Start-Control-Connection-Reply",
+      "to": "ControlConnectionEstablished"
+    },
+    {
+      "from": "ControlConnectionEstablished",
+      "event": "receive Outgoing-Call-Request",
+      "action": "send Outgoing-Call-Reply",
+      "to": "SessionEstablished"
+    },
+    {
+      "from": "ControlConnectionEstablished",
+      "event": "receive Incoming-Call-Request",
+      "action": "send Incoming-Call-Reply",
+      "to": "SessionEstablished"
+    },
+    {
+      "from": "ControlConnectionEstablished",
+      "event": "receive Incoming-Call-Connected",
+      "action": "send Incoming-Call-Connected",
+      "to": "SessionEstablished"
+    },
+    {
+      "from": "ControlConnectionEstablished",
+      "event": "receive Call-Clear-Request",
+      "action": "send Call-Clear-Reply",
+      "to": "SessionTerminated"
+    },
+    {
+      "from": "SessionEstablished",
+      "event": "receive Call-Disconnect-Notify",
+      "action": "send Call-Disconnect-Notify",
+      "to": "SessionTerminated"
+    },
+    {
+      "from": "SessionEstablished",
+      "event": "receive Wan-Error-Notify",
+      "action": "send Wan-Error-Notify",
+      "to": "SessionTerminated"
+    },
+    {
+      "from": "SessionEstablished",
+      "event": "receive Set-Link-Info",
+      "action": "send Set-Link-Info",
+      "to": "SessionTerminated"
+    },
+    {
+      "from": "SessionEstablished",
+      "event": "receive Stop-Control-Connection-Request",
+      "action": "send Stop-Control-Connection-Reply",
+      "to": "SessionTerminated"
+    },
+    {
+      "from": "SessionEstablished",
+      "event": "receive Incoming-Call-Reply",
+      "action": "send Incoming-Call-Reply",
+      "to": "wait_connect"
+    },
+    {
+      "from": "wait_connect",
+      "event": "receive Incoming-Call-Connect",
+      "action": "send Incoming-Call-Connect",
+      "to": "established"
+    },
+    {
+      "from": "established",
+      "event": "receive Call-Disconnect-Notify",
+      "action": "send Call-Disconnect-Notify",
+      "to": "Idle"
+    }
+  ]
+}

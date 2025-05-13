@@ -1,0 +1,87 @@
+{
+  "states": [
+    "Established",
+    "CloseWait",
+    "FinWait1",
+    "FinWait2",
+    "TimeWait",
+    "SynSent",
+    "SynReceived",
+    "LastAck",
+    "Closing",
+    "Listening",
+    "Closed"
+  ],
+  "initial_state": "Listening",
+  "final_states": [
+    "Closed"
+  ],
+  "transitions": [
+    {
+      "from": "Established",
+      "event": "receive FIN",
+      "action": "send ACK",
+      "to": "CloseWait"
+    },
+    {
+      "from": "CloseWait",
+      "event": "timeout 2MSL",
+      "action": "close connection",
+      "to": "Closed"
+    },
+    {
+      "from": "FinWait1",
+      "event": "receive ACK",
+      "action": "close connection",
+      "to": "Closed"
+    },
+    {
+      "from": "FinWait2",
+      "event": "timeout 2MSL",
+      "action": "close connection",
+      "to": "Closed"
+    },
+    {
+      "from": "TimeWait",
+      "event": "timeout 2MSL",
+      "action": "close connection",
+      "to": "Closed"
+    },
+    {
+      "from": "SynSent",
+      "event": "receive SYN",
+      "action": "send SYN ACK",
+      "to": "SynReceived"
+    },
+    {
+      "from": "SynReceived",
+      "event": "receive ACK",
+      "action": "set Established",
+      "to": "Established"
+    },
+    {
+      "from": "LastAck",
+      "event": "receive ACK",
+      "action": "close connection",
+      "to": "Closed"
+    },
+    {
+      "from": "Closing",
+      "event": "timeout 2MSL",
+      "action": "close connection",
+      "to": "Closed"
+    },
+    {
+      "from": "Listening",
+      "event": "receive SYN",
+      "action": "send SYN ACK",
+      "to": "SynReceived"
+    },
+    {
+      "from": "Closed",
+      "event": "open connection",
+      "action": "set Listening",
+      "to": "Listening"
+    }
+  ]
+}

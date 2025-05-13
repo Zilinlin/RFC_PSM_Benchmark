@@ -1,0 +1,25 @@
+{
+  "states": [
+    "Idle",
+    "Established",
+    "WaitDisconnect"
+  ],
+  "initial_state": "Idle",
+  "final_states": [
+    "WaitDisconnect"
+  ],
+  "transitions": [
+    {
+      "from": "Idle",
+      "event": "receive CallRequest",
+      "action": "send CallConnected",
+      "to": "Established"
+    },
+    {
+      "from": "Established",
+      "event": "receive DisconnectRequest",
+      "action": "send DisconnectResponse",
+      "to": "WaitDisconnect"
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "states": [
+    "Initial",
+    "AwaitingUsername",
+    "AwaitingPassword",
+    "Authenticated",
+    "TransferringData",
+    "Error",
+    "Terminated",
+    "Begin",
+    "WaitingForReply",
+    "Success",
+    "End"
+  ],
+  "initial_state": "Initial",
+  "final_states": [
+    "Terminated",
+    "End"
+  ],
+  "transitions": [
+    {
+      "from": "Initial",
+      "event": "receive USER",
+      "action": "reply 331",
+      "to": "AwaitingPassword"
+    },
+    {
+      "from": "AwaitingPassword",
+      "event": "receive PASS",
+      "action": "reply 230",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive RETR",
+      "action": "open data connection",
+      "to": "TransferringData"
+    },
+    {
+      "from": "TransferringData",
+      "event": "receive 226",
+      "action": "close data connection",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive TYPE",
+      "action": "reply 200",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive STOR",
+      "action": "reply 550",
+      "to": "Error"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive QUIT",
+      "action": "close connections",
+      "to": "Terminated"
+    },
+    {
+      "from": "Begin",
+      "event": "receive USER",
+      "action": "reply 331",
+      "to": "AwaitingPassword"
+    },
+    {
+      "from": "AwaitingPassword",
+      "event": "receive PASS",
+      "action": "reply 230",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive ACCT",
+      "action": "reply 202",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive COMMAND",
+      "action": "reply 150",
+      "to": "TransferringData"
+    },
+    {
+      "from": "WaitingForReply",
+      "event": "receive 4xx",
+      "action": "reply 4xx",
+      "to": "Error"
+    },
+    {
+      "from": "WaitingForReply",
+      "event": "receive 2xx",
+      "action": "reply 2xx",
+      "to": "Success"
+    },
+    {
+      "from": "Success",
+      "event": "end",
+      "action": "close connection",
+      "to": "End"
+    }
+  ]
+}

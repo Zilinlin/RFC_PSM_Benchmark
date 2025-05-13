@@ -114,5 +114,80 @@
     }
   ],
   "final_response": "It appears that the text you provided contains repetitive and redundant information. Let's clean it up and focus on the essential parts.\n\nHere is a refined version of the information:\n\n### Buffer Management Logic\n\n1. **Buffer Management Logic**:\n   - When the run length is zero, set `buf_head` to `buf_tail`.\n   - When the run length is greater than zero, update `buf_tail` by adding the run length to `buf_tail`.\n\n2. **State Transitions**:\n   - **States**:\n     - `buf_head`\n     - `buf_tail`\n   - **Transitions**:\n     - From `buf_head` to `buf_tail` when the run length is zero.\n     - From `buf_tail` to `buf_head` when the run length is greater than zero.\n\n### Example JSON Structure\n\n```json\n{\n  \"states\": [\n    \"buf_head\",\n    \"buf_tail\"\n  ],\n  \"transitions\": [\n    {\n      \"from\": \"buf_head\",\n      \"event\": \"run length is zero\",\n      \"action\": \"set buf_head to buf_tail\"\n    },\n    {\n      \"from\": \"buf_tail\",\n      \"event\": \"run length is greater than zero\",\n      \"action\": \"update buf_tail by adding run length to buf_tail\"\n    }\n  ]\n}\n```\n\n### Guidelines for State Machine Definitions\n\n1. **State Names**:\n   - Must be unique.\n   - Must be lowercase.\n   - Must be sorted alphabetically.\n   - Must not contain punctuation, spaces, or numbers.\n   - Be a noun or noun phrase.\n\n2. **Event Names**:\n   - Be a single verb or verb phrase (e.g., `\"receive COMMAND\"`, `\"send \"`, `\"timeout \"`, `\"cond \"` for internal condition.\n   - `\"expire \"` for expiration.\n   - `\"error \"` for error.\n   - `\"start \"` for initial state change.\n   - `\"stop \"` for other events.\n   - Must not contain punctuation, spaces, or free-form descriptions.\n\n3. **Action Names**:\n   - Must be a single verb or verb phrase (e.g., `\"reply \"`, `\"set \"`, `\"send \"`, `\"start \"`, `\"stop \"`, `\"wait \"`, `\"clear \"`, `\"collect \"`, `\"send 20\"`, `\"send 500\"`, `\"wait 5s\".\n   - Must not include any other text, explanations, or comments.\n   - Must not be unique.\n   - Must not include any other fields.\n   - Must not include any other text or formatting.\n\n### Example State Machine\n\n```json\n{\n  \"states\": [\n    \"state1\",\n    \"state2\"\n  ],\n  \"transitions\": [\n    {\n      \"from\": \"state1\",\n      \"event\": \"event1\",\n      \"action\": \"action1\"\n    },\n    {\n      \"from\": \"state2\",\n      \"event\": \"event2\",\n      \"action\": \"action2\"\n    }\n  ]\n}\n```\n\nThis refined version should help clarify the essential parts of the buffer management logic and state machine definitions.",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "Received",
+      "Acknowledged",
+      "DeliveredCorrupt",
+      "Dropped",
+      "Processed",
+      "ECNCapable",
+      "ECNIncapable",
+      "ECNNonceMismatchDetected",
+      "MisbehaviorDetected",
+      "ConnectionReset"
+    ],
+    "initial_state": "Received",
+    "final_states": [
+      "Dropped",
+      "Processed",
+      "ConnectionReset"
+    ],
+    "transitions": [
+      {
+        "from": "Received",
+        "event": "receive DataChecksum",
+        "action": "set CheckDataChecksum true",
+        "to": "Acknowledged"
+      },
+      {
+        "from": "Received",
+        "event": "receive DataChecksum",
+        "action": "reply DataDropped DropCode3",
+        "to": "Dropped"
+      },
+      {
+        "from": "Received",
+        "event": "receive DataChecksum",
+        "action": "reply DataDropped DropCode7",
+        "to": "DeliveredCorrupt"
+      },
+      {
+        "from": "Received",
+        "event": "receive DataChecksum",
+        "action": "reply DataDropped DropCode0",
+        "to": "Processed"
+      },
+      {
+        "from": "ECNCapable",
+        "event": "receive ECNIncapable",
+        "action": "set ECNIncapable true",
+        "to": "ECNIncapable"
+      },
+      {
+        "from": "ECNIncapable",
+        "event": "send ECNIncapable",
+        "action": "reply ConfirmR",
+        "to": "ECNIncapable"
+      },
+      {
+        "from": "ECNCapable",
+        "event": "detect ECNNonceMismatch",
+        "action": "log ECNNonceMismatch",
+        "to": "ECNNonceMismatchDetected"
+      },
+      {
+        "from": "ECNNonceMismatchDetected",
+        "event": "cond verifyMisbehavior",
+        "action": "set MisbehaviorDetected true",
+        "to": "MisbehaviorDetected"
+      },
+      {
+        "from": "MisbehaviorDetected",
+        "event": "cond egregiousMisbehavior",
+        "action": "reset ConnectionReset",
+        "to": "ConnectionReset"
+      }
+    ]
+  }
 }

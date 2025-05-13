@@ -44,5 +44,29 @@
     }
   ],
   "final_response": "<think>\nOkay, let me go through each section provided and see if there's any mention of Finite State Machine (FSM) related information. \n\nFirst, the user provided several sections from an RFC document related to PPTP. The sections include Copyright Notices, References, and other legal disclaimers. \n\nLooking at the first section (Section 8. Full Copyright Statement), it's all about legal permissions and copyright information. There's no technical details about protocol states or transitions here. \n\nNext, the References section (Section 7) lists other RFCs and documents. While some of these references (like PPP or authentication protocols) might be related to FSMs in their own content, the references themselves don't contain any FSM diagrams or state descriptions. They just point to other documents.\n\nThe other sections provided are also legal or administrative, such as disclaimers and funding information. None of these sections describe protocol states, transitions, or any FSM components. \n\nSince the task is to check the given sections for FSM information and not to infer from external documents, there's no FSM data present here. The correct answer is to return \"None\" as specified.\n</think>\n\n<json>None</json>",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "Idle",
+      "Established",
+      "WaitDisconnect"
+    ],
+    "initial_state": "Idle",
+    "final_states": [
+      "WaitDisconnect"
+    ],
+    "transitions": [
+      {
+        "from": "Idle",
+        "event": "receive CallRequest",
+        "action": "send CallConnected",
+        "to": "Established"
+      },
+      {
+        "from": "Established",
+        "event": "receive DisconnectRequest",
+        "action": "send DisconnectResponse",
+        "to": "WaitDisconnect"
+      }
+    ]
+  }
 }

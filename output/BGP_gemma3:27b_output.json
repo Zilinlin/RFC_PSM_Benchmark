@@ -84,5 +84,148 @@
     }
   ],
   "final_response": "```json\n{\n  \"states\": [\n    \"Idle\",\n    \"OpenSent\",\n    \"OpenConfirm\",\n    \"Established\",\n    \"NegotiationInProgress\"\n  ],\n  \"transitions\": [\n    {\n      \"from\": \"Idle\",\n      \"event\": \"receive OPEN\",\n      \"action\": \"reply OPEN\",\n      \"to\": \"OpenSent\"\n    },\n    {\n      \"from\": \"Idle\",\n      \"event\": \"receive StartConnection\",\n      \"action\": \"send ConnectAck\",\n      \"to\": \"Established\"\n    },\n    {\n      \"from\": \"Idle\",\n      \"event\": \"receive UnknownMessage\",\n      \"action\": \"send ErrorMessage\",\n      \"to\": \"Idle\"\n    },\n    {\n      \"from\": \"OpenSent\",\n      \"event\": \"receive OPEN\",\n      \"action\": \"reply OPEN\",\n      \"to\": \"OpenConfirm\"\n    },\n    {\n      \"from\": \"OpenConfirm\",\n      \"event\": \"receive KEEPALIVE\",\n      \"action\": \"reply KEEPALIVE\",\n      \"to\": \"Established\"\n    },\n    {\n      \"from\": \"OpenConfirm\",\n      \"event\": \"receive NOTIFICATION\",\n      \"action\": \"reply NOTIFICATION\",\n      \"to\": \"Idle\"\n    },\n    {\n      \"from\": \"Established\",\n      \"event\": \"receive KEEPALIVE\",\n      \"action\": \"reply KEEPALIVE\",\n      \"to\": \"Established\"\n    },\n    {\n      \"from\": \"Established\",\n      \"event\": \"receive NOTIFICATION\",\n      \"action\": \"reply NOTIFICATION\",\n      \"to\": \"Idle\"\n    },\n    {\n      \"from\": \"Established\",\n      \"event\": \"receive CloseConnection\",\n      \"action\": \"send CloseAck\",\n      \"to\": \"Idle\"\n    },\n    {\n      \"from\": \"Established\",\n      \"event\": \"timeout Inactivity\",\n      \"action\": \"send Keepalive\",\n      \"to\": \"Established\"\n    },\n    {\n      \"from\": \"Established\",\n      \"event\": \"receive InvalidMessage\",\n      \"action\": \"send ErrorMessage\",\n      \"to\": \"Idle\"\n    },\n    {\n      \"from\": \"Established\",\n      \"event\": \"receive UnexpectedMessage\",\n      \"action\": \"send ErrorMessage\",\n      \"to\": \"Idle\"\n    },\n    {\n      \"from\": \"NegotiationInProgress\",\n      \"event\": \"receive NotificationMessage\",\n      \"action\": \"reply UnsupportedVersion\",\n      \"to\": \"NegotiationInProgress\"\n    },\n    {\n      \"from\": \"NegotiationInProgress\",\n      \"event\": \"receive OpenMessage\",\n      \"action\": \"reply highestCommonVersion\",\n      \"to\": \"Established\"\n    },\n    {\n      \"from\": \"Idle\",\n      \"event\": \"send OpenMessage\",\n      \"action\": \"send highestVersion\",\n      \"to\": \"NegotiationInProgress\"\n    }\n  ]\n}\n```",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "Idle",
+      "Connect",
+      "OpenSent",
+      "OpenConfirm",
+      "Established",
+      "InitialState",
+      "NegotiationInProgress"
+    ],
+    "initial_state": "Idle",
+    "final_states": [
+      "Idle",
+      "Established"
+    ],
+    "transitions": [
+      {
+        "from": "Idle",
+        "event": "receive OPEN",
+        "action": "set connecting",
+        "to": "Connect"
+      },
+      {
+        "from": "Connect",
+        "event": "receive OPEN",
+        "action": "reply CEASE",
+        "to": "Idle"
+      },
+      {
+        "from": "Connect",
+        "event": "receive KEEPALIVE",
+        "action": "reply KEEPALIVE",
+        "to": "Connect"
+      },
+      {
+        "from": "Connect",
+        "event": "timeout",
+        "action": "close connection",
+        "to": "Idle"
+      },
+      {
+        "from": "OpenSent",
+        "event": "receive OPEN",
+        "action": "reply OPEN",
+        "to": "OpenConfirm"
+      },
+      {
+        "from": "OpenSent",
+        "event": "receive KEEPALIVE",
+        "action": "reply KEEPALIVE",
+        "to": "OpenSent"
+      },
+      {
+        "from": "OpenSent",
+        "event": "timeout",
+        "action": "close connection",
+        "to": "Idle"
+      },
+      {
+        "from": "OpenConfirm",
+        "event": "receive OPEN",
+        "action": "close connection",
+        "to": "Idle"
+      },
+      {
+        "from": "OpenConfirm",
+        "event": "receive KEEPALIVE",
+        "action": "reply KEEPALIVE",
+        "to": "Established"
+      },
+      {
+        "from": "OpenConfirm",
+        "event": "receive NOTIFICATION",
+        "action": "reply NOTIFICATION",
+        "to": "Idle"
+      },
+      {
+        "from": "Established",
+        "event": "receive KEEPALIVE",
+        "action": "reply KEEPALIVE",
+        "to": "Established"
+      },
+      {
+        "from": "Established",
+        "event": "receive NOTIFICATION",
+        "action": "reply NOTIFICATION",
+        "to": "Idle"
+      },
+      {
+        "from": "Established",
+        "event": "timeout",
+        "action": "close connection",
+        "to": "Idle"
+      },
+      {
+        "from": "InitialState",
+        "event": "send OpenMessage",
+        "action": "send highestVersion",
+        "to": "NegotiationInProgress"
+      },
+      {
+        "from": "NegotiationInProgress",
+        "event": "receive NotificationMessage",
+        "action": "reply UnsupportedVersion",
+        "to": "NegotiationInProgress"
+      },
+      {
+        "from": "NegotiationInProgress",
+        "event": "receive OpenMessage",
+        "action": "reply highestCommonVersion",
+        "to": "Established"
+      },
+      {
+        "from": "Idle",
+        "event": "receive StartConnection",
+        "action": "send ConnectAck",
+        "to": "Established"
+      },
+      {
+        "from": "Idle",
+        "event": "receive UnknownMessage",
+        "action": "send ErrorMessage",
+        "to": "Idle"
+      },
+      {
+        "from": "Established",
+        "event": "receive CloseConnection",
+        "action": "send CloseAck",
+        "to": "Idle"
+      },
+      {
+        "from": "Established",
+        "event": "receive InvalidMessage",
+        "action": "send ErrorMessage",
+        "to": "Idle"
+      },
+      {
+        "from": "Established",
+        "event": "receive UnexpectedMessage",
+        "action": "send ErrorMessage",
+        "to": "Idle"
+      }
+    ]
+  }
 }

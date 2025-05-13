@@ -1,0 +1,58 @@
+{
+  "states": [
+    "Unauthenticated",
+    "AwaitingPassword",
+    "Authenticated",
+    "TransferInProgress",
+    "ErrorState",
+    "Disconnected"
+  ],
+  "initial_state": "Unauthenticated",
+  "final_states": [
+    "Disconnected"
+  ],
+  "transitions": [
+    {
+      "from": "Unauthenticated",
+      "event": "receive USER Doe",
+      "action": "reply 331",
+      "to": "AwaitingPassword"
+    },
+    {
+      "from": "AwaitingPassword",
+      "event": "receive PASS mumble",
+      "action": "reply 230",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive RETR test.pl1",
+      "action": "reply 150",
+      "to": "TransferInProgress"
+    },
+    {
+      "from": "TransferInProgress",
+      "event": "transfer completes",
+      "action": "reply 226",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive TYPE I",
+      "action": "reply 200",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive STOR file",
+      "action": "reply 550",
+      "to": "ErrorState"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "Disconnected"
+    }
+  ]
+}

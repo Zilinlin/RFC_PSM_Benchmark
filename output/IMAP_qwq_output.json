@@ -59,5 +59,42 @@
     }
   ],
   "final_response": "<think>\nOkay, let me tackle this problem step by step. The user provided a section from an RFC document, specifically Section 10, which is the Author's Note. The task is to determine if this section contains any Finite State Machine (FSM) related information like states, transitions, diagrams, reply codes, or sequences. If there is, I need to structure that into a JSON object following their strict format. If not, just return \"None\".\n\nFirst, I'll read through the given section carefully. The section says:\n\n\"This document is a revision or rewrite of earlier documents and supercedes the protocol specification in those documents: [RFC3501], [RFC2060], [RFC1730], unpublished IMAP2bis.TXT document, [IMAP2], and [RFC1064].\"\n\nHmm, this seems to be just an author's note about the document's history and which previous documents it replaces. There's no mention of any states, transitions, diagrams, reply codes, or sequences here. The content is purely about the document's revision history, not the protocol's operational details.\n\nThe user's instructions specify that if there's no FSM-related info, I should return exactly `<json>None</json>`. Since this section doesn't have any of the required elements like states or transitions, the correct response is to output \"None\".\n\nI need to make sure I'm not missing anything. Maybe the mention of RFC numbers could imply something? But those are just references to prior versions, not FSM components. The Author's Note typically doesn't contain protocol mechanics. The actual FSM details would be in other sections like the main protocol flow, authentication steps, etc., which aren't part of this section.\n\nTherefore, the answer should be \"None\".\n</think>\n\n<json>None</json>",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "NotAuthenticated",
+      "Authenticated",
+      "Selected",
+      "LoggedOut"
+    ],
+    "initial_state": "NotAuthenticated",
+    "final_states": [
+      "LoggedOut"
+    ],
+    "transitions": [
+      {
+        "from": "NotAuthenticated",
+        "event": "receive STARTTLS",
+        "action": "send OK Proceed with TLS negotiation",
+        "to": "NotAuthenticated"
+      },
+      {
+        "from": "NotAuthenticated",
+        "event": "receive AUTHENTICATE",
+        "action": "send OK Authentication completed",
+        "to": "Authenticated"
+      },
+      {
+        "from": "Authenticated",
+        "event": "receive SELECT",
+        "action": "send OK SELECT completed",
+        "to": "Selected"
+      },
+      {
+        "from": "Selected",
+        "event": "receive LOGOUT",
+        "action": "send OK LOGOUT completed",
+        "to": "LoggedOut"
+      }
+    ]
+  }
 }

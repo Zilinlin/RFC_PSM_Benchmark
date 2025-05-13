@@ -1,0 +1,256 @@
+{
+  "states": [
+    "InitialState",
+    "AwaitingUser",
+    "AwaitingPass",
+    "Authenticated",
+    "DataTransfer",
+    "ClosingConnection",
+    "WaitingForConnection",
+    "AwaitingAuthentication",
+    "AwaitingCommand",
+    "SendingMessage",
+    "DeletingMessage",
+    "SigningOff",
+    "Authorization",
+    "Transaction",
+    "Update",
+    "AuthenticatedApop",
+    "AuthenticatedPass"
+  ],
+  "initial_state": "InitialState",
+  "final_states": [
+    "ClosingConnection",
+    "Update"
+  ],
+  "transitions": [
+    {
+      "from": "InitialState",
+      "event": "receive USER",
+      "action": "reply 230",
+      "to": "AwaitingUser"
+    },
+    {
+      "from": "AwaitingUser",
+      "event": "receive PASS",
+      "action": "reply 230",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive APOP",
+      "action": "reply 230",
+      "to": "DataTransfer"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive DELE",
+      "action": "reply 250",
+      "to": "DataTransfer"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive LIST",
+      "action": "reply 230",
+      "to": "DataTransfer"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive NOOP",
+      "action": "reply 250",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive RETR",
+      "action": "reply 230",
+      "to": "DataTransfer"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive RSET",
+      "action": "reply 250",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive STAT",
+      "action": "reply 230",
+      "to": "DataTransfer"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive TOP",
+      "action": "reply 230",
+      "to": "DataTransfer"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive UIDL",
+      "action": "reply 230",
+      "to": "DataTransfer"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "ClosingConnection"
+    },
+    {
+      "from": "ClosingConnection",
+      "event": "send 221",
+      "action": "close connection",
+      "to": "InitialState"
+    },
+    {
+      "from": "WaitingForConnection",
+      "event": "receive open",
+      "action": "reply +OK server ready",
+      "to": "AwaitingAuthentication"
+    },
+    {
+      "from": "AwaitingAuthentication",
+      "event": "receive APOP",
+      "action": "reply +OK user maildrop",
+      "to": "AwaitingCommand"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive STAT",
+      "action": "reply +OK count size",
+      "to": "AwaitingCommand"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive LIST",
+      "action": "reply +OK message count",
+      "to": "AwaitingCommand"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive RETR",
+      "action": "reply +OK size",
+      "to": "SendingMessage"
+    },
+    {
+      "from": "SendingMessage",
+      "event": "send message data",
+      "action": "reply .",
+      "to": "AwaitingCommand"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive DELE",
+      "action": "reply +OK message deleted",
+      "to": "AwaitingCommand"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive QUIT",
+      "action": "reply +OK signing off",
+      "to": "SigningOff"
+    },
+    {
+      "from": "SigningOff",
+      "event": "send closing message",
+      "action": "close connection",
+      "to": "WaitingForConnection"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive COMMAND",
+      "action": "reply CODE",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive QUIT",
+      "action": "reply CODE",
+      "to": "Update"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive COMMAND",
+      "action": "reply CODE",
+      "to": "Transaction"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive QUIT",
+      "action": "reply 230",
+      "to": "Transaction"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive authentication command",
+      "action": "reply 230",
+      "to": "Transaction"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive authentication command",
+      "action": "reply negative status",
+      "to": "Authorization"
+    },
+    {
+      "from": "Authentication",
+      "event": "receive USER",
+      "action": "reply 230",
+      "to": "Authentication"
+    },
+    {
+      "from": "Authentication",
+      "event": "receive PASS",
+      "action": "reply 230",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive STAT",
+      "action": "reply 230",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive LIST",
+      "action": "reply 230",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive RETR",
+      "action": "reply 230",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive DELE",
+      "action": "reply 230",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive NOOP",
+      "action": "reply 230",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive RSET",
+      "action": "reply 230",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive QUIT",
+      "action": "reply 230",
+      "to": "Update"
+    },
+    {
+      "from": "Update",
+      "event": "receive QUIT",
+      "action": "reply 230",
+      "to": "Update"
+    }
+  ]
+}

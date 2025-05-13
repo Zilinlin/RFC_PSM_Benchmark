@@ -113,7 +113,7 @@ def call_api(prompt, temperature=0.0, max_tokens=8192):
     Calls the chatgpt API and returns the generated text.
     """
     completion = client.chat.completions.create(
-        model="gpt-4o",
+        model="gpt-4o-mini",
         messages=[
             {"role": "user", "content": prompt}
         ],
@@ -183,11 +183,12 @@ if __name__ == "__main__":
     # protocols = ["MQTT", 'PPP', "PPTP", "BGP"]
     #protocols = ["SIP", "NNTP", "FTP"]
     # close_models = ["deepseek-reasoner","gpt-4o-mini", "claude-3-7-sonnet-20250219","gemini-2.0-flash"]
-    close_models = ["deepseek-chat"]
+    # close_models = ["deepseek-chat"]
+    small_models = ["qwq", "qwen3:32b","gemma3:27b","mistral-small3.1"] # 32b
     directory = "output"
     fsm_dir = "fsm"
     
-    for model in close_models:
+    for model in small_models:
         for protocol in protocols:
             try:
                 final_fsm = extract_final_fsm(directory, model, protocol, fsm_dir)

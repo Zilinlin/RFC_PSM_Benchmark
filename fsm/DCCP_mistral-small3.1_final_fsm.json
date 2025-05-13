@@ -1,0 +1,76 @@
+{
+  "states": [
+    "Received",
+    "Acknowledged",
+    "DeliveredCorrupt",
+    "Dropped",
+    "Processed",
+    "ECNCapable",
+    "ECNIncapable",
+    "ECNNonceMismatchDetected",
+    "MisbehaviorDetected",
+    "ConnectionReset"
+  ],
+  "initial_state": "Received",
+  "final_states": [
+    "Dropped",
+    "Processed",
+    "ConnectionReset"
+  ],
+  "transitions": [
+    {
+      "from": "Received",
+      "event": "receive DataChecksum",
+      "action": "set CheckDataChecksum true",
+      "to": "Acknowledged"
+    },
+    {
+      "from": "Received",
+      "event": "receive DataChecksum",
+      "action": "reply DataDropped DropCode3",
+      "to": "Dropped"
+    },
+    {
+      "from": "Received",
+      "event": "receive DataChecksum",
+      "action": "reply DataDropped DropCode7",
+      "to": "DeliveredCorrupt"
+    },
+    {
+      "from": "Received",
+      "event": "receive DataChecksum",
+      "action": "reply DataDropped DropCode0",
+      "to": "Processed"
+    },
+    {
+      "from": "ECNCapable",
+      "event": "receive ECNIncapable",
+      "action": "set ECNIncapable true",
+      "to": "ECNIncapable"
+    },
+    {
+      "from": "ECNIncapable",
+      "event": "send ECNIncapable",
+      "action": "reply ConfirmR",
+      "to": "ECNIncapable"
+    },
+    {
+      "from": "ECNCapable",
+      "event": "detect ECNNonceMismatch",
+      "action": "log ECNNonceMismatch",
+      "to": "ECNNonceMismatchDetected"
+    },
+    {
+      "from": "ECNNonceMismatchDetected",
+      "event": "cond verifyMisbehavior",
+      "action": "set MisbehaviorDetected true",
+      "to": "MisbehaviorDetected"
+    },
+    {
+      "from": "MisbehaviorDetected",
+      "event": "cond egregiousMisbehavior",
+      "action": "reset ConnectionReset",
+      "to": "ConnectionReset"
+    }
+  ]
+}

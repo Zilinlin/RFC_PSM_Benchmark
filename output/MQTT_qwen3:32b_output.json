@@ -59,5 +59,61 @@
     }
   ],
   "final_response": "<think>\nOkay, let's see. The user provided a section from an RFC document about the MQTT protocol profile. They want me to check if there's any Finite State Machine (FSM) related information in there.\n\nFirst, I'll read through the section. It lists various requirements for the profile, like optional AS discovery, communication protocols, security protocols, mutual authentication options, content formats, unique identifiers, token introspection, token requests, authz-info endpoints, and token transport methods. \n\nLooking for terms that might indicate states or transitions. The section mentions things like \"Client and RS mutual authentication\" with several options, \"Proof-of-possession protocols\" supporting symmetric and asymmetric keys, and token transport via different methods. However, there's no mention of specific states, transitions between states, events, or actions that would define an FSM. \n\nThe document refers to sections where these features are described in more detail, but the Appendix A checklist here is more about listing supported features rather than detailing a state machine. There are no state names, events, or transitions explicitly outlined here. \n\nSince there's no FSM information present in the provided section, the correct response is to return \"None\" in the specified JSON format.\n</think>\n\n<json>None</json>",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "ProcessingPublish",
+      "ProcessingSubscribe",
+      "Disconnected",
+      "PublishProcessed",
+      "SubscribeProcessed",
+      "Authenticated",
+      "NotAuthorized"
+    ],
+    "initial_state": "ProcessingPublish",
+    "final_states": [
+      "Disconnected",
+      "PublishProcessed",
+      "SubscribeProcessed",
+      "Authenticated",
+      "NotAuthorized"
+    ],
+    "transitions": [
+      {
+        "from": "ProcessingPublish",
+        "event": "cond authorized",
+        "action": "send PUBACK",
+        "to": "PublishProcessed"
+      },
+      {
+        "from": "ProcessingPublish",
+        "event": "cond not authorized",
+        "action": "reply 0x80",
+        "to": "Disconnected"
+      },
+      {
+        "from": "ProcessingSubscribe",
+        "event": "cond authorized",
+        "action": "reply 0x00",
+        "to": "SubscribeProcessed"
+      },
+      {
+        "from": "ProcessingSubscribe",
+        "event": "cond not authorized",
+        "action": "reply 0x80",
+        "to": "SubscribeProcessed"
+      },
+      {
+        "from": "Authenticated",
+        "event": "cond token_expired",
+        "action": "send DISCONNECT 0x87",
+        "to": "NotAuthorized"
+      },
+      {
+        "from": "NotAuthorized",
+        "event": "send AUTH 0x19",
+        "action": "reply with reauthentication request",
+        "to": "Authenticated"
+      }
+    ]
+  }
 }

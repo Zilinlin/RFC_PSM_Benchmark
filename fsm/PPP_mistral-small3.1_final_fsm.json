@@ -1,0 +1,93 @@
+{
+  "states": [
+    "link_dead",
+    "link_establishment",
+    "authentication",
+    "network_layer_protocol",
+    "link_termination",
+    "waiting_for_response",
+    "connected",
+    "disconnected",
+    "sending_data"
+  ],
+  "initial_state": "link_dead",
+  "final_states": [
+    "link_dead",
+    "link_termination",
+    "disconnected"
+  ],
+  "transitions": [
+    {
+      "from": "link_dead",
+      "event": "receive_physical_layer_ready",
+      "action": "open_link_establishment",
+      "to": "link_establishment"
+    },
+    {
+      "from": "link_establishment",
+      "event": "receive_configure_ack",
+      "action": "set_lcp_opened",
+      "to": "authentication"
+    },
+    {
+      "from": "authentication",
+      "event": "receive_authentication_success",
+      "action": "open_network_layer_protocol",
+      "to": "network_layer_protocol"
+    },
+    {
+      "from": "authentication",
+      "event": "receive_authentication_failure",
+      "action": "open_link_termination",
+      "to": "link_termination"
+    },
+    {
+      "from": "network_layer_protocol",
+      "event": "receive_configure_request",
+      "action": "close_network_layer_protocol",
+      "to": "link_establishment"
+    },
+    {
+      "from": "network_layer_protocol",
+      "event": "receive_termination_event",
+      "action": "open_link_termination",
+      "to": "link_termination"
+    },
+    {
+      "from": "link_termination",
+      "event": "send_terminate_ack",
+      "action": "close_physical_layer",
+      "to": "link_dead"
+    },
+    {
+      "from": "waiting_for_response",
+      "event": "receive_command",
+      "action": "send_response",
+      "to": "connected"
+    },
+    {
+      "from": "connected",
+      "event": "timeout",
+      "action": "stop_connection",
+      "to": "disconnected"
+    },
+    {
+      "from": "disconnected",
+      "event": "receive_command",
+      "action": "send_response",
+      "to": "waiting_for_response"
+    },
+    {
+      "from": "connected",
+      "event": "send_data",
+      "action": "send_data",
+      "to": "sending_data"
+    },
+    {
+      "from": "sending_data",
+      "event": "data_sent",
+      "action": "stop_sending",
+      "to": "waiting_for_response"
+    }
+  ]
+}

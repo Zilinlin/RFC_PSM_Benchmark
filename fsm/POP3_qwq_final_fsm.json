@@ -1,0 +1,45 @@
+{
+  "states": [
+    "Unauthenticated",
+    "AwaitingPassword",
+    "Authenticated",
+    "Error"
+  ],
+  "transitions": [
+    {
+      "from": "Unauthenticated",
+      "event": "receive APOP",
+      "action": "reply +OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Unauthenticated",
+      "event": "receive USER",
+      "action": "reply +OK",
+      "to": "AwaitingPassword"
+    },
+    {
+      "from": "AwaitingPassword",
+      "event": "receive PASS",
+      "action": "reply +OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Unauthenticated",
+      "event": "receive USER",
+      "action": "reply -ERR",
+      "to": "Error"
+    },
+    {
+      "from": "AwaitingPassword",
+      "event": "receive PASS",
+      "action": "reply -ERR",
+      "to": "Error"
+    }
+  ],
+  "initial_state": "Unauthenticated",
+  "final_states": [
+    "Authenticated",
+    "Error"
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "states": [
+    "Init",
+    "Ready",
+    "Play"
+  ],
+  "transitions": [
+    {
+      "from": "Ready",
+      "event": "receive PLAY",
+      "action": "reply 200",
+      "to": "Play"
+    },
+    {
+      "from": "Ready",
+      "event": "receive SC:REDIRECT",
+      "action": "set RedP",
+      "to": "Play"
+    },
+    {
+      "from": "Ready",
+      "event": "receive SC:REDIRECT",
+      "action": "session removed",
+      "to": "Init"
+    },
+    {
+      "from": "Ready",
+      "event": "RedP reached",
+      "action": "send TEARDOWN",
+      "to": "Init"
+    },
+    {
+      "from": "Ready",
+      "event": "timeout",
+      "action": "stop media",
+      "to": "Init"
+    },
+    {
+      "from": "Play",
+      "event": "receive PAUSE",
+      "action": "reply 200",
+      "to": "Ready"
+    },
+    {
+      "from": "Play",
+      "event": "receive SC:REDIRECT",
+      "action": "set RedP",
+      "to": "Play"
+    },
+    {
+      "from": "Play",
+      "event": "receive SC:REDIRECT",
+      "action": "session removed",
+      "to": "Init"
+    },
+    {
+      "from": "Play",
+      "event": "RedP reached",
+      "action": "send TEARDOWN",
+      "to": "Init"
+    },
+    {
+      "from": "Play",
+      "event": "timeout",
+      "action": "stop media",
+      "to": "Init"
+    }
+  ]
+}

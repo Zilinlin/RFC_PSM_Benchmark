@@ -1,0 +1,73 @@
+{
+  "states": [
+    "SYN_RECEIVED",
+    "ESTABLISHED",
+    "FIN_WAIT_1",
+    "CLOSING",
+    "FIN_WAIT_2",
+    "CLOSE_WAIT",
+    "LAST_ACK",
+    "TIME_WAIT",
+    "CLOSED"
+  ],
+  "initial_state": "SYN_RECEIVED",
+  "final_states": [
+    "CLOSED"
+  ],
+  "transitions": [
+    {
+      "from": "ESTABLISHED",
+      "event": "recv FIN",
+      "action": "send ACK",
+      "to": "CLOSE_WAIT"
+    },
+    {
+      "from": "FIN_WAIT_1",
+      "event": "recv ACK",
+      "action": "start time-wait timer",
+      "to": "TIME_WAIT"
+    },
+    {
+      "from": "FIN_WAIT_1",
+      "event": "cond FIN not ACKed",
+      "action": "send FIN",
+      "to": "CLOSING"
+    },
+    {
+      "from": "FIN_WAIT_2",
+      "event": "recv FIN",
+      "action": "send ACK",
+      "to": "TIME_WAIT"
+    },
+    {
+      "from": "CLOSING",
+      "event": "recv ACK",
+      "action": "start time-wait timer",
+      "to": "TIME_WAIT"
+    },
+    {
+      "from": "LAST_ACK",
+      "event": "recv ACK",
+      "action": "delete TCB",
+      "to": "CLOSED"
+    },
+    {
+      "from": "TIME_WAIT",
+      "event": "timeout 2MSL",
+      "action": "delete TCB",
+      "to": "CLOSED"
+    },
+    {
+      "from": "ANY",
+      "event": "timeout retransmission",
+      "action": "resend segment",
+      "to": "self"
+    },
+    {
+      "from": "ANY",
+      "event": "timeout user",
+      "action": "signal error",
+      "to": "CLOSED"
+    }
+  ]
+}

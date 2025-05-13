@@ -1,0 +1,144 @@
+{
+  "states": [
+    "Idle",
+    "Connect",
+    "OpenSent",
+    "OpenConfirm",
+    "Established",
+    "InitialState",
+    "NegotiationInProgress"
+  ],
+  "initial_state": "Idle",
+  "final_states": [
+    "Idle",
+    "Established"
+  ],
+  "transitions": [
+    {
+      "from": "Idle",
+      "event": "receive OPEN",
+      "action": "set connecting",
+      "to": "Connect"
+    },
+    {
+      "from": "Connect",
+      "event": "receive OPEN",
+      "action": "reply CEASE",
+      "to": "Idle"
+    },
+    {
+      "from": "Connect",
+      "event": "receive KEEPALIVE",
+      "action": "reply KEEPALIVE",
+      "to": "Connect"
+    },
+    {
+      "from": "Connect",
+      "event": "timeout",
+      "action": "close connection",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenSent",
+      "event": "receive OPEN",
+      "action": "reply OPEN",
+      "to": "OpenConfirm"
+    },
+    {
+      "from": "OpenSent",
+      "event": "receive KEEPALIVE",
+      "action": "reply KEEPALIVE",
+      "to": "OpenSent"
+    },
+    {
+      "from": "OpenSent",
+      "event": "timeout",
+      "action": "close connection",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "receive OPEN",
+      "action": "close connection",
+      "to": "Idle"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "receive KEEPALIVE",
+      "action": "reply KEEPALIVE",
+      "to": "Established"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "receive NOTIFICATION",
+      "action": "reply NOTIFICATION",
+      "to": "Idle"
+    },
+    {
+      "from": "Established",
+      "event": "receive KEEPALIVE",
+      "action": "reply KEEPALIVE",
+      "to": "Established"
+    },
+    {
+      "from": "Established",
+      "event": "receive NOTIFICATION",
+      "action": "reply NOTIFICATION",
+      "to": "Idle"
+    },
+    {
+      "from": "Established",
+      "event": "timeout",
+      "action": "close connection",
+      "to": "Idle"
+    },
+    {
+      "from": "InitialState",
+      "event": "send OpenMessage",
+      "action": "send highestVersion",
+      "to": "NegotiationInProgress"
+    },
+    {
+      "from": "NegotiationInProgress",
+      "event": "receive NotificationMessage",
+      "action": "reply UnsupportedVersion",
+      "to": "NegotiationInProgress"
+    },
+    {
+      "from": "NegotiationInProgress",
+      "event": "receive OpenMessage",
+      "action": "reply highestCommonVersion",
+      "to": "Established"
+    },
+    {
+      "from": "Idle",
+      "event": "receive StartConnection",
+      "action": "send ConnectAck",
+      "to": "Established"
+    },
+    {
+      "from": "Idle",
+      "event": "receive UnknownMessage",
+      "action": "send ErrorMessage",
+      "to": "Idle"
+    },
+    {
+      "from": "Established",
+      "event": "receive CloseConnection",
+      "action": "send CloseAck",
+      "to": "Idle"
+    },
+    {
+      "from": "Established",
+      "event": "receive InvalidMessage",
+      "action": "send ErrorMessage",
+      "to": "Idle"
+    },
+    {
+      "from": "Established",
+      "event": "receive UnexpectedMessage",
+      "action": "send ErrorMessage",
+      "to": "Idle"
+    }
+  ]
+}

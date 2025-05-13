@@ -59,5 +59,110 @@
     }
   ],
   "final_response": "<think>\nOkay, let's see. The user provided a section from an RFC document that's part of the File Transfer Protocol (FTP) specification. The task is to check if there's any Finite State Machine (FSM) related information here.\n\nFirst, I need to recall what FSM information looks like in the context of protocols. FSMs in protocols usually involve states, transitions between those states triggered by events (like receiving a command or sending a response), and actions taken during those transitions. The example given in the problem includes states like \"Authenticated\" and transitions based on commands like MKD or RMD.\n\nLooking at the provided section, it's a list of references to other RFCs. The content here is just a list of document numbers and titles, such as RFC 765, 775, 959, etc. There's no mention of states, transitions, reply codes, or sequences of steps that would indicate an FSM. The references themselves might contain FSM details, but the section provided doesn't include that information. \n\nThe user's instructions specify that if there's no FSM information in the given section, I should reply with \"None\". Since this section is just a list of references without any protocol state machine details, the correct response is to indicate that there's no FSM information here.\n</think>\n\n<json>None</json>",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "Initial",
+      "AwaitingUsername",
+      "AwaitingPassword",
+      "Authenticated",
+      "TransferringData",
+      "Error",
+      "Terminated",
+      "Begin",
+      "WaitingForReply",
+      "Success",
+      "End"
+    ],
+    "initial_state": "Initial",
+    "final_states": [
+      "Terminated",
+      "End"
+    ],
+    "transitions": [
+      {
+        "from": "Initial",
+        "event": "receive USER",
+        "action": "reply 331",
+        "to": "AwaitingPassword"
+      },
+      {
+        "from": "AwaitingPassword",
+        "event": "receive PASS",
+        "action": "reply 230",
+        "to": "Authenticated"
+      },
+      {
+        "from": "Authenticated",
+        "event": "receive RETR",
+        "action": "open data connection",
+        "to": "TransferringData"
+      },
+      {
+        "from": "TransferringData",
+        "event": "receive 226",
+        "action": "close data connection",
+        "to": "Authenticated"
+      },
+      {
+        "from": "Authenticated",
+        "event": "receive TYPE",
+        "action": "reply 200",
+        "to": "Authenticated"
+      },
+      {
+        "from": "Authenticated",
+        "event": "receive STOR",
+        "action": "reply 550",
+        "to": "Error"
+      },
+      {
+        "from": "Authenticated",
+        "event": "receive QUIT",
+        "action": "close connections",
+        "to": "Terminated"
+      },
+      {
+        "from": "Begin",
+        "event": "receive USER",
+        "action": "reply 331",
+        "to": "AwaitingPassword"
+      },
+      {
+        "from": "AwaitingPassword",
+        "event": "receive PASS",
+        "action": "reply 230",
+        "to": "Authenticated"
+      },
+      {
+        "from": "Authenticated",
+        "event": "receive ACCT",
+        "action": "reply 202",
+        "to": "Authenticated"
+      },
+      {
+        "from": "Authenticated",
+        "event": "receive COMMAND",
+        "action": "reply 150",
+        "to": "TransferringData"
+      },
+      {
+        "from": "WaitingForReply",
+        "event": "receive 4xx",
+        "action": "reply 4xx",
+        "to": "Error"
+      },
+      {
+        "from": "WaitingForReply",
+        "event": "receive 2xx",
+        "action": "reply 2xx",
+        "to": "Success"
+      },
+      {
+        "from": "Success",
+        "event": "end",
+        "action": "close connection",
+        "to": "End"
+      }
+    ]
+  }
 }

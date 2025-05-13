@@ -1,0 +1,83 @@
+{
+  "states": [
+    "ServiceReady",
+    "UserSent",
+    "Authenticated",
+    "DataConnectionSetup",
+    "DataTransfer",
+    "ErrorState",
+    "Closing"
+  ],
+  "initial_state": "ServiceReady",
+  "final_states": [
+    "Closing"
+  ],
+  "transitions": [
+    {
+      "from": "ServiceReady",
+      "event": "send USER",
+      "action": "reply 331",
+      "to": "UserSent"
+    },
+    {
+      "from": "UserSent",
+      "event": "send PASS (correct)",
+      "action": "reply 230",
+      "to": "Authenticated"
+    },
+    {
+      "from": "UserSent",
+      "event": "send PASS (incorrect)",
+      "action": "reply 530",
+      "to": "ErrorState"
+    },
+    {
+      "from": "Authenticated",
+      "event": "send PASV",
+      "action": "reply 227",
+      "to": "DataConnectionSetup"
+    },
+    {
+      "from": "DataConnectionSetup",
+      "event": "send RETR",
+      "action": "reply 150",
+      "to": "DataTransfer"
+    },
+    {
+      "from": "DataTransfer",
+      "event": "send ABOR",
+      "action": "reply 226",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "send CWD",
+      "action": "reply 250",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "send QUIT",
+      "action": "reply 221",
+      "to": "Closing"
+    },
+    {
+      "from": "DataConnectionSetup",
+      "event": "send QUIT",
+      "action": "reply 221",
+      "to": "Closing"
+    },
+    {
+      "from": "DataTransfer",
+      "event": "send QUIT",
+      "action": "reply 221",
+      "to": "Closing"
+    },
+    {
+      "from": "ErrorState",
+      "event": "send QUIT",
+      "action": "reply 221",
+      "to": "Closing"
+    }
+  ]
+}

@@ -23,7 +23,7 @@ def preprocess_state_name(state_name):
 
 
 
-def match_states(source_states, target_states, threshold=0.5):
+def match_states(source_states, target_states, threshold):
     # Preprocess the state names
     source_clean = [preprocess_state_name(s) for s in source_states]
     target_clean = [preprocess_state_name(t) for t in target_states]
@@ -52,14 +52,19 @@ def match_states(source_states, target_states, threshold=0.5):
 
 # this function is to match all states between the ground truth and extracted FSMs
 def match_all_states(models, protocols, fsm_dir, threshold=0.5):
-    model_obj = SentenceTransformer('all-MiniLM-L6-v2')
     all_matches = {}
+    summary_stats = []
 
     for protocol in protocols:
         # Load ground truth FSM
-        gt_file = os.path.join(fsm_dir, protocol, f"gt_{protocol}_state_machine.json")
-        if not os.path.exists(gt_file):
-            print(f"Warning: No ground truth file for protocol {protocol}")
+        protocol_dir = os.path.join(protocol)
+        gt_file = None
+        for file in os.listdir(protocol_dir):
+            if file.endswith("_state_machine.json"):
+                gt_file = os.path.join(protocol_dir, file)
+                break
+
+        if not gt_file:
             continue
 
         with open(gt_file, 'r') as f:
@@ -68,23 +73,48 @@ def match_all_states(models, protocols, fsm_dir, threshold=0.5):
 
         for model in models:
             # Load extracted FSM
-            ext_file = os.path.join(fsm_dir, f"{model}_{protocol}.json")
-            if not os.path.exists(ext_file):
-                print(f"Warning: No extracted FSM file for model {model} and protocol {protocol}")
+            extracted_file = None
+
+            # Find the extracted FSM file for the protocol and model
+            for file in os.listdir(fsm_dir):
+                if protocol in file and model in file and file.endswith(".json"):
+                    extracted_file = os.path.join(fsm_dir, file)
+                    break
+
+            if not extracted_file:
                 continue
 
-            with open(ext_file, 'r') as f:
+            with open(extracted_file, 'r') as f:
                 ext_fsm = json.load(f)
             ext_states = ext_fsm.get('states', [])
 
             # Match states
-            matches, unmatched = match_states(gt_states, ext_states, model_obj, threshold=threshold)
+            matches, unmatched = match_states(gt_states, ext_states, threshold=threshold)
+            matched_count = len([m for m in matches if m[1] is not None])
+            unmatched_gt = len(gt_states) - matched_count
+            unmatched_extracted = len(ext_states) - matched_count
+            precision = matched_count / len(ext_states) if len(ext_states) > 0 else 0
+            recall = matched_count / len(gt_states) if len(gt_states) > 0 else 0
+            f1_score = (2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+
+            # Store results
             all_matches[(protocol, model)] = {
                 "matches": matches,
-                "unmatched": unmatched
+                "unmatched_gt": unmatched_gt,
+                "unmatched_extracted": unmatched_extracted,
+                "precision": precision,
+                "recall": recall,
+                "f1_score": f1_score,
+                "total_gt_states": len(gt_states),
+                "total_extracted_states": len(ext_states),
+                "matched": matched_count
             }
 
-    return all_matches
+            # Append summary stats for later table generation
+            summary_stats.append([protocol, model, len(ext_states), len(gt_states), matched_count, unmatched_gt, unmatched_extracted, precision, recall, f1_score])
+
+    # Return both detailed matches and summary stats for table generation
+    return all_matches, pd.DataFrame(summary_stats, columns=["Protocol", "Model", "Total Extracted", "Total GT", "Matched", "Unmatched (GT)", "Unmatched (Extracted)", "Precision", "Recall", "F1-Score"])
 
 def compute_similarity(a, b):
     emb1 = model.encode(a, convert_to_tensor=True)
@@ -325,11 +355,18 @@ if __name__ == "__main__":
                  "SIP", "RTSP", "DCCP", "DHCP", "FTP", "NNTP", "SMTP", "TCP"]
     models = ["deepseek-reasoner", "gpt-4o-mini", "claude-3-7-sonnet-20250219", "gemini-2.0-flash", "deepseek-chat"]
     
-    initial_state_results, score_matrix = compare_initial_states(models, protocols, fsm_dir="fsm", threshold=0.5)
-    print("Initial State Results:", initial_state_results)
-    print("Score Matrix:\n", score_matrix)
     
-    plot_score_matrix(score_matrix, threshold=0.5, output_file='initial_state_score_matrix.png')
+    '''get the initial states results'''
+    # initial_state_results, score_matrix = compare_initial_states(models, protocols, fsm_dir="fsm", threshold=0.5)
+    # print("Initial State Results:", initial_state_results)
+    # print("Score Matrix:\n", score_matrix)
     
+    # plot_score_matrix(score_matrix, threshold=0.5, output_file='initial_state_score_matrix.png')
+    
+    
+    '''get the state matches results'''
+    all_matches, summary_df = match_all_states(models, protocols, fsm_dir="fsm", threshold=0.5)
+    print("All Matches:\n", all_matches)
+    print("sumaary_df:\n", summary_df)
     
     

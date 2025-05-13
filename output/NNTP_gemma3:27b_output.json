@@ -74,5 +74,111 @@
     }
   ],
   "final_response": "```json\n{\n  \"states\": [\"Initial\", \"AwaitingQuit\", \"ClosingConnection\", \"AwaitingArticle\", \"Transferring\", \"Duplicate\", \"Rejected\", \"Failed\", \"ListingHeaders\"],\n  \"initial_state\": \"Initial\",\n  \"final_states\": [\"ClosingConnection\", \"Duplicate\", \"Rejected\", \"Failed\", \"ListingHeaders\"],\n  \"transitions\": [\n    {\n      \"from\": \"Initial\",\n      \"event\": \"receive MODE_READER\",\n      \"action\": \"reply 200\",\n      \"to\": \"Initial\"\n    },\n    {\n      \"from\": \"Initial\",\n      \"event\": \"receive MODE_READER\",\n      \"action\": \"reply 201\",\n      \"to\": \"Initial\"\n    },\n    {\n      \"from\": \"Initial\",\n      \"event\": \"receive QUIT\",\n      \"action\": \"reply 205\",\n      \"to\": \"ClosingConnection\"\n    },\n    {\n      \"from\": \"ClosingConnection\",\n      \"event\": \"send 205\",\n      \"action\": \"close connection\",\n      \"to\": \"ClosingConnection\"\n    },\n    {\n      \"from\": \"Initial\",\n      \"event\": \"receive IHAVE\",\n      \"action\": \"reply 335\",\n      \"to\": \"AwaitingArticle\"\n    },\n    {\n      \"from\": \"AwaitingArticle\",\n      \"event\": \"receive ArticleData\",\n      \"action\": \"reply 230\",\n      \"to\": \"Transferring\"\n    },\n    {\n      \"from\": \"Transferring\",\n      \"event\": \"send 230\",\n      \"action\": \"reply 230\",\n      \"to\": \"Initial\"\n    },\n    {\n      \"from\": \"Initial\",\n      \"event\": \"receive IHAVE\",\n      \"action\": \"reply 435\",\n      \"to\": \"Duplicate\"\n    },\n    {\n      \"from\": \"Initial\",\n      \"event\": \"receive IHAVE\",\n      \"action\": \"reply 437\",\n      \"to\": \"Rejected\"\n    },\n    {\n      \"from\": \"Initial\",\n      \"event\": \"receive IHAVE\",\n      \"action\": \"reply 436\",\n      \"to\": \"Failed\"\n    },\n    {\n      \"from\": \"Initial\",\n      \"event\": \"receive LIST HEADERS\",\n      \"action\": \"reply 250\",\n      \"to\": \"ListingHeaders\"\n    },\n    {\n      \"from\": \"ListingHeaders\",\n      \"event\": \"receive LIST HEADERS RANGE\",\n      \"action\": \"reply 250\",\n      \"to\": \"ListingHeaders\"\n    },\n    {\n      \"from\": \"ListingHeaders\",\n      \"event\": \"receive LIST HEADERS MSGID\",\n      \"action\": \"reply 250\",\n      \"to\": \"ListingHeaders\"\n    },\n    {\n      \"from\": \"ListingHeaders\",\n      \"event\": \"receive LIST HEADERS\",\n      \"action\": \"reply 250\",\n      \"to\": \"ListingHeaders\"\n    }\n  ]\n}\n```",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "Initial",
+      "AwaitingQuit",
+      "ClosingConnection",
+      "AwaitingArticle",
+      "Transferring",
+      "Duplicate",
+      "Rejected",
+      "Failed",
+      "ListingHeaders"
+    ],
+    "initial_state": "Initial",
+    "final_states": [
+      "ClosingConnection",
+      "Duplicate",
+      "Rejected",
+      "Failed",
+      "ListingHeaders"
+    ],
+    "transitions": [
+      {
+        "from": "Initial",
+        "event": "receive MODE_READER",
+        "action": "reply 200",
+        "to": "Initial"
+      },
+      {
+        "from": "Initial",
+        "event": "receive MODE_READER",
+        "action": "reply 201",
+        "to": "Initial"
+      },
+      {
+        "from": "Initial",
+        "event": "receive QUIT",
+        "action": "reply 205",
+        "to": "ClosingConnection"
+      },
+      {
+        "from": "ClosingConnection",
+        "event": "send 205",
+        "action": "close connection",
+        "to": "ClosingConnection"
+      },
+      {
+        "from": "Initial",
+        "event": "receive IHAVE",
+        "action": "reply 335",
+        "to": "AwaitingArticle"
+      },
+      {
+        "from": "AwaitingArticle",
+        "event": "receive ArticleData",
+        "action": "reply 230",
+        "to": "Transferring"
+      },
+      {
+        "from": "Transferring",
+        "event": "send 230",
+        "action": "reply 230",
+        "to": "Initial"
+      },
+      {
+        "from": "Initial",
+        "event": "receive IHAVE",
+        "action": "reply 435",
+        "to": "Duplicate"
+      },
+      {
+        "from": "Initial",
+        "event": "receive IHAVE",
+        "action": "reply 437",
+        "to": "Rejected"
+      },
+      {
+        "from": "Initial",
+        "event": "receive IHAVE",
+        "action": "reply 436",
+        "to": "Failed"
+      },
+      {
+        "from": "Initial",
+        "event": "receive LIST HEADERS",
+        "action": "reply 250",
+        "to": "ListingHeaders"
+      },
+      {
+        "from": "ListingHeaders",
+        "event": "receive LIST HEADERS RANGE",
+        "action": "reply 250",
+        "to": "ListingHeaders"
+      },
+      {
+        "from": "ListingHeaders",
+        "event": "receive LIST HEADERS MSGID",
+        "action": "reply 250",
+        "to": "ListingHeaders"
+      },
+      {
+        "from": "ListingHeaders",
+        "event": "receive LIST HEADERS",
+        "action": "reply 250",
+        "to": "ListingHeaders"
+      }
+    ]
+  }
 }

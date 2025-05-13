@@ -1,0 +1,38 @@
+{
+  "states": [
+    "NotAuthenticated",
+    "Authenticated",
+    "Selected",
+    "Terminated"
+  ],
+  "initial_state": "NotAuthenticated",
+  "final_states": [
+    "Terminated"
+  ],
+  "transitions": [
+    {
+      "from": "NotAuthenticated",
+      "event": "receive STARTTLS",
+      "action": "send OK",
+      "to": "NotAuthenticated"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive AUTHENTICATE",
+      "action": "send OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive SELECT",
+      "action": "send OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Selected",
+      "event": "receive LOGOUT",
+      "action": "send OK",
+      "to": "Terminated"
+    }
+  ]
+}

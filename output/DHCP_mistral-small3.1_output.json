@@ -49,5 +49,47 @@
     }
   ],
   "final_response": "It appears that the provided text is a mix of incomplete and repetitive information about the DHCP (Dynamic Host Configuration Protocol) process. Let's clarify and organize the key points about the DHCP process:\n\n### DHCP Process Overview\n\nThe Dynamic Host Configuration Protocol (DHCP) is a network management protocol used to automate the process of configuring devices on IP networks, allowing them to use network services such as DNS and other communication protocols. Here are the key steps and states in the DHCP process:\n\n1. **DHCPDISCOVER**:\n   - The client broadcasts a DHCPDISCOVER message to discover available DHCP servers on the network.\n\n2. **DHCPOFFER**:\n   - DHCP servers respond with a DHCPOFFER message containing an IP address and other configuration parameters.\n\n3. **DHCPREQUEST**:\n   - The client chooses one of the offers and broadcasts a DHCPREQUEST message to inform the chosen server and request the offered IP address.\n\n4. **DHCPACK**:\n   - The selected DHCP server responds with a DHCPACK message, acknowledging the request and providing the final configuration parameters.\n\n5. **DHCPNAK**:\n   - If the client's request is denied, the server responds with a DHCPNAK message.\n\n### DHCP States\n\n1. **INIT**:\n   - The client initializes the DHCP process.\n\n2. **SELECTING**:\n   - The client is choosing between offers received from one or more DHCP servers.\n\n3. **REQUESTING**:\n   - The client is requesting the IP address from the selected DHCP server.\n\n4. **BOUND**:\n   - The client has successfully obtained an IP address and is operational on the network.\n\n5. **RENEWING**:\n   - The client is attempting to renew its lease before it expires.\n\n6. **REBINDING**:\n   - The client is trying to rebind to the network using any available DHCP server.\n\n7. **INIT-REBOOT**:\n   - The client is rebooting and attempting to obtain a new IP address.\n\n### Common DHCP Messages\n\n- **DHCPDISCOVER**: Client to Server - Discover available DHCP servers.\n- **DHCPOFFER**: Server to Client - Offer an IP address and configuration.\n- **DHCPREQUEST**: Client to Server - Request the offered IP address.\n- **DHCPACK**: Server to Client - Acknowledge the IP address and configuration.\n- **DHCPNAK**: Server to Client - Negative acknowledgment (denial of the request).\n\n### Troubleshooting DHCP Issues\n\n- **No IP Address Assigned**: Check DHCP server availability, client configuration, and network connectivity.\n- **IP Address Conflict**: Ensure unique IP addresses are assigned and no manual configurations conflict with DHCP.\n- **Lease Expiration**: Monitor lease times and renewals to avoid disruptions.\n\nThis structured overview should help clarify the DHCP process, states, and common troubleshooting steps. If you have specific questions or need further details on any part of the DHCP process, feel free to ask!",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "Init",
+      "Rebinding",
+      "Requesting"
+    ],
+    "initial_state": "Init",
+    "final_states": [
+      "Rebinding"
+    ],
+    "transitions": [
+      {
+        "from": "Init",
+        "event": "receive DHCPACK",
+        "action": "set lease true",
+        "to": "Requesting"
+      },
+      {
+        "from": "Requesting",
+        "event": "receive DHCPNAK",
+        "action": "reset lease",
+        "to": "Init"
+      },
+      {
+        "from": "Requesting",
+        "event": "timeout T2",
+        "action": "send DHCPREQUEST",
+        "to": "Rebinding"
+      },
+      {
+        "from": "Rebinding",
+        "event": "receive DHCPACK",
+        "action": "set lease true",
+        "to": "Requesting"
+      },
+      {
+        "from": "Rebinding",
+        "event": "receive DHCPNAK",
+        "action": "reset lease",
+        "to": "Init"
+      }
+    ]
+  }
 }

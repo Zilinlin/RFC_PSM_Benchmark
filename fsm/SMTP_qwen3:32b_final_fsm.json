@@ -1,0 +1,60 @@
+{
+  "states": [
+    "Initial",
+    "AfterEHLO",
+    "AfterVRFY",
+    "AfterMAIL",
+    "AfterRCPT",
+    "DataTransfer",
+    "AfterData",
+    "Closing"
+  ],
+  "initial_state": "Initial",
+  "final_states": [
+    "Closing"
+  ],
+  "transitions": [
+    {
+      "from": "Initial",
+      "event": "receive EHLO",
+      "action": "reply 250",
+      "to": "AfterEHLO"
+    },
+    {
+      "from": "AfterEHLO",
+      "event": "receive VRFY",
+      "action": "reply 250",
+      "to": "AfterVRFY"
+    },
+    {
+      "from": "AfterVRFY",
+      "event": "receive MAIL FROM",
+      "action": "reply 250",
+      "to": "AfterMAIL"
+    },
+    {
+      "from": "AfterMAIL",
+      "event": "receive RCPT TO",
+      "action": "reply 250",
+      "to": "AfterRCPT"
+    },
+    {
+      "from": "AfterRCPT",
+      "event": "receive DATA",
+      "action": "reply 354",
+      "to": "DataTransfer"
+    },
+    {
+      "from": "DataTransfer",
+      "event": "receive DATA content and .",
+      "action": "reply 250",
+      "to": "AfterData"
+    },
+    {
+      "from": "AfterData",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "Closing"
+    }
+  ]
+}

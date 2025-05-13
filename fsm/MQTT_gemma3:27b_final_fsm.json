@@ -1,0 +1,137 @@
+{
+  "states": [
+    "Disconnected",
+    "Authenticating",
+    "Connected",
+    "Idle",
+    "Publishing",
+    "Subscribing",
+    "Authorized",
+    "Unauthorized",
+    "Authenticated",
+    "NotAuthorized",
+    "Reauthenticating"
+  ],
+  "initial_state": "Disconnected",
+  "final_states": [
+    "Disconnected",
+    "Unauthorized",
+    "NotAuthorized"
+  ],
+  "transitions": [
+    {
+      "from": "Disconnected",
+      "event": "receive CONNECT",
+      "action": "reply 0x00",
+      "to": "Authenticating"
+    },
+    {
+      "from": "Authenticating",
+      "event": "cond valid_token",
+      "action": "reply 0x00",
+      "to": "Connected"
+    },
+    {
+      "from": "Authenticating",
+      "event": "cond invalid_token",
+      "action": "reply error_code",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Connected",
+      "event": "receive PUBLISH",
+      "action": "process PUBLISH",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "receive SUBSCRIBE",
+      "action": "process SUBSCRIBE",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "receive DISCONNECT",
+      "action": "close connection",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Idle",
+      "event": "receive PUBLISH",
+      "action": "check token",
+      "to": "Publishing"
+    },
+    {
+      "from": "Publishing",
+      "event": "cond topic authorized",
+      "action": "publish message",
+      "to": "Authorized"
+    },
+    {
+      "from": "Publishing",
+      "event": "cond topic unauthorized",
+      "action": "reply 0x87",
+      "to": "Unauthorized"
+    },
+    {
+      "from": "Idle",
+      "event": "receive SUBSCRIBE",
+      "action": "check token",
+      "to": "Subscribing"
+    },
+    {
+      "from": "Subscribing",
+      "event": "cond filter authorized",
+      "action": "reply success",
+      "to": "Authorized"
+    },
+    {
+      "from": "Subscribing",
+      "event": "cond filter unauthorized",
+      "action": "reply 0x87",
+      "to": "Unauthorized"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive PUBLISH",
+      "action": "check token",
+      "to": "NotAuthorized"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive SUBSCRIBE",
+      "action": "check token",
+      "to": "NotAuthorized"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive CONNECT",
+      "action": "check token",
+      "to": "NotAuthorized"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive PINGREQ",
+      "action": "check token",
+      "to": "NotAuthorized"
+    },
+    {
+      "from": "NotAuthorized",
+      "event": "receive AUTH",
+      "action": "set reauthenticating",
+      "to": "Reauthenticating"
+    },
+    {
+      "from": "Reauthenticating",
+      "event": "cond valid_pop",
+      "action": "set Authenticated",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Reauthenticating",
+      "event": "cond invalid_pop",
+      "action": "send DISCONNECT",
+      "to": "NotAuthorized"
+    }
+  ]
+}

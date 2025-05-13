@@ -1,0 +1,232 @@
+{
+  "states": [
+    "AccessDenied",
+    "Authenticated",
+    "Begin",
+    "Connected",
+    "DirectoryChanged",
+    "DirectoryCreated",
+    "DirectoryExists",
+    "DirectoryRemoved",
+    "Error",
+    "Failure",
+    "Initial",
+    "ProcessingCDUP",
+    "ProcessingMKD",
+    "ProcessingPWD",
+    "ProcessingRMD",
+    "Success",
+    "Terminated",
+    "TransferComplete",
+    "TransferInProgress",
+    "WaitingForReply"
+  ],
+  "initial_state": "Initial",
+  "final_states": [
+    "AccessDenied",
+    "Error",
+    "Failure",
+    "Success",
+    "Terminated"
+  ],
+  "transitions": [
+    {
+      "from": "Initial",
+      "event": "receive connect",
+      "action": "reply 220",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "receive USER",
+      "action": "reply 331",
+      "to": "Connected"
+    },
+    {
+      "from": "Connected",
+      "event": "receive PASS",
+      "action": "reply 230",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive RETR",
+      "action": "reply 150",
+      "to": "TransferInProgress"
+    },
+    {
+      "from": "TransferInProgress",
+      "event": "receive data",
+      "action": "reply 226",
+      "to": "TransferComplete"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive TYPE",
+      "action": "reply 200",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive STOR",
+      "action": "reply 550",
+      "to": "AccessDenied"
+    },
+    {
+      "from": "TransferComplete",
+      "event": "receive QUIT",
+      "action": "close connections",
+      "to": "Terminated"
+    },
+    {
+      "from": "AccessDenied",
+      "event": "receive QUIT",
+      "action": "close connections",
+      "to": "Terminated"
+    },
+    {
+      "from": "Begin",
+      "event": "receive cmd",
+      "action": "send 1",
+      "to": "WaitingForReply"
+    },
+    {
+      "from": "Begin",
+      "event": "receive RNFR",
+      "action": "send 1",
+      "to": "WaitingForReply"
+    },
+    {
+      "from": "Begin",
+      "event": "receive RNTO",
+      "action": "send 1",
+      "to": "WaitingForReply"
+    },
+    {
+      "from": "Begin",
+      "event": "receive REST",
+      "action": "send 1",
+      "to": "WaitingForReply"
+    },
+    {
+      "from": "Begin",
+      "event": "receive USER",
+      "action": "send 1",
+      "to": "WaitingForReply"
+    },
+    {
+      "from": "Begin",
+      "event": "receive PASS",
+      "action": "send 1",
+      "to": "WaitingForReply"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive MKD",
+      "action": "set ProcessingMKD",
+      "to": "ProcessingMKD"
+    },
+    {
+      "from": "ProcessingMKD",
+      "event": "cond directory created",
+      "action": "reply 257",
+      "to": "DirectoryCreated"
+    },
+    {
+      "from": "ProcessingMKD",
+      "event": "cond directory exists",
+      "action": "reply 521",
+      "to": "DirectoryExists"
+    },
+    {
+      "from": "ProcessingMKD",
+      "event": "cond access denied",
+      "action": "reply 521",
+      "to": "AccessDenied"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive RMD",
+      "action": "set ProcessingRMD",
+      "to": "ProcessingRMD"
+    },
+    {
+      "from": "ProcessingRMD",
+      "event": "cond directory removed",
+      "action": "reply 250",
+      "to": "DirectoryRemoved"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive PWD",
+      "action": "set ProcessingPWD",
+      "to": "ProcessingPWD"
+    },
+    {
+      "from": "ProcessingPWD",
+      "event": "cond directory changed",
+      "action": "reply 257",
+      "to": "DirectoryChanged"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive CDUP",
+      "action": "set ProcessingCDUP",
+      "to": "ProcessingCDUP"
+    },
+    {
+      "from": "ProcessingCDUP",
+      "event": "cond directory changed",
+      "action": "reply 250",
+      "to": "DirectoryChanged"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive invalid command",
+      "action": "reply 500",
+      "to": "InvalidCommand"
+    },
+    {
+      "from": "WaitingForReply",
+      "event": "receive 1",
+      "action": "reply 1",
+      "to": "Error"
+    },
+    {
+      "from": "WaitingForReply",
+      "event": "receive 2",
+      "action": "reply 2",
+      "to": "WaitingForReply"
+    },
+    {
+      "from": "WaitingForReply",
+      "event": "receive 3",
+      "action": "reply 3",
+      "to": "Success"
+    },
+    {
+      "from": "WaitingForReply",
+      "event": "receive 4",
+      "action": "reply 4",
+      "to": "Failure"
+    },
+    {
+      "from": "WaitingForReply",
+      "event": "receive 5",
+      "action": "reply 5",
+      "to": "Failure"
+    },
+    {
+      "from": "WaitingForReply",
+      "event": "receive 220",
+      "action": "reply 220",
+      "to": "Success"
+    },
+    {
+      "from": "Error",
+      "event": "receive 230",
+      "action": "reply 230",
+      "to": "Failure"
+    }
+  ]
+}

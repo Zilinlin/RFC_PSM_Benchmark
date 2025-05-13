@@ -1,0 +1,23 @@
+{
+  "states": [
+    "Initial",
+    "SetupComplete",
+    "Streaming"
+  ],
+  "initial_state": "Initial",
+  "final_states": [],
+  "transitions": [
+    {
+      "from": "Initial",
+      "event": "receive SETUP",
+      "action": "reply 200",
+      "to": "SetupComplete"
+    },
+    {
+      "from": "SetupComplete",
+      "event": "receive PLAY",
+      "action": "reply 200",
+      "to": "Streaming"
+    }
+  ]
+}

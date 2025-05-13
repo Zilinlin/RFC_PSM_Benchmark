@@ -59,5 +59,62 @@
     }
   ],
   "final_response": "<think>\nOkay, let me tackle this problem step by step. The user provided a section with references to various RFC documents related to FTP. My task is to determine if there's any Finite State Machine (FSM) related information in this section, such as states, transitions, diagrams, reply codes, or sequences. If there is, I need to structure it into a JSON format as specified. If not, I should return \"None\".\n\nFirst, I'll review the given section. It lists several RFCs, including RFC 765 (\"File Transfer Protocol Specification\"), RFC 949 (\"FTP Unique-Named Store Command\"), and others. The key here is to check if these references themselves contain FSM details or if they point to where such details might be found.\n\nRFC 765 is the primary specification for FTP. I recall that FTP uses a client-server model with a control connection that operates based on a state machine. The control connection typically has states like \"AUTHENTICATED\" and \"NOT AUTHENTICATED,\" with transitions triggered by commands (e.g., USER, PASS) and responses (e.g., 230 for successful login). However, the problem is that the provided section only lists the RFC references, not their actual content. The references are citations pointing to external documents, not the FSM details themselves.\n\nSince the task is to analyze the given section (the references list) and not the external RFCs, there's no explicit FSM information here. The references indicate where the FSM details might be found but don't include them. Without the actual content of the RFCs, I can't extract states, transitions, or reply codes from the references alone.\n\nTherefore, the correct answer is \"None\" because the section provided doesn't contain the FSM details; it only cites documents that might have them.\n</think>\n\nNone",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "Unauthenticated",
+      "AwaitingPassword",
+      "Authenticated",
+      "TransferInProgress",
+      "ErrorState",
+      "Disconnected"
+    ],
+    "initial_state": "Unauthenticated",
+    "final_states": [
+      "Disconnected"
+    ],
+    "transitions": [
+      {
+        "from": "Unauthenticated",
+        "event": "receive USER Doe",
+        "action": "reply 331",
+        "to": "AwaitingPassword"
+      },
+      {
+        "from": "AwaitingPassword",
+        "event": "receive PASS mumble",
+        "action": "reply 230",
+        "to": "Authenticated"
+      },
+      {
+        "from": "Authenticated",
+        "event": "receive RETR test.pl1",
+        "action": "reply 150",
+        "to": "TransferInProgress"
+      },
+      {
+        "from": "TransferInProgress",
+        "event": "transfer completes",
+        "action": "reply 226",
+        "to": "Authenticated"
+      },
+      {
+        "from": "Authenticated",
+        "event": "receive TYPE I",
+        "action": "reply 200",
+        "to": "Authenticated"
+      },
+      {
+        "from": "Authenticated",
+        "event": "receive STOR file",
+        "action": "reply 550",
+        "to": "ErrorState"
+      },
+      {
+        "from": "Authenticated",
+        "event": "receive QUIT",
+        "action": "reply 221",
+        "to": "Disconnected"
+      }
+    ]
+  }
 }

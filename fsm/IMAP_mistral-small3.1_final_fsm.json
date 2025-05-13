@@ -1,0 +1,141 @@
+{
+  "states": [
+    "Authenticated",
+    "Fetching",
+    "Idle",
+    "LoggingOut",
+    "MailboxSelected",
+    "NotAuthenticated",
+    "Selected",
+    "StoringFlags",
+    "TLSNegotiation",
+    "TransferringData"
+  ],
+  "initial_state": "NotAuthenticated",
+  "final_states": [
+    "LoggingOut",
+    "Idle"
+  ],
+  "transitions": [
+    {
+      "from": "Authenticated",
+      "event": "receive CLOSE or UNSELECT command",
+      "action": "set Authenticated",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive ENABLE",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive LOGOUT command",
+      "action": "send BYE response",
+      "to": "LoggingOut"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive SELECT or EXAMINE command",
+      "action": "set Selected",
+      "to": "Selected"
+    },
+    {
+      "from": "Authenticated",
+      "event": "server shutdown",
+      "action": "send BYE response",
+      "to": "LoggingOut"
+    },
+    {
+      "from": "Authenticated",
+      "event": "connection closed",
+      "action": "close connection",
+      "to": "LoggingOut"
+    },
+    {
+      "from": "Fetching",
+      "event": "receive FETCH",
+      "action": "reply FETCH",
+      "to": "Fetching"
+    },
+    {
+      "from": "Fetching",
+      "event": "receive STORE",
+      "action": "reply OK",
+      "to": "StoringFlags"
+    },
+    {
+      "from": "Idle",
+      "event": "receive LOGIN",
+      "action": "reply 230",
+      "to": "Authenticated"
+    },
+    {
+      "from": "LoggingOut",
+      "event": "receive BYE greeting",
+      "action": "close connection",
+      "to": "LoggingOut"
+    },
+    {
+      "from": "MailboxSelected",
+      "event": "receive FETCH",
+      "action": "reply FETCH",
+      "to": "Fetching"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive LOGIN or AUTHENTICATE command",
+      "action": "set Authenticated",
+      "to": "Authenticated"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive PREAUTH greeting",
+      "action": "set Authenticated",
+      "to": "Authenticated"
+    },
+    {
+      "from": "NotAuthenticated",
+      "event": "receive BYE greeting",
+      "action": "close connection",
+      "to": "LoggingOut"
+    },
+    {
+      "from": "Selected",
+      "event": "receive CLOSE or UNSELECT command",
+      "action": "set Authenticated",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Selected",
+      "event": "receive LOGOUT command",
+      "action": "send BYE response",
+      "to": "LoggingOut"
+    },
+    {
+      "from": "Selected",
+      "event": "server shutdown",
+      "action": "send BYE response",
+      "to": "LoggingOut"
+    },
+    {
+      "from": "StoringFlags",
+      "event": "receive LOGOUT",
+      "action": "reply BYE",
+      "to": "LoggingOut"
+    },
+    {
+      "from": "TLSNegotiation",
+      "event": "receive AUTHENTICATE",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "TransferringData",
+      "event": "receive STORE",
+      "action": "reply 230",
+      "to": "Idle"
+    }
+  ]
+}

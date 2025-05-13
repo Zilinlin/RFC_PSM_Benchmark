@@ -114,5 +114,116 @@
     }
   ],
   "final_response": "<think>\nOkay, let's see. The user provided a section from an RFC document, specifically the end part with references and administrative information. My task is to check if there's any FSM-related information here. \n\nFirst, I need to recall what FSM information looks like. Typically, in protocol specs, FSMs describe states, transitions between them based on events, actions taken during transitions, and so on. The section provided here is about references, intellectual property, and acknowledgments. \n\nLooking through the text, there's a list of RFCs and other documents referenced, followed by sections about intellectual property, how to report rights, and funding. There's no mention of states, transitions, diagrams, or any protocol-specific sequences. The keywords like \"state,\" \"transition,\" or \"diagram\" don't appear here. \n\nThe user's example shows that if there's no FSM info, I should return \"None\" in the specified JSON format. Since this section is purely administrative and doesn't discuss protocol states or transitions, there's no FSM data to extract. \n\nI need to make sure I'm not missing any hidden references. But given the content, it's all about the document's legal and administrative aspects, not the protocol's operational states. So the correct response is to return <json>None</json>.\n</think>\n\n<json>None</json>",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "Established",
+      "Closing",
+      "Closed",
+      "2MSLWait",
+      "Negotiating",
+      "REQUEST",
+      "RESPOND",
+      "PARTOPEN",
+      "OPEN",
+      "CLOSING",
+      "TIMEWAIT"
+    ],
+    "initial_state": "REQUEST",
+    "final_states": [
+      "Closed",
+      "TIMEWAIT"
+    ],
+    "transitions": [
+      {
+        "from": "Established",
+        "event": "receive DCCP-CloseReq",
+        "action": "send DCCP-Close",
+        "to": "Closing"
+      },
+      {
+        "from": "Closing",
+        "event": "receive DCCP-Reset",
+        "action": "hold state for 2MSL",
+        "to": "2MSLWait"
+      },
+      {
+        "from": "Established",
+        "event": "send DCCP-Close",
+        "action": "await DCCP-Reset",
+        "to": "Closing"
+      },
+      {
+        "from": "Closing",
+        "event": "receive DCCP-Reset",
+        "action": "clear connection state",
+        "to": "Closed"
+      },
+      {
+        "from": "2MSLWait",
+        "event": "timeout 2MSL",
+        "action": "clear state",
+        "to": "Closed"
+      },
+      {
+        "from": "Negotiating",
+        "event": "receive invalid Confirm option",
+        "action": "reset connection",
+        "to": "Closed"
+      },
+      {
+        "from": "Negotiating",
+        "event": "receive Mandatory Change option with unknown feature",
+        "action": "reset connection",
+        "to": "Closed"
+      },
+      {
+        "from": "Negotiating",
+        "event": "receive Mandatory Change option with invalid value and no shared entry",
+        "action": "reset connection",
+        "to": "Closed"
+      },
+      {
+        "from": "REQUEST",
+        "event": "receive Response",
+        "action": "send Ack",
+        "to": "PARTOPEN"
+      },
+      {
+        "from": "RESPOND",
+        "event": "receive Request",
+        "action": "send Response",
+        "to": "OPEN"
+      },
+      {
+        "from": "PARTOPEN",
+        "event": "receive Response",
+        "action": "send Ack",
+        "to": "OPEN"
+      },
+      {
+        "from": "PARTOPEN",
+        "event": "receive non-Sync",
+        "action": "set OSR",
+        "to": "OPEN"
+      },
+      {
+        "from": "OPEN",
+        "event": "receive CloseReq",
+        "action": "send Close",
+        "to": "CLOSING"
+      },
+      {
+        "from": "OPEN",
+        "event": "receive Close",
+        "action": "send Reset",
+        "to": "TIMEWAIT"
+      },
+      {
+        "from": "OPEN",
+        "event": "receive Reset",
+        "action": "tear down",
+        "to": "TIMEWAIT"
+      }
+    ]
+  }
 }

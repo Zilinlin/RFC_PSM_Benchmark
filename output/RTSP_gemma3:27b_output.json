@@ -164,5 +164,176 @@
     }
   ],
   "final_response": "```json\n{\n  \"states\": [\n    \"Initial\",\n    \"PlayState\",\n    \"RTSP1_0Supported\",\n    \"RTSP2_0Supported\",\n    \"Ready\",\n    \"Play\",\n    \"Init\",\n    \"ProxyConnecting\",\n    \"ClientApproval\",\n    \"ForwardingRequest\"\n  ],\n  \"transitions\": [\n    {\n      \"from\": \"Initial\",\n      \"event\": \"receive OPTIONS\",\n      \"action\": \"reply 200\",\n      \"to\": \"RTSP2_0Supported\"\n    },\n    {\n      \"from\": \"Initial\",\n      \"event\": \"receive COMMAND\",\n      \"action\": \"reply 505\",\n      \"to\": \"Initial\"\n    },\n    {\n      \"from\": \"Initial\",\n      \"event\": \"receive COMMAND\",\n      \"action\": \"reply 200\",\n      \"to\": \"RTSP1_0Supported\"\n    },\n    {\n      \"from\": \"RTSP1_0Supported\",\n      \"event\": \"receive COMMAND\",\n      \"action\": \"reply 200\",\n      \"to\": \"RTSP1_0Supported\"\n    },\n    {\n      \"from\": \"RTSP2_0Supported\",\n      \"event\": \"receive COMMAND\",\n      \"action\": \"reply 200\",\n      \"to\": \"RTSP2_0Supported\"\n    },\n    {\n      \"from\": \"PlayState\",\n      \"event\": \"receive Play\",\n      \"action\": \"reply 200\",\n      \"to\": \"PlayState\"\n    },\n    {\n      \"from\": \"Ready\",\n      \"event\": \"receive PAUSE\",\n      \"action\": \"reply CODE\",\n      \"to\": \"Ready\"\n    },\n    {\n      \"from\": \"Play\",\n      \"event\": \"receive PAUSE\",\n      \"action\": \"reply CODE\",\n      \"to\": \"Ready\"\n    },\n    {\n      \"from\": \"Play\",\n      \"event\": \"receive End of media\",\n      \"action\": \"reply CODE\",\n      \"to\": \"Play\"\n    },\n    {\n      \"from\": \"Play\",\n      \"event\": \"receive RedP reached\",\n      \"action\": \"reply CODE\",\n      \"to\": \"Init\"\n    },\n    {\n      \"from\": \"Play\",\n      \"event\": \"receive Timeout\",\n      \"action\": \"reply Stop Media\",\n      \"to\": \"Init\"\n    },\n    {\n      \"from\": \"Play\",\n      \"event\": \"receive SC_REDIRECT\",\n      \"action\": \"reply Session is removed\",\n      \"to\": \"Init\"\n    },\n    {\n      \"from\": \"Init\",\n      \"event\": \"receive TEARDOWN\",\n      \"action\": \"reply TEARDOWN\",\n      \"to\": \"Init\"\n    },\n    {\n      \"from\": \"ProxyConnecting\",\n      \"event\": \"receive SETUP\",\n      \"action\": \"reply 404\",\n      \"to\": \"ClientApproval\"\n    },\n    {\n      \"from\": \"ClientApproval\",\n      \"event\": \"receive SETUP with credentials\",\n      \"action\": \"reply 200\",\n      \"to\": \"ForwardingRequest\"\n    },\n    {\n      \"from\": \"ForwardingRequest\",\n      \"event\": \"send SETUP\",\n      \"action\": \"send SETUP\",\n      \"to\": \"Initial\"\n    }\n  ]\n}\n```",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "Initial",
+      "ReceivingRequest",
+      "ProcessingRequest",
+      "SendingResponse",
+      "Error",
+      "ProxyConnecting",
+      "ClientApproval",
+      "ForwardingRequest",
+      "Ready",
+      "Play",
+      "Init",
+      "PlayState",
+      "RTSP1_0Supported",
+      "RTSP2_0Supported"
+    ],
+    "initial_state": "Initial",
+    "final_states": [
+      "Error",
+      "ForwardingRequest",
+      "RTSP1_0Supported",
+      "RTSP2_0Supported",
+      "PlayState"
+    ],
+    "transitions": [
+      {
+        "from": "Initial",
+        "event": "receive COMMAND",
+        "action": "set processing_request",
+        "to": "ReceivingRequest"
+      },
+      {
+        "from": "ReceivingRequest",
+        "event": "cond valid_command",
+        "action": "set processing_request",
+        "to": "ProcessingRequest"
+      },
+      {
+        "from": "ReceivingRequest",
+        "event": "cond invalid_command",
+        "action": "reply 400",
+        "to": "Error"
+      },
+      {
+        "from": "ProcessingRequest",
+        "event": "cond success",
+        "action": "send 200",
+        "to": "Initial"
+      },
+      {
+        "from": "ProcessingRequest",
+        "event": "cond failure",
+        "action": "reply 551",
+        "to": "Error"
+      },
+      {
+        "from": "Error",
+        "event": "receive COMMAND",
+        "action": "reply 400",
+        "to": "Error"
+      },
+      {
+        "from": "Error",
+        "event": "timeout 5s",
+        "action": "reset state",
+        "to": "Initial"
+      },
+      {
+        "from": "Initial",
+        "event": "receive SETUP",
+        "action": "reply 404",
+        "to": "ProxyConnecting"
+      },
+      {
+        "from": "ProxyConnecting",
+        "event": "receive SETUP",
+        "action": "reply 404",
+        "to": "ClientApproval"
+      },
+      {
+        "from": "ClientApproval",
+        "event": "receive SETUP with credentials",
+        "action": "reply 200",
+        "to": "ForwardingRequest"
+      },
+      {
+        "from": "ForwardingRequest",
+        "event": "send SETUP",
+        "action": "send SETUP",
+        "to": "Initial"
+      },
+      {
+        "from": "Ready",
+        "event": "receive PAUSE",
+        "action": "reply CODE",
+        "to": "Ready"
+      },
+      {
+        "from": "Play",
+        "event": "receive PAUSE",
+        "action": "reply CODE",
+        "to": "Ready"
+      },
+      {
+        "from": "Play",
+        "event": "receive End of media",
+        "action": "reply CODE",
+        "to": "Play"
+      },
+      {
+        "from": "Play",
+        "event": "receive RedP reached",
+        "action": "reply CODE",
+        "to": "Init"
+      },
+      {
+        "from": "Play",
+        "event": "receive Timeout",
+        "action": "reply Stop Media",
+        "to": "Init"
+      },
+      {
+        "from": "Play",
+        "event": "receive SC_REDIRECT",
+        "action": "reply Session is removed",
+        "to": "Init"
+      },
+      {
+        "from": "Init",
+        "event": "receive TEARDOWN",
+        "action": "reply TEARDOWN",
+        "to": "Init"
+      },
+      {
+        "from": "Initial",
+        "event": "receive OPTIONS",
+        "action": "reply 200",
+        "to": "RTSP2_0Supported"
+      },
+      {
+        "from": "Initial",
+        "event": "receive COMMAND",
+        "action": "reply 505",
+        "to": "Initial"
+      },
+      {
+        "from": "Initial",
+        "event": "receive COMMAND",
+        "action": "reply 200",
+        "to": "RTSP1_0Supported"
+      },
+      {
+        "from": "RTSP1_0Supported",
+        "event": "receive COMMAND",
+        "action": "reply 200",
+        "to": "RTSP1_0Supported"
+      },
+      {
+        "from": "RTSP2_0Supported",
+        "event": "receive COMMAND",
+        "action": "reply 200",
+        "to": "RTSP2_0Supported"
+      },
+      {
+        "from": "PlayState",
+        "event": "receive Play",
+        "action": "reply 200",
+        "to": "PlayState"
+      }
+    ]
+  }
 }

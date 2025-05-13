@@ -1,0 +1,53 @@
+{
+  "states": [
+    "Initial",
+    "AwaitingEhlo",
+    "AwaitingMailFrom",
+    "AwaitingRcptTo",
+    "AwaitingData",
+    "TransferInProgress",
+    "ClosingConnection"
+  ],
+  "initial_state": "Initial",
+  "final_states": [
+    "ClosingConnection"
+  ],
+  "transitions": [
+    {
+      "from": "Initial",
+      "event": "receive EHLO",
+      "action": "reply 220",
+      "to": "AwaitingEhlo"
+    },
+    {
+      "from": "AwaitingEhlo",
+      "event": "receive MAIL FROM",
+      "action": "reply 250",
+      "to": "AwaitingRcptTo"
+    },
+    {
+      "from": "AwaitingRcptTo",
+      "event": "receive RCPT TO",
+      "action": "reply 250",
+      "to": "AwaitingRcptTo"
+    },
+    {
+      "from": "AwaitingRcptTo",
+      "event": "receive DATA",
+      "action": "reply 354",
+      "to": "AwaitingData"
+    },
+    {
+      "from": "AwaitingData",
+      "event": "receive end of data",
+      "action": "reply 250",
+      "to": "TransferInProgress"
+    },
+    {
+      "from": "TransferInProgress",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "ClosingConnection"
+    }
+  ]
+}

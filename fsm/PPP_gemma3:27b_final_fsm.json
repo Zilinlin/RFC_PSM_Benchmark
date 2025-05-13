@@ -1,0 +1,72 @@
+{
+  "states": [
+    "LinkDead",
+    "LinkTermination",
+    "Configuring",
+    "Terminating",
+    "LCP_Open",
+    "Authenticated"
+  ],
+  "initial_state": "LinkDead",
+  "final_states": [
+    "LinkDead",
+    "Configuring",
+    "Terminating"
+  ],
+  "transitions": [
+    {
+      "from": "LinkDead",
+      "event": "receive COMMAND",
+      "action": "reply CODE",
+      "to": "LinkTermination"
+    },
+    {
+      "from": "LinkTermination",
+      "event": "receive COMMAND",
+      "action": "reply CODE",
+      "to": "LinkDead"
+    },
+    {
+      "from": "Configuring",
+      "event": "send ConfigureRequest",
+      "action": "set MaxConfigure",
+      "to": "Configuring"
+    },
+    {
+      "from": "Configuring",
+      "event": "receive ConfigureAck",
+      "action": "reply Ack",
+      "to": "Configuring"
+    },
+    {
+      "from": "Configuring",
+      "event": "receive ConfigureNak",
+      "action": "reply Nak",
+      "to": "Configuring"
+    },
+    {
+      "from": "Configuring",
+      "event": "receive ConfigureReject",
+      "action": "reply Reject",
+      "to": "Configuring"
+    },
+    {
+      "from": "Terminating",
+      "event": "send TerminateRequest",
+      "action": "set MaxTerminate",
+      "to": "Terminating"
+    },
+    {
+      "from": "Terminating",
+      "event": "receive TerminateAck",
+      "action": "reply Ack",
+      "to": "Terminating"
+    },
+    {
+      "from": "LCP_Open",
+      "event": "receive Protocol",
+      "action": "reply CODE",
+      "to": "Authenticated"
+    }
+  ]
+}

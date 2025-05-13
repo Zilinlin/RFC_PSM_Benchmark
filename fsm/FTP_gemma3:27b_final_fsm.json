@@ -1,0 +1,280 @@
+{
+  "states": [
+    "Disconnected",
+    "AwaitingUser",
+    "AwaitingPassword",
+    "Authenticated",
+    "TransferInProgress",
+    "PassiveMode",
+    "Initial",
+    "AwaitingCommand",
+    "Aborted",
+    "AwaitingReply",
+    "End",
+    "TransferringData",
+    "AccessDenied",
+    "ClosingConnections",
+    "CreatedDirectory"
+  ],
+  "initial_state": "Disconnected",
+  "final_states": [
+    "Disconnected",
+    "Aborted",
+    "ClosingConnections",
+    "CreatedDirectory"
+  ],
+  "transitions": [
+    {
+      "from": "Disconnected",
+      "event": "receive USER",
+      "action": "reply 331",
+      "to": "AwaitingPassword"
+    },
+    {
+      "from": "AwaitingPassword",
+      "event": "receive PASSWORD",
+      "action": "reply 230",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive COMMAND",
+      "action": "reply 250",
+      "to": "TransferInProgress"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive PASV",
+      "action": "reply 227",
+      "to": "PassiveMode"
+    },
+    {
+      "from": "TransferInProgress",
+      "event": "receive COMMAND",
+      "action": "reply 250",
+      "to": "TransferInProgress"
+    },
+    {
+      "from": "PassiveMode",
+      "event": "receive DATA",
+      "action": "reply 200",
+      "to": "TransferInProgress"
+    },
+    {
+      "from": "Disconnected",
+      "event": "receive USER",
+      "action": "reply 500",
+      "to": "Disconnected"
+    },
+    {
+      "from": "AwaitingPassword",
+      "event": "receive USER",
+      "action": "reply 500",
+      "to": "AwaitingPassword"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "Disconnected"
+    },
+    {
+      "from": "TransferInProgress",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "Disconnected"
+    },
+    {
+      "from": "PassiveMode",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Initial",
+      "event": "receive USER",
+      "action": "reply 230",
+      "to": "AwaitingCommand"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive PWD",
+      "action": "reply 257",
+      "to": "AwaitingCommand"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive SYST",
+      "action": "reply 215",
+      "to": "AwaitingCommand"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive STAT",
+      "action": "reply 211",
+      "to": "AwaitingCommand"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive HELP",
+      "action": "reply 211",
+      "to": "AwaitingCommand"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive SITE",
+      "action": "reply 200",
+      "to": "AwaitingCommand"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive NOOP",
+      "action": "reply 200",
+      "to": "AwaitingCommand"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive ABOR",
+      "action": "reply 225",
+      "to": "Aborted"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive DELE",
+      "action": "reply 250",
+      "to": "AwaitingCommand"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive RMD",
+      "action": "reply 250",
+      "to": "AwaitingCommand"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive MKD",
+      "action": "reply 257",
+      "to": "AwaitingCommand"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive RNTO",
+      "action": "reply 250",
+      "to": "AwaitingCommand"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive RTO",
+      "action": "reply 250",
+      "to": "AwaitingCommand"
+    },
+    {
+      "from": "Aborted",
+      "event": "receive ABOR",
+      "action": "reply 225",
+      "to": "Aborted"
+    },
+    {
+      "from": "Begin",
+      "event": "receive cmd",
+      "action": "reply CODE",
+      "to": "AwaitingCommand"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive USER",
+      "action": "reply 230",
+      "to": "AwaitingReply"
+    },
+    {
+      "from": "AwaitingReply",
+      "event": "receive PASS",
+      "action": "reply 230",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive ACCT",
+      "action": "reply 230",
+      "to": "TransferInProgress"
+    },
+    {
+      "from": "TransferInProgress",
+      "event": "receive cmd",
+      "action": "reply CODE",
+      "to": "AwaitingReply"
+    },
+    {
+      "from": "AwaitingReply",
+      "event": "receive cmd",
+      "action": "reply CODE",
+      "to": "AwaitingReply"
+    },
+    {
+      "from": "End",
+      "event": "receive cmd",
+      "action": "reply CODE",
+      "to": "AwaitingReply"
+    },
+    {
+      "from": "Initial",
+      "event": "receive MKD",
+      "action": "reply 257",
+      "to": "CreatedDirectory"
+    },
+    {
+      "from": "Initial",
+      "event": "receive RMD",
+      "action": "reply CODE",
+      "to": "Initial"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive MKD",
+      "action": "reply 257",
+      "to": "CreatedDirectory"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive RMD",
+      "action": "reply CODE",
+      "to": "Initial"
+    },
+    {
+      "from": "CreatedDirectory",
+      "event": "receive COMMAND",
+      "action": "reply CODE",
+      "to": "Initial"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive RETR",
+      "action": "reply 150",
+      "to": "TransferringData"
+    },
+    {
+      "from": "TransferringData",
+      "event": "send data",
+      "action": "reply 226",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive STOR",
+      "action": "reply 550",
+      "to": "AccessDenied"
+    },
+    {
+      "from": "AccessDenied",
+      "event": "receive QUIT",
+      "action": "close connections",
+      "to": "ClosingConnections"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive QUIT",
+      "action": "close connections",
+      "to": "ClosingConnections"
+    }
+  ]
+}

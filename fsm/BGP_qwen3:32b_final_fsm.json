@@ -1,0 +1,82 @@
+{
+  "states": [
+    "Idle",
+    "Connect",
+    "Active",
+    "OpenSent",
+    "OpenConfirm",
+    "Established"
+  ],
+  "initial_state": "Idle",
+  "final_states": [
+    "Idle"
+  ],
+  "transitions": [
+    {
+      "from": "Idle",
+      "event": "cond Start",
+      "action": "send OPEN",
+      "to": "Connect"
+    },
+    {
+      "from": "Connect",
+      "event": "connect",
+      "action": "send OPEN",
+      "to": "Active"
+    },
+    {
+      "from": "Connect",
+      "event": "timeout ConnectRetryTimer",
+      "action": "reset timer",
+      "to": "Connect"
+    },
+    {
+      "from": "Active",
+      "event": "receive OPEN",
+      "action": "send KEEPALIVE",
+      "to": "OpenSent"
+    },
+    {
+      "from": "OpenSent",
+      "event": "receive OPEN",
+      "action": "send KEEPALIVE",
+      "to": "OpenConfirm"
+    },
+    {
+      "from": "OpenConfirm",
+      "event": "receive KEEPALIVE",
+      "action": "start HoldTimer",
+      "to": "Established"
+    },
+    {
+      "from": "Established",
+      "event": "receive UPDATE",
+      "action": "send KEEPALIVE",
+      "to": "Established"
+    },
+    {
+      "from": "Established",
+      "event": "receive UPDATE with error",
+      "action": "send NOTIFICATION, set ConnectRetryTimer to zero, delete routes, release resources, drop TCP, increment counter, maybe damping",
+      "to": "Idle"
+    },
+    {
+      "from": "Established",
+      "event": "receive other event",
+      "action": "send FSM error NOTIFICATION, set ConnectRetryTimer to zero, delete routes, release resources, drop TCP, increment counter, maybe damping",
+      "to": "Idle"
+    },
+    {
+      "from": "Established",
+      "event": "receive NOTIFICATION",
+      "action": "close connection",
+      "to": "Idle"
+    },
+    {
+      "from": "*",
+      "event": "receive NOTIFICATION",
+      "action": "close connection",
+      "to": "Idle"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "states": [
+    "INIT",
+    "BOUND",
+    "RENEWING",
+    "REBINDING"
+  ],
+  "initial_state": "INIT",
+  "final_states": [],
+  "transitions": [
+    {
+      "from": "BOUND",
+      "event": "lease expires",
+      "action": "stop using address",
+      "to": "INIT"
+    },
+    {
+      "from": "RENEWING",
+      "event": "lease expires",
+      "action": "stop network processing",
+      "to": "INIT"
+    },
+    {
+      "from": "REBINDING",
+      "event": "lease expires",
+      "action": "stop network processing",
+      "to": "INIT"
+    },
+    {
+      "from": "INIT",
+      "event": "receive DHCPACK (new address)",
+      "action": "stop using old address",
+      "to": "INIT"
+    }
+  ]
+}

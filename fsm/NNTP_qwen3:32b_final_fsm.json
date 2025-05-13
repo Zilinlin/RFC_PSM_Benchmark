@@ -1,0 +1,46 @@
+{
+  "states": [
+    "InitialState",
+    "AuthenticationState",
+    "IdleState",
+    "DataTransferState"
+  ],
+  "transitions": [
+    {
+      "from": "InitialState",
+      "event": "receive USER",
+      "action": "reply 331",
+      "to": "AuthenticationState"
+    },
+    {
+      "from": "AuthenticationState",
+      "event": "receive PASS",
+      "action": "reply 230",
+      "to": "IdleState"
+    },
+    {
+      "from": "IdleState",
+      "event": "receive STOR",
+      "action": "reply 150",
+      "to": "DataTransferState"
+    },
+    {
+      "from": "DataTransferState",
+      "event": "send 226",
+      "action": "set transfer_complete true",
+      "to": "IdleState"
+    },
+    {
+      "from": "IdleState",
+      "event": "receive RETR",
+      "action": "reply 150",
+      "to": "DataTransferState"
+    },
+    {
+      "from": "InitialState",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "InitialState"
+    }
+  ]
+}

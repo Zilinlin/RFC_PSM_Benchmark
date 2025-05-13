@@ -84,5 +84,62 @@
     }
   ],
   "final_response": "<think>\nOkay, let me go through each of the user's queries and the provided examples to understand what they need. The user has given several instances where they want to determine if a given text contains Finite State Machine (FSM) related information. The FSM details could include states, transitions, events, or specific sequences. If there's no such information, the answer should be \"None\". Otherwise, they expect a structured JSON response.\n\nLooking at the examples, the user provided different sections of RFC documents. For instance, one section was about BGP and TCP options, another about legal notices, and others about protocol changes. The correct answers were \"None\" because none of those sections contained FSM details like states or transitions.\n\nNow, the current query is a section from an RFC that discusses legal notices, copyright, and intellectual property. The task is to check if this text has any FSM information. \n\nFirst, I'll read through the provided text. The section starts with \"section\" tags and includes disclaimers about the document's status, copyright notices, and information about handling intellectual property. There are mentions of BCP 78, IPR disclosures, and funding for the RFC Editor. The main body includes legal disclaimers and administrative information about patents and copyrights. \n\nI need to check if there are any mentions of states, transitions, events, or FSM diagrams here. The text is purely about legal and administrative matters, not protocol behavior or state changes. Terms like \"Acknowledgement\", \"Intellectual Property\", and \"Disclaimer\" don't relate to FSM components. There's no discussion of protocol states, transitions between states, or event-driven actions. \n\nSince there's no FSM-related content in this section, the correct answer should be \"None\". The user's examples confirm that legal and administrative sections don't qualify, so this follows the same pattern.\n</think>\n\n<json>None</json>",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "Idle",
+      "Connect",
+      "Active",
+      "OpenSent",
+      "OpenConfirm",
+      "Established"
+    ],
+    "initial_state": "Idle",
+    "final_states": [
+      "Idle"
+    ],
+    "transitions": [
+      {
+        "from": "Idle",
+        "event": "receive OPEN",
+        "action": "send OPEN",
+        "to": "OpenSent"
+      },
+      {
+        "from": "OpenSent",
+        "event": "receive OPEN",
+        "action": "compare BGP IDs",
+        "to": "OpenConfirm"
+      },
+      {
+        "from": "OpenConfirm",
+        "event": "receive KEEPALIVE",
+        "action": "restart HoldTimer",
+        "to": "Established"
+      },
+      {
+        "from": "OpenConfirm",
+        "event": "receive UPDATE",
+        "action": "process message and restart HoldTimer",
+        "to": "Established"
+      },
+      {
+        "from": "OpenConfirm",
+        "event": "receive UPDATE with error",
+        "action": "send NOTIFICATION",
+        "to": "Idle"
+      },
+      {
+        "from": "Established",
+        "event": "Hold Timer expires",
+        "action": "transition to Idle",
+        "to": "Idle"
+      },
+      {
+        "from": "Established",
+        "event": "receive NOTIFICATION",
+        "action": "send NOTIFICATION",
+        "to": "Idle"
+      }
+    ]
+  }
 }

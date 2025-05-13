@@ -1,0 +1,45 @@
+{
+  "states": [
+    "LinkDead",
+    "Establish",
+    "Authenticate",
+    "Network",
+    "Terminate"
+  ],
+  "initial_state": "LinkDead",
+  "final_states": [
+    "LinkDead"
+  ],
+  "transitions": [
+    {
+      "from": "LinkDead",
+      "event": "link activation",
+      "action": "start LCP negotiation",
+      "to": "Establish"
+    },
+    {
+      "from": "Establish",
+      "event": "LCP success",
+      "action": "proceed to authentication",
+      "to": "Authenticate"
+    },
+    {
+      "from": "Authenticate",
+      "event": "authentication success",
+      "action": "start network phase",
+      "to": "Network"
+    },
+    {
+      "from": "Network",
+      "event": "termination trigger",
+      "action": "send Terminate-Request",
+      "to": "Terminate"
+    },
+    {
+      "from": "Terminate",
+      "event": "Terminate-Ack received",
+      "action": "disconnect link",
+      "to": "LinkDead"
+    }
+  ]
+}

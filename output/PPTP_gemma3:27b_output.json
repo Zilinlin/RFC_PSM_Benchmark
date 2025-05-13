@@ -44,5 +44,54 @@
     }
   ],
   "final_response": "```json\n{\n  \"states\": [\"Idle\", \"WaitingReply\", \"Established\", \"WaitDisconnect\"],\n  \"initial_state\": \"Idle\",\n  \"final_states\": [\"Idle\"],\n  \"transitions\": [\n    {\n      \"from\": \"Idle\",\n      \"event\": \"send OutgoingCallRequest\",\n      \"action\": \"reply None\",\n      \"to\": \"WaitingReply\"\n    },\n    {\n      \"from\": \"WaitingReply\",\n      \"event\": \"receive OutgoingCallReply with Error\",\n      \"action\": \"reply None\",\n      \"to\": \"Idle\"\n    },\n    {\n      \"from\": \"WaitingReply\",\n      \"event\": \"receive OutgoingCallReply No Error\",\n      \"action\": \"reply None\",\n      \"to\": \"Established\"\n    },\n    {\n      \"from\": \"Established\",\n      \"event\": \"receive CallDisconnectNotify\",\n      \"action\": \"reply None\",\n      \"to\": \"Idle\"\n    },\n    {\n      \"from\": \"Established\",\n      \"event\": \"send CallClearRequest\",\n      \"action\": \"reply None\",\n      \"to\": \"WaitDisconnect\"\n    },\n    {\n      \"from\": \"WaitDisconnect\",\n      \"event\": \"receive CallDisconnectNotify\",\n      \"action\": \"reply None\",\n      \"to\": \"Idle\"\n    }\n  ]\n}\n```",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "Idle",
+      "WaitingReply",
+      "Established",
+      "WaitDisconnect"
+    ],
+    "initial_state": "Idle",
+    "final_states": [
+      "Idle"
+    ],
+    "transitions": [
+      {
+        "from": "Idle",
+        "event": "send OutgoingCallRequest",
+        "action": "reply None",
+        "to": "WaitingReply"
+      },
+      {
+        "from": "WaitingReply",
+        "event": "receive OutgoingCallReply with Error",
+        "action": "reply None",
+        "to": "Idle"
+      },
+      {
+        "from": "WaitingReply",
+        "event": "receive OutgoingCallReply No Error",
+        "action": "reply None",
+        "to": "Established"
+      },
+      {
+        "from": "Established",
+        "event": "receive CallDisconnectNotify",
+        "action": "reply None",
+        "to": "Idle"
+      },
+      {
+        "from": "Established",
+        "event": "send CallClearRequest",
+        "action": "reply None",
+        "to": "WaitDisconnect"
+      },
+      {
+        "from": "WaitDisconnect",
+        "event": "receive CallDisconnectNotify",
+        "action": "reply None",
+        "to": "Idle"
+      }
+    ]
+  }
 }

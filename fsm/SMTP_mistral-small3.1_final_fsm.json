@@ -1,0 +1,261 @@
+{
+  "states": [
+    "Idle",
+    "Authenticating",
+    "Authenticated",
+    "Transferring",
+    "Closing",
+    "InitialLookup",
+    "MXRecordFound",
+    "CNAMERecordFound",
+    "NoMXRecords",
+    "AddressResolution",
+    "DeliveryAttempt",
+    "QueueMessage",
+    "ReportError",
+    "RelayMessage",
+    "FinalDelivery",
+    "Initial",
+    "AwaitingCommand",
+    "ProcessingCommand",
+    "SendingReply",
+    "HandlingVrfy",
+    "HandlingExpn",
+    "HandlingRcpt",
+    "HandlingMail",
+    "HandlingEHLO",
+    "HandlingHELO",
+    "HandlingData",
+    "HandlingRelay",
+    "HandlingAttack",
+    "HandlingRejection",
+    "EHLOReceived",
+    "MailFromReceived",
+    "RcptToReceived",
+    "DataReceived",
+    "DataTransferInProgress",
+    "TransactionComplete",
+    "Aborted",
+    "Relaying",
+    "Verifying"
+  ],
+  "initial_state": "Idle",
+  "final_states": [
+    "Closing",
+    "FinalDelivery",
+    "Aborted",
+    "TransactionComplete"
+  ],
+  "transitions": [
+    {
+      "from": "Idle",
+      "event": "receive AUTH",
+      "action": "set authenticating true",
+      "to": "Authenticating"
+    },
+    {
+      "from": "Authenticating",
+      "event": "receive PASS",
+      "action": "set authenticated true",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive DATA",
+      "action": "start transfer",
+      "to": "Transferring"
+    },
+    {
+      "from": "Transferring",
+      "event": "send DATA",
+      "action": "close connection",
+      "to": "Closing"
+    },
+    {
+      "from": "InitialLookup",
+      "event": "receive domain name",
+      "action": "lookup MX record",
+      "to": "MXRecordFound"
+    },
+    {
+      "from": "InitialLookup",
+      "event": "receive CNAME record",
+      "action": "process CNAME record",
+      "to": "CNAMERecordFound"
+    },
+    {
+      "from": "InitialLookup",
+      "event": "receive non-existent domain error",
+      "action": "report error",
+      "to": "ReportError"
+    },
+    {
+      "from": "InitialLookup",
+      "event": "receive temporary error",
+      "action": "queue message",
+      "to": "QueueMessage"
+    },
+    {
+      "from": "MXRecordFound",
+      "event": "receive empty list of MXs",
+      "action": "treat as implicit MX",
+      "to": "AddressResolution"
+    },
+    {
+      "from": "MXRecordFound",
+      "event": "receive usable MX records",
+      "action": "resolve addresses",
+      "to": "AddressResolution"
+    },
+    {
+      "from": "MXRecordFound",
+      "event": "receive unusable MX records",
+      "action": "report error",
+      "to": "ReportError"
+    },
+    {
+      "from": "CNAMERecordFound",
+      "event": "process CNAME record",
+      "action": "lookup MX record",
+      "to": "MXRecordFound"
+    },
+    {
+      "from": "AddressResolution",
+      "event": "receive address records",
+      "action": "attempt delivery",
+      "to": "DeliveryAttempt"
+    },
+    {
+      "from": "AddressResolution",
+      "event": "receive no address records",
+      "action": "report error",
+      "to": "ReportError"
+    },
+    {
+      "from": "DeliveryAttempt",
+      "event": "receive successful delivery",
+      "action": "stop delivery attempt",
+      "to": "FinalDelivery"
+    },
+    {
+      "from": "DeliveryAttempt",
+      "event": "receive failure",
+      "action": "retry next address",
+      "to": "DeliveryAttempt"
+    },
+    {
+      "from": "QueueMessage",
+      "event": "timeout retry period",
+      "action": "retry delivery",
+      "to": "DeliveryAttempt"
+    },
+    {
+      "from": "RelayMessage",
+      "event": "receive message",
+      "action": "sort MX records",
+      "to": "RelayMessage"
+    },
+    {
+      "from": "RelayMessage",
+      "event": "receive matching record",
+      "action": "discard higher-preference records",
+      "to": "RelayMessage"
+    },
+    {
+      "from": "RelayMessage",
+      "event": "receive no matching record",
+      "action": "report undeliverable",
+      "to": "ReportError"
+    },
+    {
+      "from": "Initial",
+      "event": "receive EHLO",
+      "action": "reply 250",
+      "to": "EHLOReceived"
+    },
+    {
+      "from": "Initial",
+      "event": "receive HELO",
+      "action": "reply 250",
+      "to": "HandlingHELO"
+    },
+    {
+      "from": "EHLOReceived",
+      "event": "receive MAIL FROM",
+      "action": "reply 250",
+      "to": "MailFromReceived"
+    },
+    {
+      "from": "MailFromReceived",
+      "event": "receive RCPT TO",
+      "action": "reply 250",
+      "to": "RcptToReceived"
+    },
+    {
+      "from": "RcptToReceived",
+      "event": "receive DATA",
+      "action": "reply 354",
+      "to": "DataTransferInProgress"
+    },
+    {
+      "from": "DataTransferInProgress",
+      "event": "receive .",
+      "action": "reply 250",
+      "to": "TransactionComplete"
+    },
+    {
+      "from": "RcptToReceived",
+      "event": "receive RSET",
+      "action": "reply 250",
+      "to": "Aborted"
+    },
+    {
+      "from": "EHLOReceived",
+      "event": "receive VRFY",
+      "action": "reply 250",
+      "to": "Verifying"
+    },
+    {
+      "from": "Verifying",
+      "event": "receive MAIL FROM",
+      "action": "reply 250",
+      "to": "MailFromReceived"
+    },
+    {
+      "from": "TransactionComplete",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "Initial"
+    },
+    {
+      "from": "Aborted",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "Initial"
+    },
+    {
+      "from": "Initial",
+      "event": "receive EHLO",
+      "action": "reply 250",
+      "to": "Relaying"
+    },
+    {
+      "from": "Relaying",
+      "event": "receive MAIL FROM",
+      "action": "reply 250",
+      "to": "MailFromReceived"
+    },
+    {
+      "from": "Relaying",
+      "event": "receive RCPT TO",
+      "action": "reply 250",
+      "to": "RcptToReceived"
+    },
+    {
+      "from": "Relaying",
+      "event": "receive DATA",
+      "action": "reply 354",
+      "to": "DataTransferInProgress"
+    }
+  ]
+}

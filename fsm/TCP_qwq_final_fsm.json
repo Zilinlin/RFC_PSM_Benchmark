@@ -1,0 +1,73 @@
+{
+  "states": [
+    "CLOSED",
+    "SYN_RECEIVED",
+    "ESTABLISHED",
+    "FIN_WAIT_1",
+    "FIN_WAIT_2",
+    "CLOSE_WAIT",
+    "CLOSING",
+    "LAST_ACK",
+    "TIME_WAIT"
+  ],
+  "initial_state": "CLOSED",
+  "final_states": [
+    "CLOSED"
+  ],
+  "transitions": [
+    {
+      "from": "SYN_RECEIVED",
+      "event": "receive FIN",
+      "action": "enter CLOSE_WAIT",
+      "to": "CLOSE_WAIT"
+    },
+    {
+      "from": "ESTABLISHED",
+      "event": "receive FIN",
+      "action": "enter CLOSE_WAIT",
+      "to": "CLOSE_WAIT"
+    },
+    {
+      "from": "FIN_WAIT_1",
+      "event": "ACK FIN",
+      "action": "enter TIME_WAIT",
+      "to": "TIME_WAIT"
+    },
+    {
+      "from": "FIN_WAIT_1",
+      "event": "receive FIN",
+      "action": "enter CLOSING",
+      "to": "CLOSING"
+    },
+    {
+      "from": "FIN_WAIT_2",
+      "event": "receive FIN",
+      "action": "enter TIME_WAIT",
+      "to": "TIME_WAIT"
+    },
+    {
+      "from": "CLOSE_WAIT",
+      "event": "receive FIN",
+      "action": "remain",
+      "to": "CLOSE_WAIT"
+    },
+    {
+      "from": "CLOSING",
+      "event": "receive FIN",
+      "action": "remain",
+      "to": "CLOSING"
+    },
+    {
+      "from": "LAST_ACK",
+      "event": "receive FIN",
+      "action": "remain",
+      "to": "LAST_ACK"
+    },
+    {
+      "from": "TIME_WAIT",
+      "event": "timeout",
+      "action": "delete TCB",
+      "to": "CLOSED"
+    }
+  ]
+}

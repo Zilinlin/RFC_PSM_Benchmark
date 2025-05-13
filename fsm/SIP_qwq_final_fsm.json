@@ -1,0 +1,49 @@
+{
+  "states": [
+    "AwaitingRegistration",
+    "Registered",
+    "Authenticating",
+    "Authenticated",
+    "Unregistered",
+    "RequestPending",
+    "RequestCancelled"
+  ],
+  "initial_state": "Unregistered",
+  "final_states": [
+    "Registered",
+    "Authenticated",
+    "RequestCancelled"
+  ],
+  "transitions": [
+    {
+      "from": "Unregistered",
+      "event": "receive REGISTER",
+      "action": "process registration",
+      "to": "AwaitingRegistration"
+    },
+    {
+      "from": "AwaitingRegistration",
+      "event": "receive 200 OK",
+      "action": "update location service",
+      "to": "Registered"
+    },
+    {
+      "from": "Unregistered",
+      "event": "receive invalid credentials",
+      "action": "reply 401 Unauthorized",
+      "to": "Authenticating"
+    },
+    {
+      "from": "Authenticating",
+      "event": "receive valid credentials",
+      "action": "reply 200 OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "RequestPending",
+      "event": "receive CANCEL",
+      "action": "reply 200 OK",
+      "to": "RequestCancelled"
+    }
+  ]
+}

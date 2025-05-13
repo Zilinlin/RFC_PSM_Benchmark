@@ -84,5 +84,86 @@
     }
   ],
   "final_response": "<think>\nOkay, let's see. The user provided a section from an RFC document, and they want me to check if there's any Finite State Machine (FSM) information here. The instructions say to look for states, transitions, diagrams, reply codes, or sequences. If there's none, I should return \"None\". If there is, I need to extract and structure the JSON accordingly.\n\nLooking at the given text, it's the end part of an RFC. The content includes normative references, intellectual property statements, acknowledgments, and the full copyright statement. There's a list of references to other RFCs and BCPs. \n\nI need to check if there's any mention of states, transitions, diagrams, reply codes, or sequences. Scanning through the text, I don't see any terms related to FSM. The sections here are about references, legal stuff, and administrative information. There's no protocol-specific state machine details in this part of the document. \n\nThe user might be testing if I can differentiate between sections of an RFC. The actual FSM details would typically be in the main body of the document, not in the references or legal sections. Since there's no FSM information here, the correct response is to return \"None\".\n</think>\n\n<json>None</json>",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "Idle",
+      "Connect",
+      "Active",
+      "OpenSent",
+      "OpenConfirm",
+      "Established"
+    ],
+    "initial_state": "Idle",
+    "final_states": [
+      "Idle"
+    ],
+    "transitions": [
+      {
+        "from": "Idle",
+        "event": "cond Start",
+        "action": "send OPEN",
+        "to": "Connect"
+      },
+      {
+        "from": "Connect",
+        "event": "connect",
+        "action": "send OPEN",
+        "to": "Active"
+      },
+      {
+        "from": "Connect",
+        "event": "timeout ConnectRetryTimer",
+        "action": "reset timer",
+        "to": "Connect"
+      },
+      {
+        "from": "Active",
+        "event": "receive OPEN",
+        "action": "send KEEPALIVE",
+        "to": "OpenSent"
+      },
+      {
+        "from": "OpenSent",
+        "event": "receive OPEN",
+        "action": "send KEEPALIVE",
+        "to": "OpenConfirm"
+      },
+      {
+        "from": "OpenConfirm",
+        "event": "receive KEEPALIVE",
+        "action": "start HoldTimer",
+        "to": "Established"
+      },
+      {
+        "from": "Established",
+        "event": "receive UPDATE",
+        "action": "send KEEPALIVE",
+        "to": "Established"
+      },
+      {
+        "from": "Established",
+        "event": "receive UPDATE with error",
+        "action": "send NOTIFICATION, set ConnectRetryTimer to zero, delete routes, release resources, drop TCP, increment counter, maybe damping",
+        "to": "Idle"
+      },
+      {
+        "from": "Established",
+        "event": "receive other event",
+        "action": "send FSM error NOTIFICATION, set ConnectRetryTimer to zero, delete routes, release resources, drop TCP, increment counter, maybe damping",
+        "to": "Idle"
+      },
+      {
+        "from": "Established",
+        "event": "receive NOTIFICATION",
+        "action": "close connection",
+        "to": "Idle"
+      },
+      {
+        "from": "*",
+        "event": "receive NOTIFICATION",
+        "action": "close connection",
+        "to": "Idle"
+      }
+    ]
+  }
 }

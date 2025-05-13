@@ -1,0 +1,62 @@
+{
+  "states": [
+    "Authorization",
+    "Transaction",
+    "Update",
+    "Closed"
+  ],
+  "initial_state": "Authorization",
+  "final_states": [
+    "Closed"
+  ],
+  "transitions": [
+    {
+      "from": "Authorization",
+      "event": "receive AUTH_COMMAND",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive QUIT",
+      "action": "remove deleted messages, reply +OK, close connection",
+      "to": "Closed"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive STAT",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive LIST",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive RETR",
+      "action": "reply +OK message follows",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive DELE",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Authorization",
+      "event": "timeout",
+      "action": "close connection",
+      "to": "Closed"
+    },
+    {
+      "from": "Transaction",
+      "event": "timeout",
+      "action": "close connection",
+      "to": "Closed"
+    }
+  ]
+}

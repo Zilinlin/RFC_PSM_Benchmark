@@ -159,5 +159,228 @@
     }
   ],
   "final_response": "It appears that the text provided contains multiple repetitions and inconsistencies. Let's focus on extracting a coherent Finite State Machine (FSM) description from the given text.\n\nBased on the provided text, here is a possible FSM description:\n\n```json\n{\n  \"states\": [\n    \"Unauthenticated\",\n    \"Authenticated\",\n    \"WaitingForCommand\"\n  ],\n  \"transitions\": [\n    {\n      \"from\": \"Unauthenticated\",\n      \"event\": \"receive USER\",\n      \"action\": \"authenticate user\",\n      \"to\": \"Authenticated\"\n    },\n    {\n      \"from\": \"Authenticated\",\n      \"event\": \"recv QUIT\",\n      \"action\": \"log out user\",\n      \"to\": \"Unauthenticated\"\n    },\n    {\n      \"from\": \"Authenticated\",\n      \"event\": \"recv QUIT\",\n      \"action\": \"log out user\",\n      \"to\": \"Unauthenticated\"\n    },\n    {\n      \"from\": \"Authenticated\",\n      \"event\": \"recv QUIT\",\n      \"action\": \"log out user\",\n      \"to\": \"Unauthenticated\"\n    },\n    {\n      \"from\": \"Authenticated\",\n      \"event\": \"recv QUIT\",\n      \"action\": \"log out user\",\n      \"to\": \"Unauthenticated\"\n    },\n    {\n      \"from\": \"Authenticated\",\n      \"event\": \"recv QUIT\",\n      \"action\": \"log out user\",\n      \"to\": \"Unauthenticated\"\n    }\n  ]\n}\n```\n</partial>\n\nBased on the provided text, here is a possible FSM description:\n\n```json\n{\n  \"states\": [\n    \"Unauthenticated\",\n    \"Authenticated\",\n    \"WaitingForCommand\"\n  ],\n  \"transitions\": [\n    {\n      \"from\": \"Unauthenticated\",\n      \"event\": \"receive USER\",\n      \"action\": \"authenticate user\",\n      \"to\": \"Authenticated\"\n    },\n    {\n      \"from\": \"Authenticated\",\n      \"event\": \"recv QUIT\",\n      \"action\": \"log out user\",\n      \"to\": \"Unauthenticated\"\n    },\n    {\n      \"from\": \"Authenticated\",\n      \"event\": \"recv QUIT\",\n      \"action\": \"log out user\",\n      \"to\": \"Unauthenticated\"\n    }\n  ]\n}\n```\n</partial>\n\nGiven the repetitive and inconsistent nature of the text, the above FSM description is a best-effort interpretation. The actual FSM might vary based on additional context or specific details not provided in the text.",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "Ack",
+      "AwaitingAck",
+      "AwaitingBye",
+      "AwaitingFinalResponse",
+      "CallEnded",
+      "CallEstablished",
+      "ConfirmedDialog",
+      "Disconnected",
+      "EarlyDialog",
+      "FinalResponseReceived",
+      "FinalResponseSent",
+      "HandlingRetransmission",
+      "Idle",
+      "InviteInProgress",
+      "ProcessingCancel",
+      "ProcessingRequest",
+      "ReInviteInProgress",
+      "SessionEstablished",
+      "SessionInProgress",
+      "SessionModified",
+      "SessionTerminated",
+      "SendingCancel",
+      "SendingOptions",
+      "SendingResponse",
+      "WaitingForBye",
+      "WaitingForInvite",
+      "WaitingForOk",
+      "WaitingForProvisionalResponse",
+      "WaitingForResponse",
+      "TransactionCancelled",
+      "TransactionDoesNotExist",
+      "TransactionExists"
+    ],
+    "initial_state": "Idle",
+    "final_states": [
+      "SessionTerminated",
+      "DialogTerminated",
+      "TransactionCancelled"
+    ],
+    "transitions": [
+      {
+        "from": "Idle",
+        "event": "receive INVITE",
+        "action": "send 100 Trying",
+        "to": "InviteInProgress"
+      },
+      {
+        "from": "InviteInProgress",
+        "event": "receive 200 OK",
+        "action": "send ACK",
+        "to": "SessionEstablished"
+      },
+      {
+        "from": "SessionEstablished",
+        "event": "send re-INVITE",
+        "action": "set ReInviteInProgress true",
+        "to": "ReInviteInProgress"
+      },
+      {
+        "from": "ReInviteInProgress",
+        "event": "receive 200 OK",
+        "action": "send ACK",
+        "to": "SessionModified"
+      },
+      {
+        "from": "ReInviteInProgress",
+        "event": "receive 491 Request Pending",
+        "action": "set timer T",
+        "to": "ReInviteInProgress"
+      },
+      {
+        "from": "ReInviteInProgress",
+        "event": "timeout T",
+        "action": "send re-INVITE",
+        "to": "ReInviteInProgress"
+      },
+      {
+        "from": "ReInviteInProgress",
+        "event": "receive 481 Call/Transaction Does Not Exist",
+        "action": "send BYE",
+        "to": "SessionTerminated"
+      },
+      {
+        "from": "ReInviteInProgress",
+        "event": "receive 408 Request Timeout",
+        "action": "send BYE",
+        "to": "SessionTerminated"
+      },
+      {
+        "from": "ReInviteInProgress",
+        "event": "receive 488 Not Acceptable Here",
+        "action": "send BYE",
+        "to": "SessionTerminated"
+      },
+      {
+        "from": "SessionEstablished",
+        "event": "receive BYE",
+        "action": "send 200 OK",
+        "to": "SessionTerminated"
+      },
+      {
+        "from": "SessionModified",
+        "event": "receive BYE",
+        "action": "send 200 OK",
+        "to": "SessionTerminated"
+      },
+      {
+        "from": "AwaitingFinalResponse",
+        "event": "send CANCEL",
+        "action": "reply 487",
+        "to": "SessionTerminated"
+      },
+      {
+        "from": "AwaitingFinalResponse",
+        "event": "receive 2xx",
+        "action": "reply 2xx",
+        "to": "SessionInProgress"
+      },
+      {
+        "from": "AwaitingAck",
+        "event": "receive ACK",
+        "action": "reply 2xx",
+        "to": "SessionInProgress"
+      },
+      {
+        "from": "EarlyDialog",
+        "event": "send BYE",
+        "action": "reply 403",
+        "to": "DialogTerminated"
+      },
+      {
+        "from": "SessionEstablished",
+        "event": "receive 481",
+        "action": "reply 481",
+        "to": "DialogTerminated"
+      },
+      {
+        "from": "SessionEstablished",
+        "event": "receive 408",
+        "action": "reply 408",
+        "to": "DialogTerminated"
+      },
+      {
+        "from": "SessionEstablished",
+        "event": "timeout",
+        "action": "reply timeout",
+        "to": "DialogTerminated"
+      },
+      {
+        "from": "SessionInProgress",
+        "event": "receive BYE",
+        "action": "stop media",
+        "to": "SessionTerminated"
+      },
+      {
+        "from": "SessionInProgress",
+        "event": "send BYE",
+        "action": "stop media",
+        "to": "SessionTerminated"
+      },
+      {
+        "from": "SessionInProgress",
+        "event": "receive 481",
+        "action": "reply 481",
+        "to": "DialogTerminated"
+      },
+      {
+        "from": "SessionInProgress",
+        "event": "receive 408",
+        "action": "reply 408",
+        "to": "DialogTerminated"
+      },
+      {
+        "from": "SessionInProgress",
+        "event": "timeout",
+        "action": "reply timeout",
+        "to": "DialogTerminated"
+      },
+      {
+        "from": "WaitingForProvisionalResponse",
+        "event": "receive provisional response",
+        "action": "send cancel request",
+        "to": "SendingCancel"
+      },
+      {
+        "from": "WaitingForProvisionalResponse",
+        "event": "timeout 64*T1",
+        "action": "destroy transaction",
+        "to": "TransactionCancelled"
+      },
+      {
+        "from": "SendingCancel",
+        "event": "receive final response",
+        "action": "stop sending cancel",
+        "to": "FinalResponseReceived"
+      },
+      {
+        "from": "TransactionExists",
+        "event": "cond final response sent",
+        "action": "reply 487",
+        "to": "FinalResponseSent"
+      },
+      {
+        "from": "TransactionExists",
+        "event": "cond final response not sent",
+        "action": "reply 487",
+        "to": "FinalResponseSent"
+      },
+      {
+        "from": "ProcessingCancel",
+        "event": "receive cancel request",
+        "action": "reply 481",
+        "to": "TransactionDoesNotExist"
+      },
+      {
+        "from": "ProcessingCancel",
+        "event": "receive cancel request",
+        "action": "reply 200",
+        "to": "TransactionExists"
+      }
+    ]
+  }
 }

@@ -34,5 +34,49 @@
     }
   ],
   "final_response": "<think>\nOkay, let me tackle this problem. The user provided a section from a PPP (Point-to-Point Protocol) document and wants to know if there's any Finite State Machine (FSM) related information here. The task is to check for states, transitions, diagrams, reply codes, or sequences. If there's none, I should return \"None\". If there is, structure it into JSON with states and transitions following their constraints.\n\nFirst, I'll scan through the given text. The section starts with some technical details about PPP, mentions acknowledgments, and includes an editor's address. The main content here seems to be about the protocol's working group, acknowledgments, and references. There's a lot of information about the contributors and the document's history, but I don't see any mention of states, transitions, state diagrams, or specific FSM events. \n\nLooking for keywords like \"state\", \"transition\", \"machine\", \"event\", \"reply codes\", \"sequences\", but the text doesn't have those in the context of FSM. The sections provided are more about the protocol's development, authors, and administrative details rather than the protocol's operational states or state transitions. \n\nThe user's example included a scenario where if there's no FSM info, the answer is \"None\". Since this section doesn't contain any FSM-related details like states or transitions, the correct response should be \"None\".\n\nI need to make sure I didn't miss any hidden FSM info. Let me check again. The section mentions \"phase and negotiation state machines\" in the acknowledgments part, but that's a passing reference to prior work, not actual FSM definitions here. The main body here doesn't outline any specific states or transitions. \n\nTherefore, the answer is indeed \"None\".\n</think>\n\n<json>None</json>",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "LinkDead",
+      "Establish",
+      "Authenticate",
+      "Network",
+      "Terminate"
+    ],
+    "initial_state": "LinkDead",
+    "final_states": [
+      "LinkDead"
+    ],
+    "transitions": [
+      {
+        "from": "LinkDead",
+        "event": "link activation",
+        "action": "start LCP negotiation",
+        "to": "Establish"
+      },
+      {
+        "from": "Establish",
+        "event": "LCP success",
+        "action": "proceed to authentication",
+        "to": "Authenticate"
+      },
+      {
+        "from": "Authenticate",
+        "event": "authentication success",
+        "action": "start network phase",
+        "to": "Network"
+      },
+      {
+        "from": "Network",
+        "event": "termination trigger",
+        "action": "send Terminate-Request",
+        "to": "Terminate"
+      },
+      {
+        "from": "Terminate",
+        "event": "Terminate-Ack received",
+        "action": "disconnect link",
+        "to": "LinkDead"
+      }
+    ]
+  }
 }

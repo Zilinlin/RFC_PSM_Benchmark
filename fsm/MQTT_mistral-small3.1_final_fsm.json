@@ -1,0 +1,256 @@
+{
+  "states": [
+    "Authenticated",
+    "Authorized",
+    "Connected",
+    "Disconnected",
+    "Error",
+    "MessageExpired",
+    "ReauthenticationFailed",
+    "ReauthenticationSucceeded",
+    "Reauthenticating",
+    "SessionConnected",
+    "SessionCreated",
+    "SessionDisconnected",
+    "SessionExpired",
+    "SessionResumed",
+    "TokenExpired",
+    "TokenInvalid",
+    "TokenValidated",
+    "Unauthorized",
+    "Waiting",
+    "WillMessageSent"
+  ],
+  "initial_state": "Connected",
+  "final_states": [
+    "Error",
+    "ReauthenticationFailed",
+    "TokenExpired",
+    "Unauthorized",
+    "WillMessageSent"
+  ],
+  "transitions": [
+    {
+      "from": "Authenticated",
+      "event": "receive password",
+      "action": "establish connection",
+      "to": "Connected"
+    },
+    {
+      "from": "Authorized",
+      "event": "send PUBLISH",
+      "action": "forward PUBLISH",
+      "to": "Authorized"
+    },
+    {
+      "from": "Connected",
+      "event": "cond invalid token",
+      "action": "send 0x84",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Connected",
+      "event": "receive disconnect",
+      "action": "close connection",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Disconnected",
+      "event": "cond SessionExpiryInterval 0",
+      "action": "discard SessionState",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Disconnected",
+      "event": "cond SessionExpiryInterval > 0",
+      "action": "store SessionState",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Disconnected",
+      "event": "receive PUBLISH with RETAIN",
+      "action": "store RetainedMessage",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Disconnected",
+      "event": "timeout TokenExpiry",
+      "action": "discard RetainedMessage",
+      "to": "TokenExpired"
+    },
+    {
+      "from": "Disconnected",
+      "event": "timeout MessageExpiryInterval",
+      "action": "discard RetainedMessage",
+      "to": "MessageExpired"
+    },
+    {
+      "from": "Reauthenticating",
+      "event": "cond reauthentication fails",
+      "action": "send DISCONNECT Not Authorized",
+      "to": "ReauthenticationFailed"
+    },
+    {
+      "from": "Reauthenticating",
+      "event": "cond reauthentication succeeds",
+      "action": "set token valid",
+      "to": "ReauthenticationSucceeded"
+    },
+    {
+      "from": "ReauthenticationSucceeded",
+      "event": "receive CONNECT",
+      "action": "check token expiration",
+      "to": "TokenValidated"
+    },
+    {
+      "from": "ReauthenticationSucceeded",
+      "event": "receive PUBLISH",
+      "action": "check token expiration",
+      "to": "TokenValidated"
+    },
+    {
+      "from": "ReauthenticationSucceeded",
+      "event": "receive SUBSCRIBE",
+      "action": "check token expiration",
+      "to": "TokenValidated"
+    },
+    {
+      "from": "ReauthenticationSucceeded",
+      "event": "receive PINGREQ",
+      "action": "check token expiration",
+      "to": "TokenValidated"
+    },
+    {
+      "from": "SessionConnected",
+      "event": "receive DISCONNECT",
+      "action": "send WillMessage",
+      "to": "WillMessageSent"
+    },
+    {
+      "from": "TokenValidated",
+      "event": "cond clean flag set",
+      "action": "set session new",
+      "to": "SessionCreated"
+    },
+    {
+      "from": "TokenValidated",
+      "event": "cond clean flag not set",
+      "action": "set session resumed",
+      "to": "SessionResumed"
+    },
+    {
+      "from": "TokenValidated",
+      "event": "receive CONNECT",
+      "action": "check token expiration",
+      "to": "TokenValidated"
+    },
+    {
+      "from": "TokenValidated",
+      "event": "receive PUBLISH",
+      "action": "check token expiration",
+      "to": "TokenValidated"
+    },
+    {
+      "from": "TokenValidated",
+      "event": "receive SUBSCRIBE",
+      "action": "check token expiration",
+      "to": "TokenValidated"
+    },
+    {
+      "from": "TokenValidated",
+      "event": "receive PINGREQ",
+      "action": "check token expiration",
+      "to": "TokenValidated"
+    },
+    {
+      "from": "Waiting",
+      "event": "expire timeout",
+      "action": "retry connection",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Unauthorized",
+      "event": "send DISCONNECT",
+      "action": "close connection",
+      "to": "WillMessageSent"
+    },
+    {
+      "from": "SessionResumed",
+      "event": "cond session expired",
+      "action": "send 0x84",
+      "to": "SessionExpired"
+    },
+    {
+      "from": "SessionResumed",
+      "event": "receive PUBLISH",
+      "action": "send 0x80",
+      "to": "Disconnected"
+    },
+    {
+      "from": "SessionCreated",
+      "event": "receive PUBLISH",
+      "action": "send 0x80",
+      "to": "Disconnected"
+    },
+    {
+      "from": "SessionCreated",
+      "event": "receive SUBSCRIBE",
+      "action": "send 0x80",
+      "to": "Disconnected"
+    },
+    {
+      "from": "SessionResumed",
+      "event": "receive SUBSCRIBE",
+      "action": "send 0x80",
+      "to": "Disconnected"
+    },
+    {
+      "from": "TokenExpired",
+      "event": "receive AUTH Reauthentication",
+      "action": "set Authentication Method ace",
+      "to": "Reauthenticating"
+    },
+    {
+      "from": "TokenValid",
+      "event": "receive CONNECT",
+      "action": "check token expiration",
+      "to": "TokenValid"
+    },
+    {
+      "from": "TokenValid",
+      "event": "receive PUBLISH",
+      "action": "check token expiration",
+      "to": "TokenValid"
+    },
+    {
+      "from": "TokenValid",
+      "event": "receive SUBSCRIBE",
+      "action": "check token expiration",
+      "to": "TokenValid"
+    },
+    {
+      "from": "TokenValid",
+      "event": "receive PINGREQ",
+      "action": "check token expiration",
+      "to": "TokenValid"
+    },
+    {
+      "from": "TokenValid",
+      "event": "cond token expired",
+      "action": "send PUBACK Not authorized",
+      "to": "TokenExpired"
+    },
+    {
+      "from": "TokenValid",
+      "event": "cond token expired",
+      "action": "send SUBACK Not authorized",
+      "to": "TokenExpired"
+    },
+    {
+      "from": "TokenValid",
+      "event": "cond token expired",
+      "action": "send DISCONNECT Not authorized",
+      "to": "Disconnected"
+    }
+  ]
+}

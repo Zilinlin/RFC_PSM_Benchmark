@@ -1,0 +1,235 @@
+{
+  "states": [
+    "SessionCreated",
+    "SessionActive",
+    "SessionTimedOut",
+    "SessionRemoved",
+    "Idle",
+    "ProcessingRequest",
+    "SendingResponse",
+    "HandlingInformationalResponse",
+    "HandlingSuccessResponse",
+    "HandlingRedirectionResponse",
+    "HandlingClientErrorResponse",
+    "HandlingServerErrorResponse",
+    "WaitingForNextRequest",
+    "Setup",
+    "Playing",
+    "SendingData",
+    "RTSP1.0Server",
+    "RTSP2.0Server",
+    "PlayState",
+    "SessionEstablished",
+    "MediaStreaming",
+    "SessionTerminated"
+  ],
+  "initial_state": "Idle",
+  "final_states": [
+    "SessionRemoved",
+    "SessionTimedOut",
+    "HandlingServerErrorResponse",
+    "HandlingClientErrorResponse",
+    "SendingResponse",
+    "SessionTerminated"
+  ],
+  "transitions": [
+    {
+      "from": "SessionCreated",
+      "event": "receive SETUP",
+      "action": "reply 200 OK",
+      "to": "SessionActive"
+    },
+    {
+      "from": "SessionActive",
+      "event": "timeout 30s",
+      "action": "close session",
+      "to": "SessionTimedOut"
+    },
+    {
+      "from": "SessionActive",
+      "event": "receive TEARDOWN",
+      "action": "reply 200 OK",
+      "to": "SessionRemoved"
+    },
+    {
+      "from": "Idle",
+      "event": "receive request",
+      "action": "set processingRequest true",
+      "to": "ProcessingRequest"
+    },
+    {
+      "from": "ProcessingRequest",
+      "event": "cond informational response",
+      "action": "reply 100",
+      "to": "HandlingInformationalResponse"
+    },
+    {
+      "from": "ProcessingRequest",
+      "event": "cond success response",
+      "action": "reply 200",
+      "to": "HandlingSuccessResponse"
+    },
+    {
+      "from": "ProcessingRequest",
+      "event": "cond redirection response",
+      "action": "reply 301",
+      "to": "HandlingRedirectionResponse"
+    },
+    {
+      "from": "ProcessingRequest",
+      "event": "cond client error response",
+      "action": "reply 400",
+      "to": "HandlingClientErrorResponse"
+    },
+    {
+      "from": "ProcessingRequest",
+      "event": "cond server error response",
+      "action": "reply 500",
+      "to": "HandlingServerErrorResponse"
+    },
+    {
+      "from": "HandlingInformationalResponse",
+      "event": "send 100",
+      "action": "set sendingResponse true",
+      "to": "SendingResponse"
+    },
+    {
+      "from": "HandlingSuccessResponse",
+      "event": "send 200",
+      "action": "set sendingResponse true",
+      "to": "SendingResponse"
+    },
+    {
+      "from": "HandlingRedirectionResponse",
+      "event": "send 301",
+      "action": "set sendingResponse true",
+      "to": "SendingResponse"
+    },
+    {
+      "from": "HandlingInformationalResponse",
+      "event": "send 100",
+      "action": "reply 100",
+      "to": "HandlingSuccessResponse"
+    },
+    {
+      "from": "HandlingInformationalResponse",
+      "event": "send 301",
+      "action": "reply 301",
+      "to": "HandlingRedirectionResponse"
+    },
+    {
+      "from": "HandlingRedirectionResponse",
+      "event": "send 400",
+      "action": "reply 400",
+      "to": "HandlingClientErrorResponse"
+    },
+    {
+      "from": "HandlingClientErrorResponse",
+      "event": "send 500",
+      "action": "reply 500",
+      "to": "HandlingServerErrorResponse"
+    },
+    {
+      "from": "HandlingServerErrorResponse",
+      "event": "send 501",
+      "action": "reply 501",
+      "to": "Idle"
+    },
+    {
+      "from": "Idle",
+      "event": "receive Request",
+      "action": "set ProcessingRequest true",
+      "to": "ProcessingRequest"
+    },
+    {
+      "from": "ProcessingRequest",
+      "event": "cond request processed",
+      "action": "set WaitingForNextRequest true",
+      "to": "WaitingForNextRequest"
+    },
+    {
+      "from": "WaitingForNextRequest",
+      "event": "receive NextRequest",
+      "action": "set ProcessingRequest true",
+      "to": "ProcessingRequest"
+    },
+    {
+      "from": "ProcessingRequest",
+      "event": "cond response ready",
+      "action": "send Response",
+      "to": "SendingResponse"
+    },
+    {
+      "from": "SendingResponse",
+      "event": "send Response",
+      "action": "set Idle true",
+      "to": "Idle"
+    },
+    {
+      "from": "Idle",
+      "event": "receive SETUP",
+      "action": "reply 200",
+      "to": "Setup"
+    },
+    {
+      "from": "Setup",
+      "event": "receive PLAY",
+      "action": "reply 200",
+      "to": "Playing"
+    },
+    {
+      "from": "Playing",
+      "event": "send RTP packet",
+      "action": "send RTP packet",
+      "to": "SendingData"
+    },
+    {
+      "from": "SendingData",
+      "event": "send RTCP packet",
+      "action": "send RTCP packet",
+      "to": "SendingData"
+    },
+    {
+      "from": "RTSP2.0Server",
+      "event": "receive RTSP/1.0 request",
+      "action": "reply 505",
+      "to": "RTSP1.0Server"
+    },
+    {
+      "from": "RTSP2.0Server",
+      "event": "receive RTSP/1.0 request",
+      "action": "reply RTSP/1.0",
+      "to": "RTSP1.0Server"
+    },
+    {
+      "from": "RTSP2.0Server",
+      "event": "receive RTSP/2.0 request",
+      "action": "reply RTSP/2.0",
+      "to": "RTSP2.0Server"
+    },
+    {
+      "from": "RTSP1.0Server",
+      "event": "receive RTSP/2.0 request",
+      "action": "reply 505",
+      "to": "RTSP1.0Server"
+    },
+    {
+      "from": "PlayState",
+      "event": "receive PLAY",
+      "action": "replace previous PLAY",
+      "to": "PlayState"
+    },
+    {
+      "from": "SessionEstablished",
+      "event": "receive PLAY",
+      "action": "reply 200",
+      "to": "MediaStreaming"
+    },
+    {
+      "from": "MediaStreaming",
+      "event": "receive TEARDOWN",
+      "action": "reply 200",
+      "to": "SessionTerminated"
+    }
+  ]
+}

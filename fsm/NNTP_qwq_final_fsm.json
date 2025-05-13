@@ -1,0 +1,27 @@
+{
+  "states": [
+    "Unauthenticated",
+    "AwaitingPassword",
+    "Authenticated"
+  ],
+  "transitions": [
+    {
+      "from": "Unauthenticated",
+      "event": "receive USER",
+      "action": "reply 331",
+      "to": "AwaitingPassword"
+    },
+    {
+      "from": "AwaitingPassword",
+      "event": "receive PASS",
+      "action": "reply 230",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Unauthenticated",
+      "event": "receive PASV",
+      "action": "reply 530",
+      "to": "Unauthenticated"
+    }
+  ]
+}

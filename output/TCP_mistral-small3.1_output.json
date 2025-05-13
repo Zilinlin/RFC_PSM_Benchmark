@@ -54,5 +54,91 @@
     }
   ],
   "final_response": "It seems like you have provided a partial JSON structure for a state machine, but it appears to be incomplete and contains some extraneous text. Let's clean it up and ensure it follows the specified format correctly.\n\nHere is the corrected and complete JSON structure:\n\n```json\n{\n  \"states\": [\n    \"Established\",\n    \"CloseWait\",\n    \"FinWait1\",\n    \"FinWait2\",\n    \"TimeWait\",\n    \"SynSent\",\n    \"SynReceived\",\n    \"LastAck\",\n    \"Closing\",\n    \"Listening\",\n    \"Closed\"\n  ],\n  \"transitions\": [\n    {\n      \"from\": \"Established\",\n      \"event\": \"receive FIN\",\n      \"action\": \"send ACK\",\n      \"to\": \"CloseWait\"\n    },\n    {\n      \"from\": \"CloseWait\",\n      \"event\": \"timeout 2MSL\",\n      \"action\": \"close connection\",\n      \"to\": \"Closed\"\n    },\n    {\n      \"from\": \"FinWait1\",\n      \"event\": \"receive ACK\",\n      \"action\": \"close connection\",\n      \"to\": \"Closed\"\n    },\n    {\n      \"from\": \"FinWait2\",\n      \"event\": \"timeout 2MSL\",\n      \"action\": \"close connection\",\n      \"to\": \"Closed\"\n    },\n    {\n      \"from\": \"TimeWait\",\n      \"event\": \"timeout 2MSL\",\n      \"action\": \"close connection\",\n      \"to\": \"Closed\"\n    },\n    {\n      \"from\": \"SynSent\",\n      \"event\": \"receive SYN\",\n      \"action\": \"send SYN ACK\",\n      \"to\": \"SynReceived\"\n    },\n    {\n      \"from\": \"SynReceived\",\n      \"event\": \"receive ACK\",\n      \"action\": \"set Established\",\n      \"to\": \"Established\"\n    },\n    {\n      \"from\": \"LastAck\",\n      \"event\": \"receive ACK\",\n      \"action\": \"close connection\",\n      \"to\": \"Closed\"\n    },\n    {\n      \"from\": \"Closing\",\n      \"event\": \"timeout 2MSL\",\n      \"action\": \"close connection\",\n      \"to\": \"Closed\"\n    },\n    {\n      \"from\": \"Listening\",\n      \"event\": \"receive SYN\",\n      \"action\": \"send SYN ACK\",\n      \"to\": \"SynReceived\"\n    },\n    {\n      \"from\": \"Closed\",\n      \"event\": \"open connection\",\n      \"action\": \"set Listening\",\n      \"to\": \"Listening\"\n    }\n  ]\n}\n```\n\nThis JSON structure now correctly defines the states and transitions for a state machine, adhering to the specified format. Each state and transition is clearly defined with appropriate actions and events.",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "Established",
+      "CloseWait",
+      "FinWait1",
+      "FinWait2",
+      "TimeWait",
+      "SynSent",
+      "SynReceived",
+      "LastAck",
+      "Closing",
+      "Listening",
+      "Closed"
+    ],
+    "initial_state": "Listening",
+    "final_states": [
+      "Closed"
+    ],
+    "transitions": [
+      {
+        "from": "Established",
+        "event": "receive FIN",
+        "action": "send ACK",
+        "to": "CloseWait"
+      },
+      {
+        "from": "CloseWait",
+        "event": "timeout 2MSL",
+        "action": "close connection",
+        "to": "Closed"
+      },
+      {
+        "from": "FinWait1",
+        "event": "receive ACK",
+        "action": "close connection",
+        "to": "Closed"
+      },
+      {
+        "from": "FinWait2",
+        "event": "timeout 2MSL",
+        "action": "close connection",
+        "to": "Closed"
+      },
+      {
+        "from": "TimeWait",
+        "event": "timeout 2MSL",
+        "action": "close connection",
+        "to": "Closed"
+      },
+      {
+        "from": "SynSent",
+        "event": "receive SYN",
+        "action": "send SYN ACK",
+        "to": "SynReceived"
+      },
+      {
+        "from": "SynReceived",
+        "event": "receive ACK",
+        "action": "set Established",
+        "to": "Established"
+      },
+      {
+        "from": "LastAck",
+        "event": "receive ACK",
+        "action": "close connection",
+        "to": "Closed"
+      },
+      {
+        "from": "Closing",
+        "event": "timeout 2MSL",
+        "action": "close connection",
+        "to": "Closed"
+      },
+      {
+        "from": "Listening",
+        "event": "receive SYN",
+        "action": "send SYN ACK",
+        "to": "SynReceived"
+      },
+      {
+        "from": "Closed",
+        "event": "open connection",
+        "action": "set Listening",
+        "to": "Listening"
+      }
+    ]
+  }
 }

@@ -1,0 +1,76 @@
+{
+  "states": [
+    "Authenticated",
+    "Authenticating",
+    "Connected",
+    "Disconnected",
+    "Error",
+    "Idle",
+    "TransferComplete",
+    "Transferring",
+    "WaitingForCommand",
+    "WaitingForData"
+  ],
+  "initial_state": "Idle",
+  "final_states": [
+    "Disconnected",
+    "TransferComplete",
+    "Error"
+  ],
+  "transitions": [
+    {
+      "from": "Idle",
+      "event": "receive Start",
+      "action": "set connecting true",
+      "to": "Authenticating"
+    },
+    {
+      "from": "Authenticating",
+      "event": "receive USER",
+      "action": "reply 230",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive Command",
+      "action": "reply 200",
+      "to": "WaitingForCommand"
+    },
+    {
+      "from": "WaitingForCommand",
+      "event": "receive Data",
+      "action": "set transferring true",
+      "to": "Transferring"
+    },
+    {
+      "from": "Transferring",
+      "event": "receive Complete",
+      "action": "set transferring false",
+      "to": "TransferComplete"
+    },
+    {
+      "from": "TransferComplete",
+      "event": "receive Close",
+      "action": "set disconnected true",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Disconnected",
+      "event": "receive Start",
+      "action": "set connecting false",
+      "to": "Idle"
+    },
+    {
+      "from": "Disconnected",
+      "event": "receive Error",
+      "action": "log failure",
+      "to": "Error"
+    },
+    {
+      "from": "Error",
+      "event": "receive Reset",
+      "action": "reset error state",
+      "to": "Idle"
+    }
+  ]
+}

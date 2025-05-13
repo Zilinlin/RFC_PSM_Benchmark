@@ -49,5 +49,78 @@
     }
   ],
   "final_response": "```json\n{\n  \"states\": [\"Init\", \"Renewing\", \"Rebinding\", \"Bound\"],\n  \"initial_state\": \"Init\",\n  \"final_states\": [\"Init\"],\n  \"transitions\": [\n    {\n      \"from\": \"Init\",\n      \"event\": \"receive DHCPACK\",\n      \"action\": \"reply ACK\",\n      \"to\": \"Init\"\n    },\n    {\n      \"from\": \"Init\",\n      \"event\": \"lease expires\",\n      \"action\": \"reset network\",\n      \"to\": \"Init\"\n    },\n    {\n      \"from\": \"Renewing\",\n      \"event\": \"receive DHCPACK\",\n      \"action\": \"reply ACK\",\n      \"to\": \"Renewing\"\n    },\n    {\n      \"from\": \"Renewing\",\n      \"event\": \"timeout remaining time\",\n      \"action\": \"retransmit DHCPREQUEST\",\n      \"to\": \"Renewing\"\n    },\n    {\n      \"from\": \"Renewing\",\n      \"event\": \"lease expires\",\n      \"action\": \"reset network\",\n      \"to\": \"Init\"\n    },\n    {\n      \"from\": \"Rebinding\",\n      \"event\": \"receive DHCPACK\",\n      \"action\": \"reply ACK\",\n      \"to\": \"Rebinding\"\n    },\n    {\n      \"from\": \"Rebinding\",\n      \"event\": \"timeout remaining time\",\n      \"action\": \"retransmit DHCPREQUEST\",\n      \"to\": \"Rebinding\"\n    },\n    {\n      \"from\": \"Rebinding\",\n      \"event\": \"lease expires\",\n      \"action\": \"reset network\",\n      \"to\": \"Init\"\n    },\n    {\n      \"from\": \"Bound\",\n      \"event\": \"lease expires\",\n      \"action\": \"stop use of address\",\n      \"to\": \"Bound\"\n    },\n    {\n      \"from\": \"Bound\",\n      \"event\": \"unable to contact server\",\n      \"action\": \"continue use of address\",\n      \"to\": \"Bound\"\n    }\n  ]\n}\n```",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "Bound",
+      "Init",
+      "Renewing",
+      "Rebinding"
+    ],
+    "initial_state": "Init",
+    "final_states": [
+      "Bound"
+    ],
+    "transitions": [
+      {
+        "from": "Bound",
+        "event": "lease expires",
+        "action": "stop use of address",
+        "to": "Bound"
+      },
+      {
+        "from": "Bound",
+        "event": "unable to contact server",
+        "action": "continue use of address",
+        "to": "Bound"
+      },
+      {
+        "from": "Init",
+        "event": "receive DHCPACK",
+        "action": "reply ACK",
+        "to": "Init"
+      },
+      {
+        "from": "Init",
+        "event": "lease expires",
+        "action": "reset network",
+        "to": "Init"
+      },
+      {
+        "from": "Renewing",
+        "event": "receive DHCPACK",
+        "action": "reply ACK",
+        "to": "Renewing"
+      },
+      {
+        "from": "Renewing",
+        "event": "timeout remaining time",
+        "action": "retransmit DHCPREQUEST",
+        "to": "Renewing"
+      },
+      {
+        "from": "Renewing",
+        "event": "lease expires",
+        "action": "reset network",
+        "to": "Init"
+      },
+      {
+        "from": "Rebinding",
+        "event": "receive DHCPACK",
+        "action": "reply ACK",
+        "to": "Rebinding"
+      },
+      {
+        "from": "Rebinding",
+        "event": "timeout remaining time",
+        "action": "retransmit DHCPREQUEST",
+        "to": "Rebinding"
+      },
+      {
+        "from": "Rebinding",
+        "event": "lease expires",
+        "action": "reset network",
+        "to": "Init"
+      }
+    ]
+  }
 }

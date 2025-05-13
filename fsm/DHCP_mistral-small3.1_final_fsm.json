@@ -1,0 +1,43 @@
+{
+  "states": [
+    "Init",
+    "Rebinding",
+    "Requesting"
+  ],
+  "initial_state": "Init",
+  "final_states": [
+    "Rebinding"
+  ],
+  "transitions": [
+    {
+      "from": "Init",
+      "event": "receive DHCPACK",
+      "action": "set lease true",
+      "to": "Requesting"
+    },
+    {
+      "from": "Requesting",
+      "event": "receive DHCPNAK",
+      "action": "reset lease",
+      "to": "Init"
+    },
+    {
+      "from": "Requesting",
+      "event": "timeout T2",
+      "action": "send DHCPREQUEST",
+      "to": "Rebinding"
+    },
+    {
+      "from": "Rebinding",
+      "event": "receive DHCPACK",
+      "action": "set lease true",
+      "to": "Requesting"
+    },
+    {
+      "from": "Rebinding",
+      "event": "receive DHCPNAK",
+      "action": "reset lease",
+      "to": "Init"
+    }
+  ]
+}

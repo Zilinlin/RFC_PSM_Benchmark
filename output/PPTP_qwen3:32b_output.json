@@ -44,5 +44,54 @@
     }
   ],
   "final_response": "<think>\nOkay, let's see. The user provided the \"Section 9. Acknowledgments\" from an RFC document for PPTP. My task is to check if this section contains any Finite State Machine (FSM) related information. \n\nFirst, I need to understand what FSM information looks like. FSMs typically involve states, transitions between those states based on events, actions taken during transitions, and possibly conditions. The section provided here is about acknowledging individuals or organizations that contributed to the document. \n\nLooking through the text, there's a mention of the IETF, the Internet community, and specific individuals like Kory Hamzeh, Gurdeep Pall, and others. However, there's no mention of states, transitions, events, or any protocol-specific sequences that would indicate an FSM. The content is purely about giving credit and not related to the operational states or transitions of a protocol.\n\nThe user's steps say that if there's no FSM info, I should return <json>None</json>. Since this section doesn't discuss any protocol states or state transitions, the correct response is to indicate that there's nothing here. \n\nI need to make sure I'm not missing any subtle references. For example, terms like \"phases\" or \"steps\" might hint at states, but in this case, the document is about acknowledgments, not protocol behavior. Therefore, there's no FSM to extract here.\n</think>\n\n<json>None</json>",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "Idle",
+      "Wait-Reply",
+      "Established",
+      "Wait-Disconnect"
+    ],
+    "initial_state": "Idle",
+    "final_states": [
+      "Idle"
+    ],
+    "transitions": [
+      {
+        "from": "Idle",
+        "event": "send OutgoingCallRequest",
+        "action": "send OutgoingCallRequest",
+        "to": "Wait-Reply"
+      },
+      {
+        "from": "Wait-Reply",
+        "event": "receive OutgoingCallReply with error",
+        "action": "reply error",
+        "to": "Idle"
+      },
+      {
+        "from": "Wait-Reply",
+        "event": "receive OutgoingCallReply without error",
+        "action": "connect telco call",
+        "to": "Established"
+      },
+      {
+        "from": "Established",
+        "event": "receive CallDisconnectNotify",
+        "action": "reply disconnect",
+        "to": "Idle"
+      },
+      {
+        "from": "Established",
+        "event": "send CallClearRequest",
+        "action": "send CallClearRequest",
+        "to": "Wait-Disconnect"
+      },
+      {
+        "from": "Wait-Disconnect",
+        "event": "receive CallDisconnectNotify",
+        "action": "reply disconnect",
+        "to": "Idle"
+      }
+    ]
+  }
 }
