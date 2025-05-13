@@ -5,6 +5,8 @@
     "IdleState",
     "DataTransferState"
   ],
+  "initial_state": "InitialState",
+  "final_states": ["InitialState"],
   "transitions": [
     {
       "from": "InitialState",

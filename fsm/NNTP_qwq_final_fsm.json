@@ -4,6 +4,8 @@
     "AwaitingPassword",
     "Authenticated"
   ],
+  "initial_state": "Unauthenticated",
+  "final_states": ["Unauthenticated"],
   "transitions": [
     {
       "from": "Unauthenticated",

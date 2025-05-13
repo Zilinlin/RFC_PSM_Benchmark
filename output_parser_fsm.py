@@ -177,14 +177,14 @@ def extract_final_fsm(directory: str, model: str, protocol: str, output_dir: str
 
 
 if __name__ == "__main__":
-    protocols = ["DCCP","DHCP", "FTP", "IMAP", 
-                  "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP",
-                  "MQTT", 'PPP', "PPTP", "BGP"]
-    # protocols = ["MQTT", 'PPP', "PPTP", "BGP"]
+    # protocols = ["DCCP","DHCP", "FTP", "IMAP", 
+    #               "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP",
+    #               "MQTT", 'PPP', "PPTP", "BGP"]
+    protocols = ["NNTP"]
     #protocols = ["SIP", "NNTP", "FTP"]
     # close_models = ["deepseek-reasoner","gpt-4o-mini", "claude-3-7-sonnet-20250219","gemini-2.0-flash"]
-    # close_models = ["deepseek-chat"]
-    small_models = ["qwq", "qwen3:32b","gemma3:27b","mistral-small3.1"] # 32b
+    # close_models = ["deepseek-chat"] , "qwen3:32b","gemma3:27b","mistral-small3.1" qwq
+    small_models = ["mistral-small3.1"] # 32b
     directory = "output"
     fsm_dir = "fsm"
     

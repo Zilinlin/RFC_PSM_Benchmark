@@ -74,5 +74,41 @@
     }
   ],
   "final_response": "It seems like you're experiencing some kind of repetitive or corrupted data. Let's try to clean this up and understand what you might be looking for.\n\nIf you're trying to send or receive data, here are a few common formats and examples:\n\n### JSON Example\nJSON (JavaScript Object Notation) is a lightweight data-interchange format that's easy for humans to read and write, and easy for machines to parse and generate.\n\n```json\n{\n  \"name\": \"John\",\n  \"age\": 30,\n  \"city\": \"New York\"\n}\n```\n\n### XML Example\nXML (eXtensible Markup Language) is a markup language that defines a set of rules for encoding documents in a format that is both human-readable and machine-readable.\n\n```xml\n<person>\n  <name>John</name>\n  <age>30</age>\n  <city>New York</city>\n</person>\n```\n\n### CSV Example\nCSV (Comma-Separated Values) is a simple file format used to store tabular data, such as a spreadsheet or database.\n\n```csv\nname,age,city\nJohn,30,New York\n```\n\n### Plain Text Example\nPlain text is the most basic form of data and can be used for simple messages or logs.\n\n```\nHello, World!\n```\n\nIf you need help with a specific format or have a particular question, feel free to ask!",
-  "final_fsm": null
+  "final_fsm": {
+    "states": [
+      "Idle",
+      "Authenticated",
+      "ProcessingCommand"
+    ],
+    "initial_state": "Idle",
+    "final_states": [
+      "Idle"
+    ],
+    "transitions": [
+      {
+        "from": "Idle",
+        "event": "receive_list_command",
+        "action": "send_215_listing_newsgroups",
+        "to": "ProcessingCommand"
+      },
+      {
+        "from": "ProcessingCommand",
+        "event": "send_listing_newsgroups",
+        "action": "reply_215",
+        "to": "Idle"
+      },
+      {
+        "from": "Idle",
+        "event": "receive_auth_command",
+        "action": "send_200_ok",
+        "to": "Authenticated"
+      },
+      {
+        "from": "Authenticated",
+        "event": "receive_post_command",
+        "action": "send_340_posting_ok",
+        "to": "Idle"
+      }
+    ]
+  }
 }

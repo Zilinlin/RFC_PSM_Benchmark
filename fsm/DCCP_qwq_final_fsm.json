@@ -1,6 +1,38 @@
 {
-  "states": [],
-  "initial_state": null,
-  "final_states": [],
-  "transitions": []
+  "states": [
+    "Established",
+    "Closing",
+    "TimeWait",
+    "Closed"
+  ],
+  "initial_state": "Established",
+  "final_states": [
+    "Closed"
+  ],
+  "transitions": [
+    {
+      "from": "Established",
+      "event": "receive DCCP-CloseReq",
+      "action": "send DCCP-Close",
+      "to": "Closing"
+    },
+    {
+      "from": "Closing",
+      "event": "receive DCCP-Reset",
+      "action": "set hold 2MSL",
+      "to": "TimeWait"
+    },
+    {
+      "from": "TimeWait",
+      "event": "timeout 2MSL",
+      "action": "close connection",
+      "to": "Closed"
+    },
+    {
+      "from": "Established",
+      "event": "send DCCP-Close",
+      "action": "receive DCCP-Reset",
+      "to": "TimeWait"
+    }
+  ]
 }

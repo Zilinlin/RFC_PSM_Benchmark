@@ -4,6 +4,8 @@
     "Ready",
     "Play"
   ],
+  "initial_state": "Init",
+  "final_states": ["Init"],
   "transitions": [
     {
       "from": "Ready",

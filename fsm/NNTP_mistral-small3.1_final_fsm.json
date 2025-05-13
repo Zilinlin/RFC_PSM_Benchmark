@@ -1,0 +1,37 @@
+{
+  "states": [
+    "Idle",
+    "Authenticated",
+    "ProcessingCommand"
+  ],
+  "initial_state": "Idle",
+  "final_states": [
+    "Idle"
+  ],
+  "transitions": [
+    {
+      "from": "Idle",
+      "event": "receive_list_command",
+      "action": "send_215_listing_newsgroups",
+      "to": "ProcessingCommand"
+    },
+    {
+      "from": "ProcessingCommand",
+      "event": "send_listing_newsgroups",
+      "action": "reply_215",
+      "to": "Idle"
+    },
+    {
+      "from": "Idle",
+      "event": "receive_auth_command",
+      "action": "send_200_ok",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive_post_command",
+      "action": "send_340_posting_ok",
+      "to": "Idle"
+    }
+  ]
+}

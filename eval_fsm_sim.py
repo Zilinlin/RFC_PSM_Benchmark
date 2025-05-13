@@ -13,6 +13,18 @@ import seaborn as sns
 
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
+model_name_mapping = {
+    "deepseek-reasoner": "DS-R1",
+    "gpt-4o-mini": "Gpt4o-Mini",
+    "claude-3-7-sonnet-20250219": "Claude3",
+    "gemini-2.0-flash": "Gemini2",
+    "deepseek-chat": "DS-V3",
+    "qwq": "QWQ",
+    "qwen3:32b": "QWen3",
+    "gemma3:27b": "Gemma3",
+    "mistral-small3.1": "Mistral"
+}
+
 def preprocess_state_name(state_name):
     # Convert to lowercase, remove punctuation, and split compound words
     state_name = state_name.lower()
@@ -148,11 +160,13 @@ def compare_initial_states(models, protocols, fsm_dir, threshold=0.5):
 
         if not gt_file:
             continue
-
+        
+        print("current protocol:", protocol)
         gt_initial = preprocess_state_name(extract_initial_state(gt_file))
 
         # Iterate over each model
         for model in models:
+            print("current model:", model)
             extracted_file = None
 
             # Find the extracted FSM file for the protocol and model
@@ -182,7 +196,7 @@ def compare_initial_states(models, protocols, fsm_dir, threshold=0.5):
 def plot_score_matrix(score_matrix, threshold=0.5, output_file='score_matrix.png'):
     # Ensure the score matrix is numeric
     numeric_matrix = score_matrix.astype(float).copy()
-    plt.figure(figsize=(18, 12))
+    plt.figure(figsize=(24, 18))
     # Custom color map with yellow for <=0.5 and green for >0.5
     cmap = sns.diverging_palette(65, 145, s=85, l=65, sep=20, as_cmap=True)
     # Ensure the score matrix is numeric
@@ -196,10 +210,19 @@ def plot_score_matrix(score_matrix, threshold=0.5, output_file='score_matrix.png
     plt.figure(figsize=(18, 12))
     cmap = plt.get_cmap('YlGn')
     # Use different color intensities for scores above and below the threshold
-    ax = sns.heatmap(numeric_matrix, annot=True, cmap=cmap, linewidths=0.5, center=threshold, cbar_kws={"label": "Similarity Score"}, vmin=0, vmax=1)
-    plt.title("Initial State Matching Scores with Summary Rows")
-    plt.xticks(rotation=45, ha="right")
-    plt.yticks(rotation=0)
+    ax = sns.heatmap(numeric_matrix, 
+                     annot=True, 
+                     cmap=cmap, 
+                     linewidths=0.5, 
+                     center=threshold, 
+                     cbar_kws={"label": "Similarity Score"}, 
+                     vmin=0, 
+                     vmax=1,
+                     annot_kws={"size": 18})
+    plt.title("Initial State Matching Scores for Protocols and Models", fontsize=24, weight='bold')
+    plt.xticks(rotation=45, ha="right", fontsize=20, weight='bold')
+    plt.yticks(rotation=0, fontsize=20, weight='bold')
+    ax.figure.axes[-1].yaxis.label.set_size(20)
     plt.tight_layout()
     plt.savefig(output_file, dpi=300)
     print(f"Score matrix saved as {output_file}")
@@ -353,20 +376,32 @@ if __name__ == "__main__":
     #batch_evaluate_fsm_similarity()
     protocols = ["IMAP", "POP3", "MQTT","PPP","PPTP", "BGP",
                  "SIP", "RTSP", "DCCP", "DHCP", "FTP", "NNTP", "SMTP", "TCP"]
-    models = ["deepseek-reasoner", "gpt-4o-mini", "claude-3-7-sonnet-20250219", "gemini-2.0-flash", "deepseek-chat"]
+    models = ["deepseek-reasoner", "gpt-4o-mini", "claude-3-7-sonnet-20250219", 
+              "gemini-2.0-flash", "deepseek-chat",
+              "qwq", "qwen3:32b","gemma3:27b","mistral-small3.1"]
     
     
     '''get the initial states results'''
-    # initial_state_results, score_matrix = compare_initial_states(models, protocols, fsm_dir="fsm", threshold=0.5)
-    # print("Initial State Results:", initial_state_results)
-    # print("Score Matrix:\n", score_matrix)
+    initial_state_results, score_matrix = compare_initial_states(models, protocols, fsm_dir="fsm", threshold=0.5)
+    print("Initial State Results:", initial_state_results)
+    print("Score Matrix:\n", score_matrix)
     
-    # plot_score_matrix(score_matrix, threshold=0.5, output_file='initial_state_score_matrix.png')
+    # Replace with your actual score matrix DataFrame
+    score_matrix.columns = [model_name_mapping.get(col, col) for col in score_matrix.columns]
+    plot_score_matrix(score_matrix, threshold=0.5, output_file='initial_state_score_matrix.png')
     
-    
+    # Count the number of protocols with values > 0.5 for each model
+    high_score_counts = (score_matrix > 0.5).sum()
+
+    # Convert to DataFrame for easy viewing
+    high_score_counts_df = high_score_counts.reset_index()
+    high_score_counts_df.columns = ["Model", "High Score Count"]
+
+    print(high_score_counts_df)
+
     '''get the state matches results'''
-    all_matches, summary_df = match_all_states(models, protocols, fsm_dir="fsm", threshold=0.5)
-    print("All Matches:\n", all_matches)
-    print("sumaary_df:\n", summary_df)
+    # all_matches, summary_df = match_all_states(models, protocols, fsm_dir="fsm", threshold=0.5)
+    # print("All Matches:\n", all_matches)
+    # print("sumaary_df:\n", summary_df)
     
     
