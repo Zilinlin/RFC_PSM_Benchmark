@@ -1,0 +1,110 @@
+{
+  "states": [
+    "Not_Authenticated",
+    "Authenticated",
+    "Selected",
+    "Logout"
+  ],
+  "initial_state": "Not_Authenticated",
+  "final_states": [
+    "Logout"
+  ],
+  "transitions": [
+    {
+      "from": "Not_Authenticated",
+      "event": "receive LOGIN or AUTHENTICATE",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Not_Authenticated",
+      "event": "receive LOGIN",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Not_Authenticated",
+      "event": "receive AUTHENTICATE",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Not_Authenticated",
+      "event": "receive STARTTLS",
+      "action": "reply OK",
+      "to": "Not_Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive SELECT or EXAMINE",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive SELECT",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive EXAMINE",
+      "action": "reply OK",
+      "to": "Selected"
+    },
+    {
+      "from": "Selected",
+      "event": "receive CLOSE or UNSELECT",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Selected",
+      "event": "receive CLOSE",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Selected",
+      "event": "receive UNSELECT",
+      "action": "reply OK",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Not_Authenticated",
+      "event": "receive LOGOUT",
+      "action": "reply BYE",
+      "to": "Logout"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive LOGOUT",
+      "action": "reply BYE",
+      "to": "Logout"
+    },
+    {
+      "from": "Selected",
+      "event": "receive LOGOUT",
+      "action": "reply BYE",
+      "to": "Logout"
+    },
+    {
+      "from": "Not_Authenticated",
+      "event": "cond server shutdown",
+      "action": "send BYE",
+      "to": "Logout"
+    },
+    {
+      "from": "Authenticated",
+      "event": "cond server shutdown",
+      "action": "send BYE",
+      "to": "Logout"
+    },
+    {
+      "from": "Selected",
+      "event": "cond server shutdown",
+      "action": "send BYE",
+      "to": "Logout"
+    }
+  ]
+}

@@ -1,0 +1,153 @@
+{
+  "states": [
+    "Dead",
+    "Establish",
+    "Authenticate",
+    "Network",
+    "Terminate",
+    "Initial",
+    "Starting",
+    "Closed",
+    "Stopped",
+    "Closing",
+    "Stopping",
+    "Req_Sent",
+    "Ack_Rcvd",
+    "Ack_Sent",
+    "Opened"
+  ],
+  "initial_state": "Initial",
+  "final_states": [
+    "Dead",
+    "Closed",
+    "Stopped"
+  ],
+  "transitions": [
+    {
+      "from": "Dead",
+      "event": "UP",
+      "action": "set link ready",
+      "to": "Establish"
+    },
+    {
+      "from": "Establish",
+      "event": "OPENED",
+      "action": "set link opened",
+      "to": "Authenticate"
+    },
+    {
+      "from": "Establish",
+      "event": "FAIL",
+      "action": "reset link",
+      "to": "Dead"
+    },
+    {
+      "from": "Authenticate",
+      "event": "SUCCESS",
+      "action": "set authenticated",
+      "to": "Network"
+    },
+    {
+      "from": "Authenticate",
+      "event": "NONE",
+      "action": "set no auth",
+      "to": "Network"
+    },
+    {
+      "from": "Authenticate",
+      "event": "FAIL",
+      "action": "reset link",
+      "to": "Dead"
+    },
+    {
+      "from": "Network",
+      "event": "CLOSING",
+      "action": "close link",
+      "to": "Terminate"
+    },
+    {
+      "from": "Terminate",
+      "event": "DOWN",
+      "action": "reset link",
+      "to": "Dead"
+    },
+    {
+      "from": "Initial",
+      "event": "Up",
+      "action": "set state Starting",
+      "to": "Starting"
+    },
+    {
+      "from": "Starting",
+      "event": "Up",
+      "action": "send Configure_Request",
+      "to": "Req_Sent"
+    },
+    {
+      "from": "Closed",
+      "event": "Open",
+      "action": "send Configure_Request",
+      "to": "Req_Sent"
+    },
+    {
+      "from": "Stopped",
+      "event": "Down",
+      "action": "set state Starting",
+      "to": "Starting"
+    },
+    {
+      "from": "Closing",
+      "event": "TO+",
+      "action": "send Terminate_Request",
+      "to": "Closing"
+    },
+    {
+      "from": "Closing",
+      "event": "TO-",
+      "action": "set state Closed",
+      "to": "Closed"
+    },
+    {
+      "from": "Stopping",
+      "event": "TO+",
+      "action": "send Terminate_Request",
+      "to": "Stopping"
+    },
+    {
+      "from": "Stopping",
+      "event": "TO-",
+      "action": "set state Stopped",
+      "to": "Stopped"
+    },
+    {
+      "from": "Req_Sent",
+      "event": "RCR+",
+      "action": "send Configure_Ack",
+      "to": "Ack_Sent"
+    },
+    {
+      "from": "Req_Sent",
+      "event": "RCR-",
+      "action": "send Configure_Nak",
+      "to": "Req_Sent"
+    },
+    {
+      "from": "Ack_Rcvd",
+      "event": "RCA",
+      "action": "set state Opened",
+      "to": "Opened"
+    },
+    {
+      "from": "Ack_Sent",
+      "event": "RCA",
+      "action": "set state Opened",
+      "to": "Opened"
+    },
+    {
+      "from": "Opened",
+      "event": "Close",
+      "action": "send Terminate_Request",
+      "to": "Closing"
+    }
+  ]
+}

@@ -1,0 +1,500 @@
+{
+  "states": [
+    "Initial",
+    "AwaitingPassword",
+    "AwaitingAccount",
+    "Authenticated",
+    "TransferInProgress",
+    "AwaitingRenameTo",
+    "AwaitingRestart",
+    "Closing",
+    "Connection_Establishment",
+    "Login",
+    "Transfer_Parameters",
+    "File_Action",
+    "Logout",
+    "Informational",
+    "Miscellaneous",
+    "Begin",
+    "Wait",
+    "Success",
+    "Error",
+    "Fail",
+    "LoggedIn",
+    "Transferring",
+    "Terminated"
+  ],
+  "initial_state": "Initial",
+  "final_states": [
+    "Closing",
+    "Logout",
+    "Terminated",
+    "Success",
+    "Error",
+    "Fail"
+  ],
+  "transitions": [
+    {
+      "from": "Initial",
+      "event": "receive USER",
+      "action": "reply 331",
+      "to": "AwaitingPassword"
+    },
+    {
+      "from": "AwaitingPassword",
+      "event": "receive PASS",
+      "action": "reply 230",
+      "to": "Authenticated"
+    },
+    {
+      "from": "AwaitingPassword",
+      "event": "receive PASS",
+      "action": "reply 332",
+      "to": "AwaitingAccount"
+    },
+    {
+      "from": "AwaitingAccount",
+      "event": "receive ACCT",
+      "action": "reply 230",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "Closing"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive RETR",
+      "action": "reply 150",
+      "to": "TransferInProgress"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive STOR",
+      "action": "reply 150",
+      "to": "TransferInProgress"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive RNFR",
+      "action": "reply 350",
+      "to": "AwaitingRenameTo"
+    },
+    {
+      "from": "AwaitingRenameTo",
+      "event": "receive RNTO",
+      "action": "reply 250",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive REST",
+      "action": "reply 350",
+      "to": "AwaitingRestart"
+    },
+    {
+      "from": "AwaitingRestart",
+      "event": "receive RETR",
+      "action": "reply 150",
+      "to": "TransferInProgress"
+    },
+    {
+      "from": "TransferInProgress",
+      "event": "receive ABOR",
+      "action": "reply 226",
+      "to": "Authenticated"
+    },
+    {
+      "from": "TransferInProgress",
+      "event": "transfer complete",
+      "action": "reply 226",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Connection_Establishment",
+      "event": "receive 120",
+      "action": "reply 220",
+      "to": "Login"
+    },
+    {
+      "from": "Connection_Establishment",
+      "event": "receive 220",
+      "action": "reply none",
+      "to": "Login"
+    },
+    {
+      "from": "Connection_Establishment",
+      "event": "receive 421",
+      "action": "close connection",
+      "to": "Logout"
+    },
+    {
+      "from": "Login",
+      "event": "receive USER",
+      "action": "reply 230",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Login",
+      "event": "receive USER",
+      "action": "reply 530",
+      "to": "Login"
+    },
+    {
+      "from": "Login",
+      "event": "receive USER",
+      "action": "reply 331",
+      "to": "Login"
+    },
+    {
+      "from": "Login",
+      "event": "receive PASS",
+      "action": "reply 230",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Login",
+      "event": "receive PASS",
+      "action": "reply 530",
+      "to": "Login"
+    },
+    {
+      "from": "Login",
+      "event": "receive ACCT",
+      "action": "reply 230",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Login",
+      "event": "receive ACCT",
+      "action": "reply 530",
+      "to": "Login"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive CWD",
+      "action": "reply 250",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive CDUP",
+      "action": "reply 200",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive SMNT",
+      "action": "reply 250",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive PORT",
+      "action": "reply 200",
+      "to": "Transfer_Parameters"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive PASV",
+      "action": "reply 227",
+      "to": "Transfer_Parameters"
+    },
+    {
+      "from": "Transfer_Parameters",
+      "event": "receive MODE",
+      "action": "reply 200",
+      "to": "Transfer_Parameters"
+    },
+    {
+      "from": "Transfer_Parameters",
+      "event": "receive TYPE",
+      "action": "reply 200",
+      "to": "Transfer_Parameters"
+    },
+    {
+      "from": "Transfer_Parameters",
+      "event": "receive STRU",
+      "action": "reply 200",
+      "to": "Transfer_Parameters"
+    },
+    {
+      "from": "Transfer_Parameters",
+      "event": "receive RETR",
+      "action": "reply 150",
+      "to": "File_Action"
+    },
+    {
+      "from": "Transfer_Parameters",
+      "event": "receive STOR",
+      "action": "reply 150",
+      "to": "File_Action"
+    },
+    {
+      "from": "File_Action",
+      "event": "receive 226",
+      "action": "reply none",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive REIN",
+      "action": "reply 220",
+      "to": "Login"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive SYST",
+      "action": "reply 215",
+      "to": "Informational"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive STAT",
+      "action": "reply 211",
+      "to": "Informational"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive HELP",
+      "action": "reply 211",
+      "to": "Informational"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive NOOP",
+      "action": "reply 200",
+      "to": "Miscellaneous"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive SITE",
+      "action": "reply 200",
+      "to": "Miscellaneous"
+    },
+    {
+      "from": "Begin",
+      "event": "receive ABOR",
+      "action": "send cmd",
+      "to": "Wait"
+    },
+    {
+      "from": "Wait",
+      "event": "receive 1",
+      "action": "reply error",
+      "to": "Error"
+    },
+    {
+      "from": "Wait",
+      "event": "receive 3",
+      "action": "reply error",
+      "to": "Error"
+    },
+    {
+      "from": "Wait",
+      "event": "receive 2",
+      "action": "reply success",
+      "to": "Success"
+    },
+    {
+      "from": "Wait",
+      "event": "receive 4",
+      "action": "reply fail",
+      "to": "Fail"
+    },
+    {
+      "from": "Wait",
+      "event": "receive 5",
+      "action": "reply fail",
+      "to": "Fail"
+    },
+    {
+      "from": "Begin",
+      "event": "receive APPE",
+      "action": "send cmd",
+      "to": "Wait"
+    },
+    {
+      "from": "Wait",
+      "event": "receive 3",
+      "action": "reply error",
+      "to": "Error"
+    },
+    {
+      "from": "Wait",
+      "event": "receive 2",
+      "action": "reply success",
+      "to": "Success"
+    },
+    {
+      "from": "Wait",
+      "event": "receive 1",
+      "action": "reply fail",
+      "to": "Fail"
+    },
+    {
+      "from": "Wait",
+      "event": "receive 4",
+      "action": "reply fail",
+      "to": "Fail"
+    },
+    {
+      "from": "Wait",
+      "event": "receive 5",
+      "action": "reply fail",
+      "to": "Fail"
+    },
+    {
+      "from": "Begin",
+      "event": "receive RNFR",
+      "action": "send cmd",
+      "to": "Wait"
+    },
+    {
+      "from": "Wait",
+      "event": "receive 1",
+      "action": "reply error",
+      "to": "Error"
+    },
+    {
+      "from": "Wait",
+      "event": "receive 2",
+      "action": "reply error",
+      "to": "Error"
+    },
+    {
+      "from": "Wait",
+      "event": "receive 3",
+      "action": "reply success",
+      "to": "Success"
+    },
+    {
+      "from": "Wait",
+      "event": "receive 4",
+      "action": "reply fail",
+      "to": "Fail"
+    },
+    {
+      "from": "Wait",
+      "event": "receive 5",
+      "action": "reply fail",
+      "to": "Fail"
+    },
+    {
+      "from": "Begin",
+      "event": "receive REST",
+      "action": "send cmd",
+      "to": "Wait"
+    },
+    {
+      "from": "Wait",
+      "event": "receive 1",
+      "action": "reply error",
+      "to": "Error"
+    },
+    {
+      "from": "Wait",
+      "event": "receive 2",
+      "action": "reply error",
+      "to": "Error"
+    },
+    {
+      "from": "Wait",
+      "event": "receive 3",
+      "action": "reply success",
+      "to": "Success"
+    },
+    {
+      "from": "Wait",
+      "event": "receive 4",
+      "action": "reply fail",
+      "to": "Fail"
+    },
+    {
+      "from": "Wait",
+      "event": "receive 5",
+      "action": "reply fail",
+      "to": "Fail"
+    },
+    {
+      "from": "Begin",
+      "event": "receive USER",
+      "action": "send cmd",
+      "to": "Wait"
+    },
+    {
+      "from": "Wait",
+      "event": "receive 1",
+      "action": "reply error",
+      "to": "Error"
+    },
+    {
+      "from": "Wait",
+      "event": "receive 2",
+      "action": "reply success",
+      "to": "Success"
+    },
+    {
+      "from": "Wait",
+      "event": "receive 3",
+      "action": "reply fail",
+      "to": "Fail"
+    },
+    {
+      "from": "Wait",
+      "event": "receive 4",
+      "action": "reply fail",
+      "to": "Fail"
+    },
+    {
+      "from": "Wait",
+      "event": "receive 5",
+      "action": "reply fail",
+      "to": "Fail"
+    },
+    {
+      "from": "Initial",
+      "event": "receive USER",
+      "action": "reply 331",
+      "to": "AwaitingPassword"
+    },
+    {
+      "from": "AwaitingPassword",
+      "event": "receive PASS",
+      "action": "reply 230",
+      "to": "LoggedIn"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive RETR",
+      "action": "reply 150",
+      "to": "Transferring"
+    },
+    {
+      "from": "Transferring",
+      "event": "send 226",
+      "action": "close connection",
+      "to": "LoggedIn"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive TYPE",
+      "action": "reply 200",
+      "to": "LoggedIn"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive STOR",
+      "action": "reply 550",
+      "to": "LoggedIn"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive QUIT",
+      "action": "close all",
+      "to": "Terminated"
+    }
+  ]
+}

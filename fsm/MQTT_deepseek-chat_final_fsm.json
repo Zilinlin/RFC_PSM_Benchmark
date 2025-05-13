@@ -1,0 +1,50 @@
+{
+  "states": [
+    "Connected",
+    "Authenticated",
+    "ReauthenticationRequested",
+    "Disconnected"
+  ],
+  "initial_state": "Connected",
+  "final_states": [
+    "Disconnected"
+  ],
+  "transitions": [
+    {
+      "from": "Connected",
+      "event": "receive CONNECT",
+      "action": "check token",
+      "to": "Authenticated"
+    },
+    {
+      "from": "Authenticated",
+      "event": "cond token_expired",
+      "action": "send Not_authorized",
+      "to": "Connected"
+    },
+    {
+      "from": "Authenticated",
+      "event": "receive AUTH",
+      "action": "verify reauthentication",
+      "to": "ReauthenticationRequested"
+    },
+    {
+      "from": "ReauthenticationRequested",
+      "event": "cond reauthentication_success",
+      "action": "set new_token",
+      "to": "Authenticated"
+    },
+    {
+      "from": "ReauthenticationRequested",
+      "event": "cond reauthentication_failure",
+      "action": "send Not_authorized",
+      "to": "Disconnected"
+    },
+    {
+      "from": "Authenticated",
+      "event": "send DISCONNECT",
+      "action": "close connection",
+      "to": "Disconnected"
+    }
+  ]
+}

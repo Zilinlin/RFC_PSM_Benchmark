@@ -1,0 +1,190 @@
+{
+  "states": [
+    "CLOSED",
+    "LISTEN",
+    "REQUEST",
+    "RESPOND",
+    "PARTOPEN",
+    "OPEN",
+    "CLOSEREQ",
+    "CLOSING",
+    "TIMEWAIT",
+    "STABLE",
+    "CHANGING",
+    "UNSTABLE"
+  ],
+  "initial_state": "CLOSED",
+  "final_states": [
+    "CLOSED"
+  ],
+  "transitions": [
+    {
+      "from": "CLOSED",
+      "event": "send DCCP-Request",
+      "action": "set state REQUEST",
+      "to": "REQUEST"
+    },
+    {
+      "from": "CLOSED",
+      "event": "active open",
+      "action": "send Request",
+      "to": "REQUEST"
+    },
+    {
+      "from": "CLOSED",
+      "event": "passive open",
+      "action": "set listen",
+      "to": "LISTEN"
+    },
+    {
+      "from": "LISTEN",
+      "event": "receive DCCP-Request",
+      "action": "send DCCP-Response",
+      "to": "RESPOND"
+    },
+    {
+      "from": "LISTEN",
+      "event": "receive Request",
+      "action": "send Response",
+      "to": "RESPOND"
+    },
+    {
+      "from": "REQUEST",
+      "event": "receive DCCP-Response",
+      "action": "send DCCP-Ack",
+      "to": "PARTOPEN"
+    },
+    {
+      "from": "REQUEST",
+      "event": "receive Response",
+      "action": "send Ack",
+      "to": "PARTOPEN"
+    },
+    {
+      "from": "PARTOPEN",
+      "event": "send DCCP-Ack",
+      "action": "set state OPEN",
+      "to": "OPEN"
+    },
+    {
+      "from": "PARTOPEN",
+      "event": "receive packet",
+      "action": "set open",
+      "to": "OPEN"
+    },
+    {
+      "from": "RESPOND",
+      "event": "receive DCCP-Ack",
+      "action": "set state OPEN",
+      "to": "OPEN"
+    },
+    {
+      "from": "RESPOND",
+      "event": "receive Ack",
+      "action": "set open",
+      "to": "OPEN"
+    },
+    {
+      "from": "OPEN",
+      "event": "send DCCP-CloseReq",
+      "action": "set state CLOSEREQ",
+      "to": "CLOSEREQ"
+    },
+    {
+      "from": "OPEN",
+      "event": "receive CloseReq",
+      "action": "send Close",
+      "to": "CLOSING"
+    },
+    {
+      "from": "OPEN",
+      "event": "send DCCP-Close",
+      "action": "set state CLOSING",
+      "to": "CLOSING"
+    },
+    {
+      "from": "OPEN",
+      "event": "send Close",
+      "action": "set closing",
+      "to": "CLOSING"
+    },
+    {
+      "from": "CLOSEREQ",
+      "event": "receive DCCP-Close",
+      "action": "send DCCP-Reset",
+      "to": "CLOSED"
+    },
+    {
+      "from": "CLOSEREQ",
+      "event": "receive Close",
+      "action": "send Reset",
+      "to": "CLOSED"
+    },
+    {
+      "from": "CLOSING",
+      "event": "receive DCCP-Reset",
+      "action": "set state TIMEWAIT",
+      "to": "TIMEWAIT"
+    },
+    {
+      "from": "CLOSING",
+      "event": "receive Reset",
+      "action": "set timewait",
+      "to": "TIMEWAIT"
+    },
+    {
+      "from": "TIMEWAIT",
+      "event": "timeout 2MSL",
+      "action": "set state CLOSED",
+      "to": "CLOSED"
+    },
+    {
+      "from": "TIMEWAIT",
+      "event": "timeout 2MSL",
+      "action": "set closed",
+      "to": "CLOSED"
+    },
+    {
+      "from": "STABLE",
+      "event": "app_protocol_event",
+      "action": "send Change_L",
+      "to": "CHANGING"
+    },
+    {
+      "from": "STABLE",
+      "event": "receive Change_R",
+      "action": "send Confirm_L",
+      "to": "STABLE"
+    },
+    {
+      "from": "CHANGING",
+      "event": "receive Confirm_R",
+      "action": "set value",
+      "to": "STABLE"
+    },
+    {
+      "from": "CHANGING",
+      "event": "receive empty_Confirm_R",
+      "action": "revert value",
+      "to": "STABLE"
+    },
+    {
+      "from": "CHANGING",
+      "event": "preference_change",
+      "action": "set UNSTABLE",
+      "to": "UNSTABLE"
+    },
+    {
+      "from": "UNSTABLE",
+      "event": "send Change_L",
+      "action": "set CHANGING",
+      "to": "CHANGING"
+    },
+    {
+      "from": "CHANGING",
+      "event": "timeout",
+      "action": "send Change_L",
+      "to": "CHANGING"
+    }
+  ]
+}

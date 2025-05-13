@@ -1,0 +1,129 @@
+{
+  "states": [
+    "SessionInitiation",
+    "ClientInitiation",
+    "AwaitingCommand",
+    "MailTransaction",
+    "MailFrom",
+    "RcptTo",
+    "DataTransfer",
+    "DataInput",
+    "SessionTermination",
+    "Closing"
+  ],
+  "initial_state": "SessionInitiation",
+  "final_states": [
+    "SessionTermination",
+    "Closing"
+  ],
+  "transitions": [
+    {
+      "from": "SessionInitiation",
+      "event": "receive connection",
+      "action": "reply 220",
+      "to": "ClientInitiation"
+    },
+    {
+      "from": "SessionInitiation",
+      "event": "receive connection",
+      "action": "reply 554",
+      "to": "SessionTermination"
+    },
+    {
+      "from": "ClientInitiation",
+      "event": "receive EHLO",
+      "action": "reply 250",
+      "to": "AwaitingCommand"
+    },
+    {
+      "from": "ClientInitiation",
+      "event": "receive HELO",
+      "action": "reply 250",
+      "to": "AwaitingCommand"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive MAIL",
+      "action": "reply 250",
+      "to": "MailTransaction"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive MAIL FROM",
+      "action": "reply 250",
+      "to": "MailFrom"
+    },
+    {
+      "from": "MailFrom",
+      "event": "receive RCPT TO",
+      "action": "reply 250",
+      "to": "RcptTo"
+    },
+    {
+      "from": "MailTransaction",
+      "event": "receive RCPT",
+      "action": "reply 250",
+      "to": "MailTransaction"
+    },
+    {
+      "from": "MailTransaction",
+      "event": "receive DATA",
+      "action": "reply 354",
+      "to": "DataTransfer"
+    },
+    {
+      "from": "RcptTo",
+      "event": "receive DATA",
+      "action": "reply 354",
+      "to": "DataInput"
+    },
+    {
+      "from": "DataTransfer",
+      "event": "receive end_of_data",
+      "action": "reply 250",
+      "to": "MailTransaction"
+    },
+    {
+      "from": "DataInput",
+      "event": "receive .",
+      "action": "reply 250",
+      "to": "AwaitingCommand"
+    },
+    {
+      "from": "MailTransaction",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "SessionTermination"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "Closing"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive RSET",
+      "action": "reply 250",
+      "to": "AwaitingCommand"
+    },
+    {
+      "from": "RcptTo",
+      "event": "receive RSET",
+      "action": "reply 250",
+      "to": "AwaitingCommand"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive NOOP",
+      "action": "reply 250",
+      "to": "AwaitingCommand"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive VRFY",
+      "action": "reply 250",
+      "to": "AwaitingCommand"
+    }
+  ]
+}

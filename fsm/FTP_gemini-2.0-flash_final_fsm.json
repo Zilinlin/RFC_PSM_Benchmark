@@ -1,0 +1,331 @@
+{
+  "states": [
+    "NotConnected",
+    "AwaitingUsername",
+    "AwaitingPassword",
+    "AwaitingAccount",
+    "LoggedIn",
+    "PassiveMode",
+    "DataConnectionIdle",
+    "DataConnectionEstablishing",
+    "DataTransferring",
+    "DataConnectionClosing",
+    "RenamingFile",
+    "Aborting",
+    "Terminated",
+    "DirectoryCreated",
+    "ErrorState"
+  ],
+  "initial_state": "NotConnected",
+  "final_states": [
+    "Terminated"
+  ],
+  "transitions": [
+    {
+      "from": "NotConnected",
+      "event": "receive CONNECT",
+      "action": "reply 220",
+      "to": "AwaitingUsername"
+    },
+    {
+      "from": "AwaitingUsername",
+      "event": "receive USER",
+      "action": "reply 331",
+      "to": "AwaitingPassword"
+    },
+    {
+      "from": "AwaitingPassword",
+      "event": "receive PASS",
+      "action": "reply 230",
+      "to": "LoggedIn"
+    },
+    {
+      "from": "AwaitingPassword",
+      "event": "receive PASS",
+      "action": "reply 332",
+      "to": "AwaitingAccount"
+    },
+    {
+      "from": "AwaitingPassword",
+      "event": "receive PASS",
+      "action": "reply 530",
+      "to": "NotConnected"
+    },
+    {
+      "from": "AwaitingAccount",
+      "event": "receive ACCT",
+      "action": "reply 230",
+      "to": "LoggedIn"
+    },
+    {
+      "from": "AwaitingAccount",
+      "event": "receive ACCT",
+      "action": "reply 530",
+      "to": "NotConnected"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive PORT",
+      "action": "reply 200",
+      "to": "LoggedIn"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive PASV",
+      "action": "reply 227",
+      "to": "PassiveMode"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive TYPE",
+      "action": "reply 200",
+      "to": "LoggedIn"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive MODE",
+      "action": "reply 200",
+      "to": "LoggedIn"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive STRU",
+      "action": "reply 200",
+      "to": "LoggedIn"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive RETR",
+      "action": "reply 150",
+      "to": "DataTransferring"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive STOR",
+      "action": "reply 150",
+      "to": "DataTransferring"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive LIST",
+      "action": "reply 150",
+      "to": "DataTransferring"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive NLST",
+      "action": "reply 150",
+      "to": "DataTransferring"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive APPE",
+      "action": "reply 150",
+      "to": "DataTransferring"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive RNFR",
+      "action": "reply 350",
+      "to": "RenamingFile"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive DELE",
+      "action": "reply 250",
+      "to": "LoggedIn"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive RMD",
+      "action": "reply 250",
+      "to": "LoggedIn"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive MKD",
+      "action": "reply 257",
+      "to": "DirectoryCreated"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive PWD",
+      "action": "reply 257",
+      "to": "LoggedIn"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive SYST",
+      "action": "reply 215",
+      "to": "LoggedIn"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive STAT",
+      "action": "reply 211",
+      "to": "LoggedIn"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive HELP",
+      "action": "reply 214",
+      "to": "LoggedIn"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive NOOP",
+      "action": "reply 200",
+      "to": "LoggedIn"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive QUIT",
+      "action": "reply 221",
+      "to": "Terminated"
+    },
+    {
+      "from": "DataTransferring",
+      "event": "send data",
+      "action": "reply 226",
+      "to": "LoggedIn"
+    },
+    {
+      "from": "DataTransferring",
+      "event": "send data",
+      "action": "reply 250",
+      "to": "LoggedIn"
+    },
+    {
+      "from": "RenamingFile",
+      "event": "receive RNTO",
+      "action": "reply 250",
+      "to": "LoggedIn"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive REIN",
+      "action": "reset parameters",
+      "to": "NotConnected"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive USER",
+      "action": "flush info",
+      "to": "AwaitingPassword"
+    },
+    {
+      "from": "DataConnectionIdle",
+      "event": "receive TransferCommand",
+      "action": "open DataConnection",
+      "to": "DataConnectionEstablishing"
+    },
+    {
+      "from": "DataConnectionEstablishing",
+      "event": "data connection established",
+      "action": "reply confirming",
+      "to": "DataTransferring"
+    },
+    {
+      "from": "DataTransferring",
+      "event": "data transfer complete",
+      "action": "close DataConnection",
+      "to": "DataConnectionClosing"
+    },
+    {
+      "from": "DataTransferring",
+      "event": "receive ABORT",
+      "action": "close DataConnection",
+      "to": "DataConnectionClosing"
+    },
+    {
+      "from": "DataTransferring",
+      "event": "port specification changed",
+      "action": "close DataConnection",
+      "to": "DataConnectionClosing"
+    },
+    {
+      "from": "DataTransferring",
+      "event": "control connection closed",
+      "action": "close DataConnection",
+      "to": "DataConnectionClosing"
+    },
+    {
+      "from": "DataTransferring",
+      "event": "irrecoverable error occurs",
+      "action": "close DataConnection",
+      "to": "DataConnectionClosing"
+    },
+    {
+      "from": "DataConnectionClosing",
+      "event": "connection closed",
+      "action": "reply 250 or 226",
+      "to": "DataConnectionIdle"
+    },
+    {
+      "from": "DataConnectionEstablishing",
+      "event": "connection failed",
+      "action": "reply error",
+      "to": "DataConnectionIdle"
+    },
+    {
+      "from": "DataTransferring",
+      "event": "send EOF streamMode",
+      "action": "close DataConnection",
+      "to": "DataConnectionIdle"
+    },
+    {
+      "from": "DataConnectionIdle",
+      "event": "timeout",
+      "action": "reset",
+      "to": "DataConnectionIdle"
+    },
+    {
+      "from": "DataTransferring",
+      "event": "receive ABOR",
+      "action": "reply 426",
+      "to": "Aborting"
+    },
+    {
+      "from": "DataTransferring",
+      "event": "receive ABOR",
+      "action": "reply 226",
+      "to": "Aborting"
+    },
+    {
+      "from": "Aborting",
+      "event": "data connection closed",
+      "action": "reply 226",
+      "to": "LoggedIn"
+    },
+    {
+      "from": "DirectoryCreated",
+      "event": "receive CWD directory_name",
+      "action": "reply 200 directory changed",
+      "to": "LoggedIn"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive MKD pathname",
+      "action": "reply access denied",
+      "to": "ErrorState"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive MKD pathname",
+      "action": "reply STOR failures",
+      "to": "ErrorState"
+    },
+    {
+      "from": "ErrorState",
+      "event": "receive any command",
+      "action": "reply error message",
+      "to": "ErrorState"
+    },
+    {
+      "from": "LoggedIn",
+      "event": "receive CDUP",
+      "action": "reply CWD codes",
+      "to": "LoggedIn"
+    }
+  ]
+}

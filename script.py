@@ -281,15 +281,18 @@ if __name__ == "__main__":
     # prompt = build_fsm_combination_prompt(partials)
     # print(prompt)
     
-    protocols = ["DCCP","DHCP", "FTP", "IMAP", 
-                 "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP",
-                 "MQTT", "PPP", "PPTP", "BGP"]
+    # protocols = ["DCCP","DHCP", "FTP", "IMAP", 
+    #              "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP",
+    #              "MQTT", "PPP", "PPTP", "BGP"]
+    protocols = ["FTP", "IMAP", 
+                  "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP",
+                  "MQTT", "PPP", "PPTP", "BGP"]
     
     # model = "deepseek-r1:14b"
     # models = ["deepseek-r1:32b","qwen3:32b","gemma3:27b"]
     # models = ["mistral-small3.1"] # this is 24b
-    
-    models = ["qwq","qwen3:32b","gemma3:27b","mistral-small3.1"] # 32b
+    # model = ["qwq"]  qwen3:32b "gemma3:27b","mistral-small3.1"
+    models = ["mistral-small3.1"] # 32b
     for m in models:
         for d in protocols:
             process_protocol(d, m, verbose=True)

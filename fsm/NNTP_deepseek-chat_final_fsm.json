@@ -1,0 +1,183 @@
+{
+  "states": [
+    "initial_connection",
+    "connected_posting_allowed",
+    "connected_posting_prohibited",
+    "terminated",
+    "Initial",
+    "AwaitingArticle",
+    "ArticleReceived",
+    "PostingProhibited",
+    "PostingFailed",
+    "TransferRequested",
+    "TransferCompleted",
+    "TransferFailed",
+    "AwaitingCommand",
+    "GroupSelected",
+    "InvalidGroup",
+    "ArticleSelected",
+    "InvalidArticle"
+  ],
+  "initial_state": "initial_connection",
+  "final_states": [
+    "terminated",
+    "ArticleReceived",
+    "PostingFailed",
+    "TransferCompleted",
+    "TransferFailed",
+    "ArticleSelected",
+    "InvalidArticle"
+  ],
+  "transitions": [
+    {
+      "from": "initial_connection",
+      "event": "receive 200",
+      "action": "set posting_allowed true",
+      "to": "connected_posting_allowed"
+    },
+    {
+      "from": "initial_connection",
+      "event": "receive 201",
+      "action": "set posting_allowed false",
+      "to": "connected_posting_prohibited"
+    },
+    {
+      "from": "initial_connection",
+      "event": "receive 400",
+      "action": "close connection",
+      "to": "terminated"
+    },
+    {
+      "from": "initial_connection",
+      "event": "receive 502",
+      "action": "close connection",
+      "to": "terminated"
+    },
+    {
+      "from": "connected_posting_allowed",
+      "event": "receive QUIT",
+      "action": "reply 205",
+      "to": "terminated"
+    },
+    {
+      "from": "connected_posting_prohibited",
+      "event": "receive QUIT",
+      "action": "reply 205",
+      "to": "terminated"
+    },
+    {
+      "from": "Initial",
+      "event": "receive POST",
+      "action": "reply 340",
+      "to": "AwaitingArticle"
+    },
+    {
+      "from": "Initial",
+      "event": "receive POST",
+      "action": "reply 440",
+      "to": "PostingProhibited"
+    },
+    {
+      "from": "AwaitingArticle",
+      "event": "receive article",
+      "action": "reply 240",
+      "to": "ArticleReceived"
+    },
+    {
+      "from": "AwaitingArticle",
+      "event": "receive article",
+      "action": "reply 441",
+      "to": "PostingFailed"
+    },
+    {
+      "from": "Initial",
+      "event": "receive IHAVE",
+      "action": "reply 335",
+      "to": "TransferRequested"
+    },
+    {
+      "from": "Initial",
+      "event": "receive IHAVE",
+      "action": "reply 435",
+      "to": "TransferFailed"
+    },
+    {
+      "from": "Initial",
+      "event": "receive IHAVE",
+      "action": "reply 436",
+      "to": "TransferFailed"
+    },
+    {
+      "from": "TransferRequested",
+      "event": "receive article",
+      "action": "reply 235",
+      "to": "TransferCompleted"
+    },
+    {
+      "from": "TransferRequested",
+      "event": "receive article",
+      "action": "reply 436",
+      "to": "TransferFailed"
+    },
+    {
+      "from": "TransferRequested",
+      "event": "receive article",
+      "action": "reply 437",
+      "to": "TransferFailed"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive GROUP",
+      "action": "reply 211",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "AwaitingCommand",
+      "event": "receive GROUP invalid",
+      "action": "reply 412",
+      "to": "InvalidGroup"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive OVER",
+      "action": "reply 224",
+      "to": "ArticleSelected"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive OVER invalid",
+      "action": "reply 420",
+      "to": "InvalidArticle"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive HDR",
+      "action": "reply 225",
+      "to": "ArticleSelected"
+    },
+    {
+      "from": "GroupSelected",
+      "event": "receive HDR invalid",
+      "action": "reply 423",
+      "to": "InvalidArticle"
+    },
+    {
+      "from": "InvalidGroup",
+      "event": "receive GROUP",
+      "action": "reply 211",
+      "to": "GroupSelected"
+    },
+    {
+      "from": "InvalidArticle",
+      "event": "receive OVER valid",
+      "action": "reply 224",
+      "to": "ArticleSelected"
+    },
+    {
+      "from": "ArticleSelected",
+      "event": "receive OVER invalid",
+      "action": "reply 423",
+      "to": "InvalidArticle"
+    }
+  ]
+}

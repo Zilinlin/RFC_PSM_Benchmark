@@ -1,0 +1,135 @@
+{
+  "states": [
+    "WaitingForConnection",
+    "Authorization",
+    "Transaction",
+    "Update",
+    "Closed"
+  ],
+  "initial_state": "WaitingForConnection",
+  "final_states": [
+    "Closed"
+  ],
+  "transitions": [
+    {
+      "from": "WaitingForConnection",
+      "event": "receive open_connection",
+      "action": "reply +OK",
+      "to": "Authorization"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive USER",
+      "action": "reply +OK",
+      "to": "Authorization"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive PASS",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive APOP",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Authorization",
+      "event": "receive QUIT",
+      "action": "reply +OK",
+      "to": "Closed"
+    },
+    {
+      "from": "Authorization",
+      "event": "cond valid_credentials",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Authorization",
+      "event": "cond invalid_credentials",
+      "action": "reply -ERR",
+      "to": "Closed"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive STAT",
+      "action": "reply +OK nn mm",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive LIST",
+      "action": "reply +OK scan listing follows",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive LIST msg",
+      "action": "reply +OK scan listing follows",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive RETR msg",
+      "action": "reply +OK message follows",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive DELE msg",
+      "action": "reply +OK message deleted",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive NOOP",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive RSET",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive TOP",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive UIDL",
+      "action": "reply +OK",
+      "to": "Transaction"
+    },
+    {
+      "from": "Transaction",
+      "event": "receive QUIT",
+      "action": "reply +OK",
+      "to": "Update"
+    },
+    {
+      "from": "Update",
+      "event": "release complete",
+      "action": "close connection",
+      "to": "Closed"
+    },
+    {
+      "from": "Update",
+      "event": "receive close_connection",
+      "action": "close connection",
+      "to": "Closed"
+    },
+    {
+      "from": "Closed",
+      "event": "timeout",
+      "action": "wait next_connection",
+      "to": "WaitingForConnection"
+    }
+  ]
+}

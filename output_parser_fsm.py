@@ -8,67 +8,67 @@ from typing import Dict, List, Union, Optional,Any
 import re
 
 from openai import OpenAI
-
+from prompt_generation import build_fsm_combination_prompt
 client = OpenAI(
   api_key="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"
 )
 
 
-def build_fsm_combination_prompt(partial_fsms: List[Union[str, dict]]) -> str:
-    """
-    Given a list of partial FSMs (JSON strings or dicts), returns a prompt
-    instructing a GPT model to merge them into one global FSM.
-    """
-    # Normalize each partial to a JSON string and wrap in <partial> tags
-    blocks = []
-    for p in partial_fsms:
-        text = p if isinstance(p, str) else json.dumps(p, ensure_ascii=False, indent=2)
-        blocks.append(f"<partial>\n{text}\n</partial>")
-    partials_block = "\n\n".join(blocks)
+# def build_fsm_combination_prompt(partial_fsms: List[Union[str, dict]]) -> str:
+#     """
+#     Given a list of partial FSMs (JSON strings or dicts), returns a prompt
+#     instructing a GPT model to merge them into one global FSM.
+#     """
+#     # Normalize each partial to a JSON string and wrap in <partial> tags
+#     blocks = []
+#     for p in partial_fsms:
+#         text = p if isinstance(p, str) else json.dumps(p, ensure_ascii=False, indent=2)
+#         blocks.append(f"<partial>\n{text}\n</partial>")
+#     partials_block = "\n\n".join(blocks)
 
-    prompt = f"""
-You have multiple partial protocol state machines resposne extracted from different sections of an RFC. Each one is wrapped in `<partial>...</partial>`.
+#     prompt = f"""
+# You have multiple partial protocol state machines resposne extracted from different sections of an RFC. Each one is wrapped in `<partial>...</partial>`.
 
-Your task: **merge** them into one **global** state machine. Follow these rules exactly:
+# Your task: **merge** them into one **global** state machine. Follow these rules exactly:
 
-1. **states**: list all unique state names.
-2. **initial_state**: the state with no incoming transitions.
-3. **final_states**: any state with no outgoing transitions.
-4. **transitions**: list all transitions, removing duplicates.  
-   Each transition must be an object with keys:
-   - `"from"` (string)
-   - `"to"` (string)
-   - `"requisite"` (string; `""` if none)
-   - `"actions"` (list of strings; `[]` if none)
-   - `"response"` (string; `""` if none)
-5. Standardize synonyms (e.g. `"Init"` vs `"Initialization"`).
-6. Do **not** include any explanations, markdown, or code fences—output **only** the JSON object.
+# 1. **states**: list all unique state names.
+# 2. **initial_state**: the state with no incoming transitions.
+# 3. **final_states**: any state with no outgoing transitions.
+# 4. **transitions**: list all transitions, removing duplicates.  
+#    Each transition must be an object with keys:
+#    - `"from"` (string)
+#    - `"to"` (string)
+#    - `"requisite"` (string; `""` if none)
+#    - `"actions"` (list of strings; `[]` if none)
+#    - `"response"` (string; `""` if none)
+# 5. Standardize synonyms (e.g. `"Init"` vs `"Initialization"`).
+# 6. Do **not** include any explanations, markdown, or code fences—output **only** the JSON object.
 
-Output **exactly** in this format:
+# Output **exactly** in this format:
 
-<json>
-{{
-  "states": ["state1", "state2", ...],
-  "initial_state": "stateX",
-  "final_states": ["stateY", ...],
-  "transitions": [
-    {{
-      "from": "state1",
-      "requisite": "conditionX",
-      "to": "state2",
-      "actions": ["action1"],
-      "response": "response1"
-    }}
-  ]
-}}
-</json>
+# <json>
+# {{
+#   "states": ["state1", "state2", ...],
+#   "initial_state": "stateX",
+#   "final_states": ["stateY", ...],
+#   "transitions": [
+#     {{
+#       "from": "state1",
+#       "requisite": "conditionX",
+#       "to": "state2",
+#       "actions": ["action1"],
+#       "response": "response1"
+#     }}
+#   ]
+# }}
+# </json>
 
-Here are the partial machines:
+# Here are the partial machines:
 
-{partials_block}
-""".strip()
+# {partials_block}
+# """.strip()
 
-    return prompt
+#     return prompt
 
 
 
@@ -113,7 +113,7 @@ def call_api(prompt, temperature=0.0, max_tokens=8192):
     Calls the chatgpt API and returns the generated text.
     """
     completion = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="gpt-4o",
         messages=[
             {"role": "user", "content": prompt}
         ],
@@ -151,6 +151,7 @@ def extract_final_fsm(directory: str, model: str, protocol: str, output_dir: str
                     json.dump(final, fo, indent=2)
                 return final
 
+            print(f"Regenerating FSM for {protocol} with model {model}...")
             # Otherwise regenerate from partial responses
             sections = data.get('sections', [])
             responses = [sec.get('response', '') for sec in sections]
@@ -176,11 +177,13 @@ def extract_final_fsm(directory: str, model: str, protocol: str, output_dir: str
 
 
 if __name__ == "__main__":
-    # protocols = ["DCCP","DHCP", "FTP", "IMAP", 
-    #              "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP"]
-    # TODO sip!
-    protocols = ["MQTT", 'PPP', "PPTP", "BGP"]
-    close_models = ["deepseek-reasoner","gpt-4o-mini", "claude-3-7-sonnet-20250219","gemini-2.0-flash"]
+    protocols = ["DCCP","DHCP", "FTP", "IMAP", 
+                  "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP",
+                  "MQTT", 'PPP', "PPTP", "BGP"]
+    # protocols = ["MQTT", 'PPP', "PPTP", "BGP"]
+    #protocols = ["SIP", "NNTP", "FTP"]
+    # close_models = ["deepseek-reasoner","gpt-4o-mini", "claude-3-7-sonnet-20250219","gemini-2.0-flash"]
+    close_models = ["deepseek-chat"]
     directory = "output"
     fsm_dir = "fsm"
     

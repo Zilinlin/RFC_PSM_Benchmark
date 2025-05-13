@@ -1,0 +1,227 @@
+{
+  "states": [
+    "Idle",
+    "Control_Connecting",
+    "Control_Connected",
+    "Call_Establishing",
+    "Call_Established",
+    "Terminating",
+    "Wait_Ctl_Reply",
+    "Wait_Stop_Reply",
+    "Wait_Reply",
+    "Wait_Connect",
+    "Wait_Disconnect",
+    "Wait_Cs_Ans"
+  ],
+  "initial_state": "Idle",
+  "final_states": [
+    "Terminating",
+    "Idle"
+  ],
+  "transitions": [
+    {
+      "from": "Idle",
+      "event": "receive Start-Control-Connection-Request",
+      "action": "reply Start-Control-Connection-Reply",
+      "to": "Control_Connecting"
+    },
+    {
+      "from": "Control_Connecting",
+      "event": "receive Start-Control-Connection-Reply",
+      "action": "set control_connected true",
+      "to": "Control_Connected"
+    },
+    {
+      "from": "Control_Connected",
+      "event": "receive Outgoing-Call-Request",
+      "action": "reply Outgoing-Call-Reply",
+      "to": "Call_Establishing"
+    },
+    {
+      "from": "Control_Connected",
+      "event": "receive Incoming-Call-Request",
+      "action": "reply Incoming-Call-Reply",
+      "to": "Call_Establishing"
+    },
+    {
+      "from": "Call_Establishing",
+      "event": "receive Incoming-Call-Connected",
+      "action": "set call_established true",
+      "to": "Call_Established"
+    },
+    {
+      "from": "Call_Established",
+      "event": "receive Call-Clear-Request",
+      "action": "reply Call-Disconnect-Notify",
+      "to": "Terminating"
+    },
+    {
+      "from": "Control_Connected",
+      "event": "receive Stop-Control-Connection-Request",
+      "action": "reply Stop-Control-Connection-Reply",
+      "to": "Terminating"
+    },
+    {
+      "from": "Control_Connected",
+      "event": "timeout no_echo_reply",
+      "action": "close connection",
+      "to": "Terminating"
+    },
+    {
+      "from": "Call_Established",
+      "event": "receive WAN-Error-Notify",
+      "action": "log error",
+      "to": "Call_Established"
+    },
+    {
+      "from": "Call_Established",
+      "event": "receive Set-Link-Info",
+      "action": "update PPP options",
+      "to": "Call_Established"
+    },
+    {
+      "from": "Idle",
+      "event": "TCP Open Indication",
+      "action": "send Start Control Connection Request",
+      "to": "Wait_Ctl_Reply"
+    },
+    {
+      "from": "Wait_Ctl_Reply",
+      "event": "receive Start Control Connection Reply Version OK",
+      "action": "set established",
+      "to": "Control_Connected"
+    },
+    {
+      "from": "Wait_Ctl_Reply",
+      "event": "receive Start Control Connection Reply Version Not OK",
+      "action": "send Stop Control Connection Request",
+      "to": "Wait_Stop_Reply"
+    },
+    {
+      "from": "Control_Connected",
+      "event": "local terminate",
+      "action": "send Stop Control Connection Request",
+      "to": "Wait_Stop_Reply"
+    },
+    {
+      "from": "Control_Connected",
+      "event": "receive Stop Control Connection Request",
+      "action": "send Stop Control Connection Reply",
+      "to": "Idle"
+    },
+    {
+      "from": "Wait_Stop_Reply",
+      "event": "receive Stop Control Connection Reply",
+      "action": "close TCP",
+      "to": "Idle"
+    },
+    {
+      "from": "Idle",
+      "event": "receive Start Control Connection Request Version OK",
+      "action": "send Start Control Connection Reply",
+      "to": "Control_Connected"
+    },
+    {
+      "from": "Idle",
+      "event": "receive Start Control Connection Request Version Not OK",
+      "action": "send Start Control Connection Reply with Error",
+      "to": "Idle"
+    },
+    {
+      "from": "Idle",
+      "event": "ring",
+      "action": "send Incoming Call Request",
+      "to": "Wait_Reply"
+    },
+    {
+      "from": "Wait_Reply",
+      "event": "receive Incoming Call Reply Not Accepting",
+      "action": "set idle",
+      "to": "Idle"
+    },
+    {
+      "from": "Wait_Reply",
+      "event": "receive Incoming Call Reply Accepting",
+      "action": "send Call Connected",
+      "to": "Call_Established"
+    },
+    {
+      "from": "Idle",
+      "event": "receive Incoming Call Request",
+      "action": "send Incoming Call Reply Not Accepting",
+      "to": "Idle"
+    },
+    {
+      "from": "Idle",
+      "event": "receive Incoming Call Request",
+      "action": "send Incoming Call Reply Accepting",
+      "to": "Wait_Connect"
+    },
+    {
+      "from": "Wait_Connect",
+      "event": "receive Incoming Call Connect",
+      "action": "set established",
+      "to": "Call_Established"
+    },
+    {
+      "from": "Wait_Connect",
+      "event": "receive Call Disconnect Notify",
+      "action": "set idle",
+      "to": "Idle"
+    },
+    {
+      "from": "Call_Established",
+      "event": "local terminate",
+      "action": "send Call Clear Request",
+      "to": "Wait_Disconnect"
+    },
+    {
+      "from": "Wait_Disconnect",
+      "event": "receive Call Disconnect Notify",
+      "action": "set idle",
+      "to": "Idle"
+    },
+    {
+      "from": "Idle",
+      "event": "receive Outgoing Call Request in Error",
+      "action": "send Outgoing Call Reply with Error",
+      "to": "Idle"
+    },
+    {
+      "from": "Idle",
+      "event": "receive Outgoing Call Request No Error",
+      "action": "dial",
+      "to": "Wait_Cs_Ans"
+    },
+    {
+      "from": "Wait_Cs_Ans",
+      "event": "incomplete call",
+      "action": "send Outgoing Call Reply with Error",
+      "to": "Idle"
+    },
+    {
+      "from": "Wait_Cs_Ans",
+      "event": "telco answer",
+      "action": "send Outgoing Call Reply",
+      "to": "Call_Established"
+    },
+    {
+      "from": "Idle",
+      "event": "send Outgoing Call Request",
+      "action": "set wait_reply",
+      "to": "Wait_Reply"
+    },
+    {
+      "from": "Wait_Reply",
+      "event": "receive Outgoing Call Reply with Error",
+      "action": "set idle",
+      "to": "Idle"
+    },
+    {
+      "from": "Wait_Reply",
+      "event": "receive Outgoing Call Reply No Error",
+      "action": "set established",
+      "to": "Call_Established"
+    }
+  ]
+}

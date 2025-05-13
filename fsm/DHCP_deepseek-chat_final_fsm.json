@@ -1,0 +1,105 @@
+{
+  "states": [
+    "init",
+    "selecting",
+    "requesting",
+    "bound",
+    "renewing",
+    "rebinding",
+    "init_reboot"
+  ],
+  "initial_state": "init",
+  "final_states": [],
+  "transitions": [
+    {
+      "from": "init",
+      "event": "send DHCPDISCOVER",
+      "action": "broadcast request",
+      "to": "selecting"
+    },
+    {
+      "from": "selecting",
+      "event": "receive DHCPOFFER",
+      "action": "collect offers",
+      "to": "selecting"
+    },
+    {
+      "from": "selecting",
+      "event": "send DHCPREQUEST",
+      "action": "broadcast request",
+      "to": "requesting"
+    },
+    {
+      "from": "selecting",
+      "event": "select offer",
+      "action": "send DHCPREQUEST",
+      "to": "requesting"
+    },
+    {
+      "from": "requesting",
+      "event": "receive DHCPACK",
+      "action": "set configuration",
+      "to": "bound"
+    },
+    {
+      "from": "requesting",
+      "event": "receive DHCPNAK",
+      "action": "reset configuration",
+      "to": "init"
+    },
+    {
+      "from": "bound",
+      "event": "timeout T1",
+      "action": "send DHCPREQUEST",
+      "to": "renewing"
+    },
+    {
+      "from": "renewing",
+      "event": "timeout T2",
+      "action": "send DHCPREQUEST",
+      "to": "rebinding"
+    },
+    {
+      "from": "renewing",
+      "event": "receive DHCPACK",
+      "action": "record lease",
+      "to": "bound"
+    },
+    {
+      "from": "rebinding",
+      "event": "timeout lease_expiry",
+      "action": "reset configuration",
+      "to": "init"
+    },
+    {
+      "from": "rebinding",
+      "event": "receive DHCPACK",
+      "action": "record lease",
+      "to": "bound"
+    },
+    {
+      "from": "init_reboot",
+      "event": "send DHCPREQUEST",
+      "action": "broadcast request",
+      "to": "requesting"
+    },
+    {
+      "from": "init_reboot",
+      "event": "receive DHCPACK",
+      "action": "set configuration",
+      "to": "bound"
+    },
+    {
+      "from": "init_reboot",
+      "event": "receive DHCPNAK",
+      "action": "reset configuration",
+      "to": "init"
+    },
+    {
+      "from": "bound",
+      "event": "send DHCPRELEASE",
+      "action": "release lease",
+      "to": "init"
+    }
+  ]
+}

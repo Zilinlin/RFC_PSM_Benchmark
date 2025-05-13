@@ -1,0 +1,281 @@
+{
+  "states": [
+    "Init",
+    "Early",
+    "EarlyDialog",
+    "Proceeding",
+    "Confirmed",
+    "ConfirmedDialog",
+    "Completed",
+    "Terminated",
+    "Session_Active",
+    "Session_Terminated",
+    "Calling",
+    "Trying"
+  ],
+  "initial_state": "Init",
+  "final_states": [
+    "Terminated",
+    "Session_Terminated"
+  ],
+  "transitions": [
+    {
+      "from": "Init",
+      "event": "send INVITE",
+      "action": "set timer",
+      "to": "EarlyDialog"
+    },
+    {
+      "from": "Early",
+      "event": "receive 2xx",
+      "action": "set confirmed",
+      "to": "Confirmed"
+    },
+    {
+      "from": "Early",
+      "event": "receive non-2xx",
+      "action": "set terminated",
+      "to": "Terminated"
+    },
+    {
+      "from": "Early",
+      "event": "timeout no_response",
+      "action": "set terminated",
+      "to": "Terminated"
+    },
+    {
+      "from": "EarlyDialog",
+      "event": "receive 1xx",
+      "action": "update dialog",
+      "to": "EarlyDialog"
+    },
+    {
+      "from": "EarlyDialog",
+      "event": "receive 2xx",
+      "action": "send ACK",
+      "to": "ConfirmedDialog"
+    },
+    {
+      "from": "EarlyDialog",
+      "event": "receive 3xx",
+      "action": "redirect call",
+      "to": "Terminated"
+    },
+    {
+      "from": "EarlyDialog",
+      "event": "receive 4xx",
+      "action": "send ACK",
+      "to": "Terminated"
+    },
+    {
+      "from": "EarlyDialog",
+      "event": "receive 5xx",
+      "action": "send ACK",
+      "to": "Terminated"
+    },
+    {
+      "from": "EarlyDialog",
+      "event": "receive 6xx",
+      "action": "send ACK",
+      "to": "Terminated"
+    },
+    {
+      "from": "EarlyDialog",
+      "event": "timeout",
+      "action": "send CANCEL",
+      "to": "Terminated"
+    },
+    {
+      "from": "Confirmed",
+      "event": "receive BYE",
+      "action": "set terminated",
+      "to": "Terminated"
+    },
+    {
+      "from": "Confirmed",
+      "event": "receive 481",
+      "action": "set terminated",
+      "to": "Terminated"
+    },
+    {
+      "from": "Confirmed",
+      "event": "receive 408",
+      "action": "set terminated",
+      "to": "Terminated"
+    },
+    {
+      "from": "Confirmed",
+      "event": "timeout no_response",
+      "action": "set terminated",
+      "to": "Terminated"
+    },
+    {
+      "from": "ConfirmedDialog",
+      "event": "send BYE",
+      "action": "terminate session",
+      "to": "Terminated"
+    },
+    {
+      "from": "ConfirmedDialog",
+      "event": "receive BYE",
+      "action": "terminate session",
+      "to": "Terminated"
+    },
+    {
+      "from": "Session_Active",
+      "event": "send BYE",
+      "action": "terminate session",
+      "to": "Session_Terminated"
+    },
+    {
+      "from": "Session_Active",
+      "event": "receive BYE",
+      "action": "reply 2xx",
+      "to": "Session_Terminated"
+    },
+    {
+      "from": "Early_Dialog",
+      "event": "send BYE",
+      "action": "terminate session",
+      "to": "Session_Terminated"
+    },
+    {
+      "from": "Confirmed_Dialog",
+      "event": "send BYE",
+      "action": "terminate session",
+      "to": "Session_Terminated"
+    },
+    {
+      "from": "Confirmed_Dialog",
+      "event": "receive BYE",
+      "action": "reply 2xx",
+      "to": "Session_Terminated"
+    },
+    {
+      "from": "Session_Active",
+      "event": "receive 481",
+      "action": "terminate session",
+      "to": "Session_Terminated"
+    },
+    {
+      "from": "Session_Active",
+      "event": "receive 408",
+      "action": "terminate session",
+      "to": "Session_Terminated"
+    },
+    {
+      "from": "Session_Active",
+      "event": "timeout BYE",
+      "action": "terminate session",
+      "to": "Session_Terminated"
+    },
+    {
+      "from": "Calling",
+      "event": "timeout TimerA",
+      "action": "retransmit request",
+      "to": "Calling"
+    },
+    {
+      "from": "Calling",
+      "event": "timeout TimerB",
+      "action": "inform TU timeout",
+      "to": "Terminated"
+    },
+    {
+      "from": "Calling",
+      "event": "receive 1xx",
+      "action": "pass response to TU",
+      "to": "Proceeding"
+    },
+    {
+      "from": "Calling",
+      "event": "receive 300-699",
+      "action": "pass response to TU",
+      "to": "Completed"
+    },
+    {
+      "from": "Calling",
+      "event": "receive 2xx",
+      "action": "pass response to TU",
+      "to": "Terminated"
+    },
+    {
+      "from": "Proceeding",
+      "event": "receive 1xx",
+      "action": "pass response to TU",
+      "to": "Proceeding"
+    },
+    {
+      "from": "Proceeding",
+      "event": "receive 300-699",
+      "action": "pass response to TU",
+      "to": "Completed"
+    },
+    {
+      "from": "Proceeding",
+      "event": "receive 2xx",
+      "action": "pass response to TU",
+      "to": "Terminated"
+    },
+    {
+      "from": "Completed",
+      "event": "receive retransmission",
+      "action": "retransmit ACK",
+      "to": "Completed"
+    },
+    {
+      "from": "Completed",
+      "event": "timeout TimerD",
+      "action": "terminate transaction",
+      "to": "Terminated"
+    },
+    {
+      "from": "Completed",
+      "event": "receive ACK",
+      "action": "confirm transaction",
+      "to": "Confirmed"
+    },
+    {
+      "from": "Confirmed",
+      "event": "timeout TimerI",
+      "action": "terminate transaction",
+      "to": "Terminated"
+    },
+    {
+      "from": "Trying",
+      "event": "receive 1xx",
+      "action": "pass response to TU",
+      "to": "Proceeding"
+    },
+    {
+      "from": "Trying",
+      "event": "receive 200-699",
+      "action": "pass response to TU",
+      "to": "Completed"
+    },
+    {
+      "from": "Trying",
+      "event": "timeout TimerF",
+      "action": "inform TU timeout",
+      "to": "Terminated"
+    },
+    {
+      "from": "Proceeding",
+      "event": "timeout TimerE",
+      "action": "retransmit request",
+      "to": "Proceeding"
+    },
+    {
+      "from": "Proceeding",
+      "event": "timeout TimerF",
+      "action": "inform TU timeout",
+      "to": "Terminated"
+    },
+    {
+      "from": "Completed",
+      "event": "timeout TimerK",
+      "action": "terminate transaction",
+      "to": "Terminated"
+    }
+  ]
+}

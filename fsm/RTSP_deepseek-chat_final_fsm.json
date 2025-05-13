@@ -1,0 +1,245 @@
+{
+  "states": [
+    "Init",
+    "Ready",
+    "Play"
+  ],
+  "initial_state": "Init",
+  "final_states": [],
+  "transitions": [
+    {
+      "from": "Init",
+      "event": "receive SETUP",
+      "action": "reply 200",
+      "to": "Ready"
+    },
+    {
+      "from": "Init",
+      "event": "receive SETUP",
+      "action": "set NRM=1 RP=0.0",
+      "to": "Ready"
+    },
+    {
+      "from": "Init",
+      "event": "receive SETUP with redirect",
+      "action": "reply 3rr",
+      "to": "Init"
+    },
+    {
+      "from": "Init",
+      "event": "receive REDIRECT",
+      "action": "terminate session",
+      "to": "Init"
+    },
+    {
+      "from": "Ready",
+      "event": "receive PLAY",
+      "action": "reply 200",
+      "to": "Play"
+    },
+    {
+      "from": "Ready",
+      "event": "receive SETUP with new URI",
+      "action": "set NRM +=1",
+      "to": "Ready"
+    },
+    {
+      "from": "Ready",
+      "event": "receive SETUP with prior URI",
+      "action": "change transport param",
+      "to": "Ready"
+    },
+    {
+      "from": "Ready",
+      "event": "receive TEARDOWN",
+      "action": "reply 200",
+      "to": "Init"
+    },
+    {
+      "from": "Ready",
+      "event": "receive TEARDOWN with Prs URI",
+      "action": "set NRM=0",
+      "to": "Init"
+    },
+    {
+      "from": "Ready",
+      "event": "receive TEARDOWN with md URI NRM=1",
+      "action": "set NRM=0",
+      "to": "Init"
+    },
+    {
+      "from": "Ready",
+      "event": "receive TEARDOWN with md URI NRM>1",
+      "action": "set NRM -=1",
+      "to": "Ready"
+    },
+    {
+      "from": "Ready",
+      "event": "receive PLAY with Prs URI no range",
+      "action": "play from RP",
+      "to": "Play"
+    },
+    {
+      "from": "Ready",
+      "event": "receive PLAY with Prs URI range",
+      "action": "play according to range",
+      "to": "Play"
+    },
+    {
+      "from": "Ready",
+      "event": "receive PLAY with md URI NRM=1 range",
+      "action": "play according to range",
+      "to": "Play"
+    },
+    {
+      "from": "Ready",
+      "event": "receive PLAY with md URI NRM=1",
+      "action": "play from RP",
+      "to": "Play"
+    },
+    {
+      "from": "Ready",
+      "event": "receive PAUSE",
+      "action": "reply 200",
+      "to": "Ready"
+    },
+    {
+      "from": "Ready",
+      "event": "receive PAUSE with Prs URI",
+      "action": "return PP",
+      "to": "Ready"
+    },
+    {
+      "from": "Ready",
+      "event": "receive REDIRECT with Terminate-Reason",
+      "action": "set RedP",
+      "to": "Ready"
+    },
+    {
+      "from": "Ready",
+      "event": "receive REDIRECT no Terminate-Reason",
+      "action": "remove session",
+      "to": "Init"
+    },
+    {
+      "from": "Ready",
+      "event": "timeout",
+      "action": "none",
+      "to": "Init"
+    },
+    {
+      "from": "Ready",
+      "event": "cond RedP reached",
+      "action": "TEARDOWN session",
+      "to": "Init"
+    },
+    {
+      "from": "Play",
+      "event": "receive PAUSE",
+      "action": "reply 200",
+      "to": "Ready"
+    },
+    {
+      "from": "Play",
+      "event": "receive PAUSE with Prs URI",
+      "action": "set RP to present point",
+      "to": "Ready"
+    },
+    {
+      "from": "Play",
+      "event": "cond End of media",
+      "action": "set RP to End of media",
+      "to": "Play"
+    },
+    {
+      "from": "Play",
+      "event": "cond End of range",
+      "action": "set RP to End of range",
+      "to": "Play"
+    },
+    {
+      "from": "Play",
+      "event": "receive PLAY with Prs URI no range",
+      "action": "play from present point",
+      "to": "Play"
+    },
+    {
+      "from": "Play",
+      "event": "receive PLAY with Prs URI range",
+      "action": "play according to range",
+      "to": "Play"
+    },
+    {
+      "from": "Play",
+      "event": "receive PLAY_NOTIFY",
+      "action": "reply 200",
+      "to": "Play"
+    },
+    {
+      "from": "Play",
+      "event": "receive SETUP with new URI",
+      "action": "reply 455",
+      "to": "Play"
+    },
+    {
+      "from": "Play",
+      "event": "receive SETUP with md URI",
+      "action": "reply 455",
+      "to": "Play"
+    },
+    {
+      "from": "Play",
+      "event": "receive SETUP with md URI IFI",
+      "action": "change transport param",
+      "to": "Play"
+    },
+    {
+      "from": "Play",
+      "event": "receive TEARDOWN",
+      "action": "reply 200",
+      "to": "Init"
+    },
+    {
+      "from": "Play",
+      "event": "receive TEARDOWN with Prs URI",
+      "action": "none",
+      "to": "Init"
+    },
+    {
+      "from": "Play",
+      "event": "receive TEARDOWN with md URI NRM=1",
+      "action": "set NRM=0",
+      "to": "Init"
+    },
+    {
+      "from": "Play",
+      "event": "receive TEARDOWN with md URI",
+      "action": "reply 455",
+      "to": "Play"
+    },
+    {
+      "from": "Play",
+      "event": "receive REDIRECT with Terminate-Reason",
+      "action": "set RedP",
+      "to": "Play"
+    },
+    {
+      "from": "Play",
+      "event": "receive REDIRECT",
+      "action": "remove session",
+      "to": "Init"
+    },
+    {
+      "from": "Play",
+      "event": "cond RedP reached",
+      "action": "TEARDOWN session",
+      "to": "Init"
+    },
+    {
+      "from": "Play",
+      "event": "timeout",
+      "action": "stop media playout",
+      "to": "Init"
+    }
+  ]
+}
