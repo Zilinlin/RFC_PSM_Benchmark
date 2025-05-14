@@ -229,56 +229,118 @@ def plot_score_matrix(score_matrix, threshold=0.5, output_file='score_matrix.png
     plt.show()
     
 
-def match_transitions_fuzzy_states(trans1, trans2, threshold=0.5, allow_partial=True):
+# def match_transitions_fuzzy_states(trans1, trans2, threshold=0.5, allow_partial=True):
+#     """
+#     Compare transitions from two FSMs and classify matches as fully correct, partially correct, or unmatched.
+#     """
+#     matched = []
+#     unmatched = []
+#     fully_correct = 0
+#     partially_correct = 0
+#     trans2_copy = trans2.copy()
+
+#     for idx1, t1 in enumerate(trans1):
+#         found = False
+#         for idx2, t2 in enumerate(trans2_copy):
+#             from_score = compute_similarity(t1.get("from", ""), t2.get("from", ""))
+#             to_score = compute_similarity(t1.get("to", ""), t2.get("to", ""))
+#             event_score = compute_similarity(t1.get("event", ""), t2.get("event", ""))
+#             action_score = compute_similarity(t1.get("action", ""), t2.get("action", ""))
+
+#             from_match = from_score >= threshold
+#             to_match = to_score >= threshold
+#             event_match = event_score >= threshold
+#             action_match = action_score >= threshold
+
+#             # Debugging output
+#             print(f"\nComparing Transition {idx1} (trans1) with Transition {idx2} (trans2):")
+#             print(f"  From: '{t1.get('from')}' vs '{t2.get('from')}' | Match: {from_match} | Score: {from_score:.2f}")
+#             print(f"  To: '{t1.get('to')}' vs '{t2.get('to')}' | Match: {to_match} | Score: {to_score:.2f}")
+#             print(f"  Event: '{t1.get('event')}' vs '{t2.get('event')}' | Match: {event_match} | Score: {event_score:.2f}")
+#             print(f"  Action: '{t1.get('action')}' vs '{t2.get('action')}' | Match: {action_match} | Score: {action_score:.2f}")
+
+#             if from_match and to_match:
+#                 if event_match and action_match:
+#                     matched.append((t1, t2))
+#                     fully_correct += 1
+#                     trans2_copy.remove(t2)
+#                     found = True
+#                     print("  --> Fully Matched\n")
+#                     break
+#                 elif allow_partial and (event_match or action_match):
+#                     matched.append((t1, t2))
+#                     partially_correct += 1
+#                     trans2_copy.remove(t2)
+#                     found = True
+#                     print("  --> Partially Matched\n")
+#                     break
+#         if not found:
+#             unmatched.append(t1)
+#             print("  --> Not Matched\n")
+
+#     return matched, unmatched, fully_correct, partially_correct
+
+
+
+def match_transitions_combined_event_action(trans1, trans2, threshold=0.5,
+                                            if_partial=True):
     """
-    Compare transitions from two FSMs and classify matches as fully correct, partially correct, or unmatched.
+    Compare transitions from two FSMs using a precomputed state_match_map for 'from' and 'to' states,
+    and a single combined similarity score for event+action.
+    
+    Args:
+      trans1: list of transition dicts from extracted FSM
+      trans2: list of transition dicts from ground truth FSM
+      state_match_map: dict mapping extracted state name -> matched GT state name
+      threshold: float threshold for combined event/action similarity
+    
+    Returns:
+      matched: list of (t1, t2) pairs that fully match
+      unmatched: list of t1 that did not match
+      fully_correct: count of fully correct transitions
     """
     matched = []
     unmatched = []
     fully_correct = 0
-    partially_correct = 0
     trans2_copy = trans2.copy()
-
-    for idx1, t1 in enumerate(trans1):
+    
+    for t1 in trans1:
         found = False
-        for idx2, t2 in enumerate(trans2_copy):
+        for t2 in list(trans2_copy):
+            # 1) State match via precomputed map
+            # from_match = state_match_map.get(t1["from"]) == t2["from"]
+            # to_match   = state_match_map.get(t1["to"])   == t2["to"]
             from_score = compute_similarity(t1.get("from", ""), t2.get("from", ""))
-            to_score = compute_similarity(t1.get("to", ""), t2.get("to", ""))
-            event_score = compute_similarity(t1.get("event", ""), t2.get("event", ""))
-            action_score = compute_similarity(t1.get("action", ""), t2.get("action", ""))
-
+            to_score   = compute_similarity(t1.get("to", ""), t2.get("to", ""))
             from_match = from_score >= threshold
-            to_match = to_score >= threshold
-            event_match = event_score >= threshold
-            action_match = action_score >= threshold
-
-            # Debugging output
-            print(f"\nComparing Transition {idx1} (trans1) with Transition {idx2} (trans2):")
-            print(f"  From: '{t1.get('from')}' vs '{t2.get('from')}' | Match: {from_match} | Score: {from_score:.2f}")
-            print(f"  To: '{t1.get('to')}' vs '{t2.get('to')}' | Match: {to_match} | Score: {to_score:.2f}")
-            print(f"  Event: '{t1.get('event')}' vs '{t2.get('event')}' | Match: {event_match} | Score: {event_score:.2f}")
-            print(f"  Action: '{t1.get('action')}' vs '{t2.get('action')}' | Match: {action_match} | Score: {action_score:.2f}")
-
-            if from_match and to_match:
-                if event_match and action_match:
-                    matched.append((t1, t2))
-                    fully_correct += 1
-                    trans2_copy.remove(t2)
-                    found = True
-                    print("  --> Fully Matched\n")
-                    break
-                elif allow_partial and (event_match or action_match):
-                    matched.append((t1, t2))
-                    partially_correct += 1
-                    trans2_copy.remove(t2)
-                    found = True
-                    print("  --> Partially Matched\n")
-                    break
+            to_match   = to_score >= threshold
+            
+            # 2) Compute combined event+action similarity
+            # ev_score     = compute_similarity(t1.get("event", ""),  t2.get("event", ""))
+            # action_score = compute_similarity(t1.get("action", ""), t2.get("action", ""))
+            # combined_score = (ev_score + action_score) / 2
+            if if_partial:
+                ev_score     = compute_similarity(t1.get("event", ""),  t2.get("event", ""))
+                action_score = compute_similarity(t1.get("action", ""), t2.get("action", ""))
+                combined_score = max(ev_score,action_score)
+            else:
+                label1 = t1.get("event", "") + t1.get("action", "")
+                label2 = t2.get("event", "") + t2.get("action", "")
+                combined_score = compute_similarity(label1, label2)
+            
+            # 3) Full match if both states match and combined >= threshold
+            if from_match and to_match and combined_score >= threshold:
+                matched.append((t1, t2))
+                fully_correct += 1
+                trans2_copy.remove(t2)
+                found = True
+                break
+        
         if not found:
             unmatched.append(t1)
-            print("  --> Not Matched\n")
+    
+    return matched, unmatched, fully_correct
 
-    return matched, unmatched, fully_correct, partially_correct
 
 
 def compute_match_metrics(matched, gt_trans, ex_trans):
@@ -307,69 +369,150 @@ def evaluate_fsm_similarity(fsm1_json, fsm2_json, allow_partial=True, threshold=
 
 
 
-def batch_evaluate_fsm_similarity():
-    # IMAP ground truth file is missing, need to handle this case.
-    # "IMAP", 
-    # "POP3" has bugs
-    #protocols = ["IMAP", "POP3"]
-    protocols = ["MQTT","PPP","PPTP", "BGP"] # check for testing
-    #protocols = ["SIP", "RTSP", "DCCP", "DHCP", "FTP", "NNTP", "SMTP", "TCP"]
-    # close_models = ["claude-3-7-sonnet-20250219"]
-    # , "gemini-2.0-flash"
-    close_models = ["deepseek-reasoner", "gpt-4o-mini", "claude-3-7-sonnet-20250219", "gemini-2.0-flash"]
-    fsm_dir = "fsm"
-    results = {}
+# def batch_evaluate_fsm_similarity():
+#     # IMAP ground truth file is missing, need to handle this case.
+#     # "IMAP", 
+#     # "POP3" has bugs
+#     #protocols = ["IMAP", "POP3"]
+#     protocols = ["MQTT","PPP","PPTP", "BGP"] # check for testing
+#     #protocols = ["SIP", "RTSP", "DCCP", "DHCP", "FTP", "NNTP", "SMTP", "TCP"]
+#     # close_models = ["claude-3-7-sonnet-20250219"]
+#     # , "gemini-2.0-flash"
+#     close_models = ["deepseek-reasoner", "gpt-4o-mini", "claude-3-7-sonnet-20250219", "gemini-2.0-flash"]
+#     fsm_dir = "fsm"
+#     results = {}
 
-    # Iterate over each protocol
+#     # Iterate over each protocol
+#     for protocol in protocols:
+#         protocol_dir = os.path.join(protocol)
+#         gt_file = None
+
+#         # Find the ground truth FSM file for the protocol
+#         for file in os.listdir(protocol_dir):
+#             if file.endswith("_state_machine.json"):
+#                 gt_file = os.path.join(protocol_dir, file)
+#                 break
+
+#         if not gt_file:
+#             continue
+
+#         # Load the ground truth FSM
+#         with open(gt_file, 'r') as f:
+#             ground_truth = json.load(f)
+
+#         # Iterate over each model
+#         for model in close_models:
+#             extracted_file = None
+
+#             # Find the extracted FSM file for the protocol and model
+#             for file in os.listdir(fsm_dir):
+#                 if protocol in file and model in file and file.endswith(".json"):
+#                     extracted_file = os.path.join(fsm_dir, file)
+#                     break
+
+#             if not extracted_file:
+#                 continue
+
+#             # Load the extracted FSM
+#             with open(extracted_file, 'r') as f:
+#                 extracted = json.load(f)
+
+#             # Evaluate the similarity between ground truth and extracted FSMs
+#             results_key = f"{protocol}_{model}"
+#             results[results_key] = {
+#                 "with_partial": evaluate_fsm_similarity(ground_truth, extracted, allow_partial=True),
+#                 "no_partial": evaluate_fsm_similarity(ground_truth, extracted, allow_partial=False)
+#             }
+
+#             # Print the evaluation results
+#             print(f"Evaluated {protocol} with model {model}")
+#             print(f"Results for {results_key}:")
+#             print(results[results_key])
+
+#             # Write the current results to the output file
+#             with open("fsm_evaluation_results.json", "w") as outfile:
+#                 json.dump(results, outfile, indent=2)
+
+
+def batch_evaluate_transitions_combined(
+    protocols, models, fsm_dir, if_partial=True, state_threshold=0.5, trans_threshold=0.5
+):
+    """
+    For each (protocol, model) pair:
+      1. Load ground-truth FSM and extracted FSM.
+      2. match_states() to get state_match_map.
+      3. match_transitions_combined_event_action() for transitions.
+      4. Compute metrics and collect into a DataFrame.
+    """
+    rows = []
     for protocol in protocols:
-        protocol_dir = os.path.join(protocol)
-        gt_file = None
-
-        # Find the ground truth FSM file for the protocol
-        for file in os.listdir(protocol_dir):
-            if file.endswith("_state_machine.json"):
-                gt_file = os.path.join(protocol_dir, file)
+        print("current protocol:", protocol)
+        # 1) Locate GT FSM
+        gt_path = None
+        for fn in os.listdir(protocol):
+            if fn.endswith("_state_machine.json"):
+                gt_path = os.path.join(protocol, fn)
                 break
-
-        if not gt_file:
+        if not gt_path:
             continue
+        with open(gt_path) as f:
+            gt_fsm = json.load(f)
+        gt_states      = gt_fsm.get("states", [])
+        gt_transitions = gt_fsm.get("transitions", [])
 
-        # Load the ground truth FSM
-        with open(gt_file, 'r') as f:
-            ground_truth = json.load(f)
-
-        # Iterate over each model
-        for model in close_models:
-            extracted_file = None
-
-            # Find the extracted FSM file for the protocol and model
-            for file in os.listdir(fsm_dir):
-                if protocol in file and model in file and file.endswith(".json"):
-                    extracted_file = os.path.join(fsm_dir, file)
+        for model in models:
+            print("current model:", model)
+            # 2) Locate extracted FSM
+            ext_path = None
+            for fn in os.listdir(fsm_dir):
+                if protocol in fn and model in fn and fn.endswith(".json"):
+                    ext_path = os.path.join(fsm_dir, fn)
                     break
-
-            if not extracted_file:
+            if not ext_path:
                 continue
+            with open(ext_path) as f:
+                ext_fsm = json.load(f)
+            ext_states      = ext_fsm.get("states", [])
+            ext_transitions = ext_fsm.get("transitions", [])
 
-            # Load the extracted FSM
-            with open(extracted_file, 'r') as f:
-                extracted = json.load(f)
+            # 3) Build state_match_map via your existing match_states()
+            state_matches, _ = match_states(ext_states, gt_states, threshold=state_threshold)
+            state_match_map = {src: tgt for src, tgt, score in state_matches if tgt is not None}
 
-            # Evaluate the similarity between ground truth and extracted FSMs
-            results_key = f"{protocol}_{model}"
-            results[results_key] = {
-                "with_partial": evaluate_fsm_similarity(ground_truth, extracted, allow_partial=True),
-                "no_partial": evaluate_fsm_similarity(ground_truth, extracted, allow_partial=False)
-            }
+            # 4) Match transitions with combined event+action similarity
+            matched, unmatched_ext, full_cnt = match_transitions_combined_event_action(
+                ext_transitions,
+                gt_transitions,
+                # state_match_map,
+                threshold=trans_threshold,
+                if_partial=if_partial
+            )
 
-            # Print the evaluation results
-            print(f"Evaluated {protocol} with model {model}")
-            print(f"Results for {results_key}:")
-            print(results[results_key])
+            # 5) Compute metrics
+            total_ext = len(ext_transitions)
+            total_gt  = len(gt_transitions)
+            matched_count = full_cnt
+            unmatched_gt   = total_gt - matched_count
+            unmatched_ex   = total_ext - matched_count
+            precision = matched_count / total_ext if total_ext > 0 else 0
+            recall    = matched_count / total_gt  if total_gt  > 0 else 0
+            f1 = (2 * precision * recall) / (precision + recall) if (precision+recall)>0 else 0
 
-            # Write the current results to the output file
-            with open("fsm_evaluation_results.json", "w") as outfile:
-                json.dump(results, outfile, indent=2)
+            rows.append({
+                "Protocol": protocol,
+                "Model": model,
+                "TotalExtracted": total_ext,
+                "TotalGT": total_gt,
+                "Matched": matched_count,
+                "UnmatchedGT": unmatched_gt,
+                "UnmatchedExtracted": unmatched_ex,
+                "Precision": round(precision, 3),
+                "Recall": round(recall, 3),
+                "F1-Score": round(f1, 3)
+            })
+
+    return pd.DataFrame(rows)
+
 
 
 if __name__ == "__main__":
@@ -438,25 +581,28 @@ if __name__ == "__main__":
     '''The following is to get the LaTeX table for each model of all protocols'''
     '''for the state metching results'''
     
-    # Group by Model and calculate the sum for Total Extracted, Total GT, and Matched
-    model_summary = summary_df.groupby("Model")[["Total Extracted", "Total GT", "Matched"]].sum().reset_index()
+    # # Group by Model and calculate the sum for Total Extracted, Total GT, and Matched
+    # model_summary = summary_df.groupby("Model")[["Total Extracted", "Total GT", "Matched"]].sum().reset_index()
 
-    # Calculate overall Precision, Recall, and F1-Score for each model
-    model_summary["Precision"] = model_summary["Matched"] / model_summary["Total Extracted"]
-    model_summary["Recall"] = model_summary["Matched"] / model_summary["Total GT"]
-    model_summary["F1-Score"] = 2 * (model_summary["Precision"] * model_summary["Recall"]) / (model_summary["Precision"] + model_summary["Recall"])
+    # # Calculate overall Precision, Recall, and F1-Score for each model
+    # model_summary["Precision"] = model_summary["Matched"] / model_summary["Total Extracted"]
+    # model_summary["Recall"] = model_summary["Matched"] / model_summary["Total GT"]
+    # model_summary["F1-Score"] = 2 * (model_summary["Precision"] * model_summary["Recall"]) / (model_summary["Precision"] + model_summary["Recall"])
 
-    latex_code = model_summary.to_latex(
-        index=False,
-        float_format="%.3f",
-        column_format="|l|c|c|c|c|c|c|",
-        longtable=False,
-        caption="Overall Model Performance on States Matching of Different Protocols",
-        label="tab:model-performance-summary",
-        escape=False
-    )
+    # latex_code = model_summary.to_latex(
+    #     index=False,
+    #     float_format="%.3f",
+    #     column_format="|l|c|c|c|c|c|c|",
+    #     longtable=False,
+    #     caption="Overall Model Performance on States Matching of Different Protocols",
+    #     label="tab:model-performance-summary",
+    #     escape=False
+    # )
     
     
-    print("Model performance summary generated successfully.\n", latex_code)
-        
+    # print("Model performance summary generated successfully.\n", latex_code)
+    
+    '''start the trasistion matching'''
+    transition_matches_df = batch_evaluate_transitions_combined(protocols=protocols, models=models, fsm_dir="fsm", if_partial=False)
+    transition_matches_df.to_csv("transitions_match_results_whole.csv", index=False)
     

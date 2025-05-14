@@ -1,0 +1,266 @@
+\begin{table}
+\caption{BGP Partially Correct Transition Extraction Metrics}
+\label{tab:bgp-partial-transition-matching-metrics}
+\begin{tabular}{llcccccc}
+\toprule
+Protocol & Model & TotalExtracted & TotalGT & Matched & Precision & Recall & F1-Score \\
+\midrule
+BGP & DS-R1 & 20 & 26 & 14 & 0.700 & 0.538 & 0.609 \\
+BGP & Gpt4o-Mini & 25 & 26 & 7 & 0.280 & 0.269 & 0.275 \\
+BGP & Claude3 & 60 & 26 & 23 & 0.383 & 0.885 & 0.535 \\
+BGP & Gemini2 & 101 & 26 & 26 & 0.257 & 1.000 & 0.409 \\
+BGP & DS-V3 & 32 & 26 & 15 & 0.469 & 0.577 & 0.517 \\
+BGP & QWQ & 7 & 26 & 3 & 0.429 & 0.115 & 0.182 \\
+BGP & QWen3 & 11 & 26 & 4 & 0.364 & 0.154 & 0.216 \\
+BGP & Gemma3 & 21 & 26 & 3 & 0.143 & 0.115 & 0.128 \\
+BGP & Mistral & 9 & 26 & 0 & 0.000 & 0.000 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{table}
+\caption{DCCP Partially Correct Transition Extraction Metrics}
+\label{tab:dccp-partial-transition-matching-metrics}
+\begin{tabular}{llcccccc}
+\toprule
+Protocol & Model & TotalExtracted & TotalGT & Matched & Precision & Recall & F1-Score \\
+\midrule
+DCCP & DS-R1 & 29 & 25 & 18 & 0.621 & 0.720 & 0.667 \\
+DCCP & Gpt4o-Mini & 55 & 25 & 8 & 0.145 & 0.320 & 0.200 \\
+DCCP & Claude3 & 40 & 25 & 19 & 0.475 & 0.760 & 0.585 \\
+DCCP & Gemini2 & 44 & 25 & 16 & 0.364 & 0.640 & 0.464 \\
+DCCP & DS-V3 & 28 & 25 & 14 & 0.500 & 0.560 & 0.528 \\
+DCCP & QWQ & 4 & 25 & 1 & 0.250 & 0.040 & 0.069 \\
+DCCP & QWen3 & 15 & 25 & 5 & 0.333 & 0.200 & 0.250 \\
+DCCP & Gemma3 & 18 & 25 & 6 & 0.333 & 0.240 & 0.279 \\
+DCCP & Mistral & 9 & 25 & 0 & 0.000 & 0.000 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{table}
+\caption{DHCP Partially Correct Transition Extraction Metrics}
+\label{tab:dhcp-partial-transition-matching-metrics}
+\begin{tabular}{llcccccc}
+\toprule
+Protocol & Model & TotalExtracted & TotalGT & Matched & Precision & Recall & F1-Score \\
+\midrule
+DHCP & DS-R1 & 20 & 19 & 12 & 0.600 & 0.632 & 0.615 \\
+DHCP & Gpt4o-Mini & 26 & 19 & 9 & 0.346 & 0.474 & 0.400 \\
+DHCP & Claude3 & 18 & 19 & 14 & 0.778 & 0.737 & 0.757 \\
+DHCP & Gemini2 & 27 & 19 & 7 & 0.259 & 0.368 & 0.304 \\
+DHCP & DS-V3 & 15 & 19 & 10 & 0.667 & 0.526 & 0.588 \\
+DHCP & QWQ & 6 & 19 & 4 & 0.667 & 0.211 & 0.320 \\
+DHCP & QWen3 & 4 & 19 & 2 & 0.500 & 0.105 & 0.174 \\
+DHCP & Gemma3 & 10 & 19 & 2 & 0.200 & 0.105 & 0.138 \\
+DHCP & Mistral & 5 & 19 & 2 & 0.400 & 0.105 & 0.167 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{table}
+\caption{FTP Partially Correct Transition Extraction Metrics}
+\label{tab:ftp-partial-transition-matching-metrics}
+\begin{tabular}{llcccccc}
+\toprule
+Protocol & Model & TotalExtracted & TotalGT & Matched & Precision & Recall & F1-Score \\
+\midrule
+FTP & DS-R1 & 23 & 24 & 5 & 0.217 & 0.208 & 0.213 \\
+FTP & Gpt4o-Mini & 53 & 24 & 4 & 0.075 & 0.167 & 0.104 \\
+FTP & Claude3 & 46 & 24 & 4 & 0.087 & 0.167 & 0.114 \\
+FTP & Gemini2 & 51 & 24 & 6 & 0.118 & 0.250 & 0.160 \\
+FTP & DS-V3 & 77 & 24 & 7 & 0.091 & 0.292 & 0.139 \\
+FTP & QWQ & 7 & 24 & 3 & 0.429 & 0.125 & 0.194 \\
+FTP & QWen3 & 14 & 24 & 1 & 0.071 & 0.042 & 0.053 \\
+FTP & Gemma3 & 42 & 24 & 5 & 0.119 & 0.208 & 0.152 \\
+FTP & Mistral & 33 & 24 & 3 & 0.091 & 0.125 & 0.105 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{table}
+\caption{IMAP Partially Correct Transition Extraction Metrics}
+\label{tab:imap-partial-transition-matching-metrics}
+\begin{tabular}{llcccccc}
+\toprule
+Protocol & Model & TotalExtracted & TotalGT & Matched & Precision & Recall & F1-Score \\
+\midrule
+IMAP & DS-R1 & 35 & 11 & 6 & 0.171 & 0.545 & 0.261 \\
+IMAP & Gpt4o-Mini & 56 & 11 & 5 & 0.089 & 0.455 & 0.149 \\
+IMAP & Claude3 & 48 & 11 & 7 & 0.146 & 0.636 & 0.237 \\
+IMAP & Gemini2 & 90 & 11 & 7 & 0.078 & 0.636 & 0.139 \\
+IMAP & DS-V3 & 16 & 11 & 6 & 0.375 & 0.545 & 0.444 \\
+IMAP & QWQ & 4 & 11 & 3 & 0.750 & 0.273 & 0.400 \\
+IMAP & QWen3 & 4 & 11 & 2 & 0.500 & 0.182 & 0.267 \\
+IMAP & Gemma3 & 17 & 11 & 5 & 0.294 & 0.455 & 0.357 \\
+IMAP & Mistral & 20 & 11 & 6 & 0.300 & 0.545 & 0.387 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{table}
+\caption{MQTT Partially Correct Transition Extraction Metrics}
+\label{tab:mqtt-partial-transition-matching-metrics}
+\begin{tabular}{llcccccc}
+\toprule
+Protocol & Model & TotalExtracted & TotalGT & Matched & Precision & Recall & F1-Score \\
+\midrule
+MQTT & DS-R1 & 16 & 17 & 2 & 0.125 & 0.118 & 0.121 \\
+MQTT & Gpt4o-Mini & 37 & 17 & 3 & 0.081 & 0.176 & 0.111 \\
+MQTT & Claude3 & 45 & 17 & 2 & 0.044 & 0.118 & 0.065 \\
+MQTT & Gemini2 & 48 & 17 & 2 & 0.042 & 0.118 & 0.062 \\
+MQTT & DS-V3 & 6 & 17 & 0 & 0.000 & 0.000 & 0.000 \\
+MQTT & QWQ & 18 & 17 & 1 & 0.056 & 0.059 & 0.057 \\
+MQTT & QWen3 & 6 & 17 & 1 & 0.167 & 0.059 & 0.087 \\
+MQTT & Gemma3 & 19 & 17 & 1 & 0.053 & 0.059 & 0.056 \\
+MQTT & Mistral & 37 & 17 & 3 & 0.081 & 0.176 & 0.111 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{table}
+\caption{NNTP Partially Correct Transition Extraction Metrics}
+\label{tab:nntp-partial-transition-matching-metrics}
+\begin{tabular}{llcccccc}
+\toprule
+Protocol & Model & TotalExtracted & TotalGT & Matched & Precision & Recall & F1-Score \\
+\midrule
+NNTP & DS-R1 & 73 & 16 & 2 & 0.027 & 0.125 & 0.045 \\
+NNTP & Gpt4o-Mini & 68 & 16 & 0 & 0.000 & 0.000 & 0.000 \\
+NNTP & Claude3 & 75 & 16 & 0 & 0.000 & 0.000 & 0.000 \\
+NNTP & Gemini2 & 116 & 16 & 2 & 0.017 & 0.125 & 0.030 \\
+NNTP & DS-V3 & 25 & 16 & 2 & 0.080 & 0.125 & 0.098 \\
+NNTP & QWQ & 3 & 16 & 0 & 0.000 & 0.000 & 0.000 \\
+NNTP & QWen3 & 6 & 16 & 0 & 0.000 & 0.000 & 0.000 \\
+NNTP & Gemma3 & 14 & 16 & 0 & 0.000 & 0.000 & 0.000 \\
+NNTP & Mistral & 4 & 16 & 0 & 0.000 & 0.000 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{table}
+\caption{POP3 Partially Correct Transition Extraction Metrics}
+\label{tab:pop3-partial-transition-matching-metrics}
+\begin{tabular}{llcccccc}
+\toprule
+Protocol & Model & TotalExtracted & TotalGT & Matched & Precision & Recall & F1-Score \\
+\midrule
+POP3 & DS-R1 & 21 & 18 & 12 & 0.571 & 0.667 & 0.615 \\
+POP3 & Gpt4o-Mini & 33 & 18 & 12 & 0.364 & 0.667 & 0.471 \\
+POP3 & Claude3 & 26 & 18 & 9 & 0.346 & 0.500 & 0.409 \\
+POP3 & Gemini2 & 39 & 18 & 13 & 0.333 & 0.722 & 0.456 \\
+POP3 & DS-V3 & 20 & 18 & 10 & 0.500 & 0.556 & 0.526 \\
+POP3 & QWQ & 5 & 18 & 1 & 0.200 & 0.056 & 0.087 \\
+POP3 & QWen3 & 8 & 18 & 4 & 0.500 & 0.222 & 0.308 \\
+POP3 & Gemma3 & 38 & 18 & 10 & 0.263 & 0.556 & 0.357 \\
+POP3 & Mistral & 29 & 18 & 9 & 0.310 & 0.500 & 0.383 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{table}
+\caption{PPP Partially Correct Transition Extraction Metrics}
+\label{tab:ppp-partial-transition-matching-metrics}
+\begin{tabular}{llcccccc}
+\toprule
+Protocol & Model & TotalExtracted & TotalGT & Matched & Precision & Recall & F1-Score \\
+\midrule
+PPP & DS-R1 & 111 & 27 & 10 & 0.090 & 0.370 & 0.145 \\
+PPP & Gpt4o-Mini & 33 & 27 & 5 & 0.152 & 0.185 & 0.167 \\
+PPP & Claude3 & 138 & 27 & 18 & 0.130 & 0.667 & 0.218 \\
+PPP & Gemini2 & 126 & 27 & 20 & 0.159 & 0.741 & 0.261 \\
+PPP & DS-V3 & 21 & 27 & 3 & 0.143 & 0.111 & 0.125 \\
+PPP & QWQ & 5 & 27 & 0 & 0.000 & 0.000 & 0.000 \\
+PPP & QWen3 & 21 & 27 & 1 & 0.048 & 0.037 & 0.042 \\
+PPP & Gemma3 & 9 & 27 & 0 & 0.000 & 0.000 & 0.000 \\
+PPP & Mistral & 12 & 27 & 0 & 0.000 & 0.000 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{table}
+\caption{PPTP Partially Correct Transition Extraction Metrics}
+\label{tab:pptp-partial-transition-matching-metrics}
+\begin{tabular}{llcccccc}
+\toprule
+Protocol & Model & TotalExtracted & TotalGT & Matched & Precision & Recall & F1-Score \\
+\midrule
+PPTP & DS-R1 & 18 & 19 & 12 & 0.667 & 0.632 & 0.649 \\
+PPTP & Gpt4o-Mini & 29 & 19 & 1 & 0.034 & 0.053 & 0.042 \\
+PPTP & Claude3 & 56 & 19 & 4 & 0.071 & 0.211 & 0.107 \\
+PPTP & Gemini2 & 23 & 19 & 0 & 0.000 & 0.000 & 0.000 \\
+PPTP & DS-V3 & 34 & 19 & 11 & 0.324 & 0.579 & 0.415 \\
+PPTP & QWQ & 2 & 19 & 0 & 0.000 & 0.000 & 0.000 \\
+PPTP & QWen3 & 6 & 19 & 4 & 0.667 & 0.211 & 0.320 \\
+PPTP & Gemma3 & 6 & 19 & 2 & 0.333 & 0.105 & 0.160 \\
+PPTP & Mistral & 12 & 19 & 1 & 0.083 & 0.053 & 0.065 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{table}
+\caption{RTSP Partially Correct Transition Extraction Metrics}
+\label{tab:rtsp-partial-transition-matching-metrics}
+\begin{tabular}{llcccccc}
+\toprule
+Protocol & Model & TotalExtracted & TotalGT & Matched & Precision & Recall & F1-Score \\
+\midrule
+RTSP & DS-R1 & 41 & 33 & 19 & 0.463 & 0.576 & 0.514 \\
+RTSP & Gpt4o-Mini & 70 & 33 & 0 & 0.000 & 0.000 & 0.000 \\
+RTSP & Claude3 & 89 & 33 & 19 & 0.213 & 0.576 & 0.311 \\
+RTSP & Gemini2 & 78 & 33 & 12 & 0.154 & 0.364 & 0.216 \\
+RTSP & DS-V3 & 39 & 33 & 30 & 0.769 & 0.909 & 0.833 \\
+RTSP & QWQ & 2 & 33 & 0 & 0.000 & 0.000 & 0.000 \\
+RTSP & QWen3 & 10 & 33 & 6 & 0.600 & 0.182 & 0.279 \\
+RTSP & Gemma3 & 24 & 33 & 4 & 0.167 & 0.121 & 0.140 \\
+RTSP & Mistral & 33 & 33 & 0 & 0.000 & 0.000 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{table}
+\caption{SIP Partially Correct Transition Extraction Metrics}
+\label{tab:sip-partial-transition-matching-metrics}
+\begin{tabular}{llcccccc}
+\toprule
+Protocol & Model & TotalExtracted & TotalGT & Matched & Precision & Recall & F1-Score \\
+\midrule
+SIP & DS-R1 & 58 & 20 & 12 & 0.207 & 0.600 & 0.308 \\
+SIP & Gpt4o-Mini & 127 & 20 & 10 & 0.079 & 0.500 & 0.136 \\
+SIP & Claude3 & 164 & 20 & 2 & 0.012 & 0.100 & 0.022 \\
+SIP & Gemini2 & 180 & 20 & 20 & 0.111 & 1.000 & 0.200 \\
+SIP & DS-V3 & 43 & 20 & 14 & 0.326 & 0.700 & 0.444 \\
+SIP & QWQ & 5 & 20 & 0 & 0.000 & 0.000 & 0.000 \\
+SIP & QWen3 & 11 & 20 & 3 & 0.273 & 0.150 & 0.194 \\
+SIP & Gemma3 & 47 & 20 & 2 & 0.043 & 0.100 & 0.060 \\
+SIP & Mistral & 30 & 20 & 0 & 0.000 & 0.000 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{table}
+\caption{SMTP Partially Correct Transition Extraction Metrics}
+\label{tab:smtp-partial-transition-matching-metrics}
+\begin{tabular}{llcccccc}
+\toprule
+Protocol & Model & TotalExtracted & TotalGT & Matched & Precision & Recall & F1-Score \\
+\midrule
+SMTP & DS-R1 & 45 & 22 & 0 & 0.000 & 0.000 & 0.000 \\
+SMTP & Gpt4o-Mini & 52 & 22 & 0 & 0.000 & 0.000 & 0.000 \\
+SMTP & Claude3 & 40 & 22 & 0 & 0.000 & 0.000 & 0.000 \\
+SMTP & Gemini2 & 32 & 22 & 2 & 0.062 & 0.091 & 0.074 \\
+SMTP & DS-V3 & 18 & 22 & 1 & 0.056 & 0.045 & 0.050 \\
+SMTP & QWQ & 11 & 22 & 0 & 0.000 & 0.000 & 0.000 \\
+SMTP & QWen3 & 7 & 22 & 0 & 0.000 & 0.000 & 0.000 \\
+SMTP & Gemma3 & 6 & 22 & 0 & 0.000 & 0.000 & 0.000 \\
+SMTP & Mistral & 35 & 22 & 0 & 0.000 & 0.000 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+\begin{table}
+\caption{TCP Partially Correct Transition Extraction Metrics}
+\label{tab:tcp-partial-transition-matching-metrics}
+\begin{tabular}{llcccccc}
+\toprule
+Protocol & Model & TotalExtracted & TotalGT & Matched & Precision & Recall & F1-Score \\
+\midrule
+TCP & DS-R1 & 15 & 20 & 11 & 0.733 & 0.550 & 0.629 \\
+TCP & Gpt4o-Mini & 10 & 20 & 4 & 0.400 & 0.200 & 0.267 \\
+TCP & Claude3 & 20 & 20 & 13 & 0.650 & 0.650 & 0.650 \\
+TCP & Gemini2 & 45 & 20 & 5 & 0.111 & 0.250 & 0.154 \\
+TCP & DS-V3 & 12 & 20 & 7 & 0.583 & 0.350 & 0.438 \\
+TCP & QWQ & 9 & 20 & 5 & 0.556 & 0.250 & 0.345 \\
+TCP & QWen3 & 9 & 20 & 5 & 0.556 & 0.250 & 0.345 \\
+TCP & Gemma3 & 14 & 20 & 4 & 0.286 & 0.200 & 0.235 \\
+TCP & Mistral & 11 & 20 & 2 & 0.182 & 0.100 & 0.129 \\
+\bottomrule
+\end{tabular}
+\end{table}
