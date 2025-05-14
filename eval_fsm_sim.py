@@ -105,9 +105,9 @@ def match_all_states(models, protocols, fsm_dir, threshold=0.5):
             matched_count = len([m for m in matches if m[1] is not None])
             unmatched_gt = len(gt_states) - matched_count
             unmatched_extracted = len(ext_states) - matched_count
-            precision = matched_count / len(ext_states) if len(ext_states) > 0 else 0
-            recall = matched_count / len(gt_states) if len(gt_states) > 0 else 0
-            f1_score = (2 * precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+            precision = round(matched_count / len(ext_states), 3) if len(ext_states) > 0 else 0
+            recall = round(matched_count / len(gt_states), 3) if len(gt_states) > 0 else 0
+            f1_score = round((2 * precision * recall) / (precision + recall), 3) if (precision + recall) > 0 else 0
 
             # Store results
             all_matches[(protocol, model)] = {
@@ -123,10 +123,10 @@ def match_all_states(models, protocols, fsm_dir, threshold=0.5):
             }
 
             # Append summary stats for later table generation
-            summary_stats.append([protocol, model, len(ext_states), len(gt_states), matched_count, unmatched_gt, unmatched_extracted, precision, recall, f1_score])
+            summary_stats.append([protocol, model, len(ext_states), len(gt_states), matched_count, precision, recall, f1_score])
 
     # Return both detailed matches and summary stats for table generation
-    return all_matches, pd.DataFrame(summary_stats, columns=["Protocol", "Model", "Total Extracted", "Total GT", "Matched", "Unmatched (GT)", "Unmatched (Extracted)", "Precision", "Recall", "F1-Score"])
+    return all_matches, pd.DataFrame(summary_stats, columns=["Protocol", "Model", "Total Extracted", "Total GT", "Matched","Precision", "Recall", "F1-Score"])
 
 def compute_similarity(a, b):
     emb1 = model.encode(a, convert_to_tensor=True)
@@ -382,26 +382,81 @@ if __name__ == "__main__":
     
     
     '''get the initial states results'''
-    initial_state_results, score_matrix = compare_initial_states(models, protocols, fsm_dir="fsm", threshold=0.5)
-    print("Initial State Results:", initial_state_results)
-    print("Score Matrix:\n", score_matrix)
+    # initial_state_results, score_matrix = compare_initial_states(models, protocols, fsm_dir="fsm", threshold=0.5)
+    # print("Initial State Results:", initial_state_results)
+    # print("Score Matrix:\n", score_matrix)
     
-    # Replace with your actual score matrix DataFrame
-    score_matrix.columns = [model_name_mapping.get(col, col) for col in score_matrix.columns]
-    plot_score_matrix(score_matrix, threshold=0.5, output_file='initial_state_score_matrix.png')
+    # # Replace with your actual score matrix DataFrame
+    # score_matrix.columns = [model_name_mapping.get(col, col) for col in score_matrix.columns]
+    # plot_score_matrix(score_matrix, threshold=0.5, output_file='initial_state_score_matrix.png')
     
-    # Count the number of protocols with values > 0.5 for each model
-    high_score_counts = (score_matrix > 0.5).sum()
+    # # Count the number of protocols with values > 0.5 for each model
+    # high_score_counts = (score_matrix > 0.5).sum()
 
-    # Convert to DataFrame for easy viewing
-    high_score_counts_df = high_score_counts.reset_index()
-    high_score_counts_df.columns = ["Model", "High Score Count"]
+    # # Convert to DataFrame for easy viewing
+    # high_score_counts_df = high_score_counts.reset_index()
+    # high_score_counts_df.columns = ["Model", "High Score Count"]
 
-    print(high_score_counts_df)
+    # print(high_score_counts_df)
 
     '''get the state matches results'''
-    # all_matches, summary_df = match_all_states(models, protocols, fsm_dir="fsm", threshold=0.5)
-    # print("All Matches:\n", all_matches)
-    # print("sumaary_df:\n", summary_df)
+    all_matches, summary_df = match_all_states(models, protocols, fsm_dir="fsm", threshold=0.5)
+    summary_df['Model'] = summary_df['Model'].replace(model_name_mapping)
+    print("All Matches:\n", all_matches)
+    print("sumaary_df:\n", summary_df)
+    import pandas as pd
+
+    '''The following is to get the LaTeX table for each protocol'''
+    # # Assuming summary_df is already loaded
+    # protocol_dfs = {protocol: group.reset_index(drop=True) for protocol, group in summary_df.groupby("Protocol")}
+
+    # # Generate LaTeX code for each protocol
+    # for protocol, df in protocol_dfs.items():
+    #     # Generate the LaTeX code
+    #     latex_code = df[['Protocol', 'Model', 'Total Extracted', 'Total GT', 'Matched', 'Precision', 'Recall', 'F1-Score']].to_latex(
+    #         index=False,
+    #         float_format="%.3f",
+    #         column_format="llcccccc",
+    #         longtable=False,
+    #         caption=f"{protocol} Protocol States Extraction Metrics",
+    #         label=f"tab:{protocol.lower()}-states-matching-metrics",
+    #         escape=False
+    #     )
+        
+    #     # Save to .tex file
+    #     file_name = f"{protocol}_states_metrics.tex"
+    #     with open(file_name, "w") as f:
+    #         f.write(latex_code)
+        
+    #     print(f"Generated LaTeX table for {protocol} and saved to {file_name}")
+
+    # # Add booktabs formatting
+    # latex_code = latex_code.replace("\\toprule", "\\toprule\n\\textbf{Protocol} & \\textbf{Model} & \\textbf{Total Extracted} & \\textbf{Total GT} & \\textbf{Matched} & \\textbf{Precision} & \\textbf{Recall} & \\textbf{F1-Score} \\\\\n\\midrule")
+
+    # print(latex_code)
     
+    '''The following is to get the LaTeX table for each model of all protocols'''
+    '''for the state metching results'''
+    
+    # Group by Model and calculate the sum for Total Extracted, Total GT, and Matched
+    model_summary = summary_df.groupby("Model")[["Total Extracted", "Total GT", "Matched"]].sum().reset_index()
+
+    # Calculate overall Precision, Recall, and F1-Score for each model
+    model_summary["Precision"] = model_summary["Matched"] / model_summary["Total Extracted"]
+    model_summary["Recall"] = model_summary["Matched"] / model_summary["Total GT"]
+    model_summary["F1-Score"] = 2 * (model_summary["Precision"] * model_summary["Recall"]) / (model_summary["Precision"] + model_summary["Recall"])
+
+    latex_code = model_summary.to_latex(
+        index=False,
+        float_format="%.3f",
+        column_format="|l|c|c|c|c|c|c|",
+        longtable=False,
+        caption="Overall Model Performance on States Matching of Different Protocols",
+        label="tab:model-performance-summary",
+        escape=False
+    )
+    
+    
+    print("Model performance summary generated successfully.\n", latex_code)
+        
     

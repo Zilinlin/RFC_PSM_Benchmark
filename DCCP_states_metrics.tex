@@ -1,0 +1,19 @@
+\begin{table}
+\caption{DCCP Protocol States Extraction Metrics}
+\label{tab:dccp-states-matching-metrics}
+\begin{tabular}{llcccccc}
+\toprule
+Protocol & Model & Total Extracted & Total GT & Matched & Precision & Recall & F1-Score \\
+\midrule
+DCCP & DS-R1 & 12 & 9 & 9 & 0.750 & 1.000 & 0.857 \\
+DCCP & Gpt4o-Mini & 41 & 9 & 9 & 0.220 & 1.000 & 0.361 \\
+DCCP & Claude3 & 12 & 9 & 9 & 0.750 & 1.000 & 0.857 \\
+DCCP & Gemini2 & 20 & 9 & 9 & 0.450 & 1.000 & 0.621 \\
+DCCP & DS-V3 & 12 & 9 & 9 & 0.750 & 1.000 & 0.857 \\
+DCCP & QWQ & 4 & 9 & 6 & 1.500 & 0.667 & 0.923 \\
+DCCP & QWen3 & 11 & 9 & 8 & 0.727 & 0.889 & 0.800 \\
+DCCP & Gemma3 & 10 & 9 & 7 & 0.700 & 0.778 & 0.737 \\
+DCCP & Mistral & 10 & 9 & 2 & 0.200 & 0.222 & 0.210 \\
+\bottomrule
+\end{tabular}
+\end{table}

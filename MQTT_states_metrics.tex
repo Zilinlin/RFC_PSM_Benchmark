@@ -1,0 +1,19 @@
+\begin{table}
+\caption{MQTT Protocol States Extraction Metrics}
+\label{tab:mqtt-states-matching-metrics}
+\begin{tabular}{llcccccc}
+\toprule
+Protocol & Model & Total Extracted & Total GT & Matched & Precision & Recall & F1-Score \\
+\midrule
+MQTT & DS-R1 & 7 & 12 & 8 & 1.143 & 0.667 & 0.842 \\
+MQTT & Gpt4o-Mini & 24 & 12 & 11 & 0.458 & 0.917 & 0.611 \\
+MQTT & Claude3 & 11 & 12 & 5 & 0.455 & 0.417 & 0.435 \\
+MQTT & Gemini2 & 26 & 12 & 10 & 0.385 & 0.833 & 0.527 \\
+MQTT & DS-V3 & 4 & 12 & 5 & 1.250 & 0.417 & 0.625 \\
+MQTT & QWQ & 14 & 12 & 8 & 0.571 & 0.667 & 0.615 \\
+MQTT & QWen3 & 7 & 12 & 5 & 0.714 & 0.417 & 0.527 \\
+MQTT & Gemma3 & 11 & 12 & 5 & 0.455 & 0.417 & 0.435 \\
+MQTT & Mistral & 20 & 12 & 11 & 0.550 & 0.917 & 0.688 \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,19 @@
+\begin{table}
+\caption{RTSP Protocol States Extraction Metrics}
+\label{tab:rtsp-states-matching-metrics}
+\begin{tabular}{llcccccc}
+\toprule
+Protocol & Model & Total Extracted & Total GT & Matched & Precision & Recall & F1-Score \\
+\midrule
+RTSP & DS-R1 & 5 & 3 & 3 & 0.600 & 1.000 & 0.750 \\
+RTSP & Gpt4o-Mini & 47 & 3 & 3 & 0.064 & 1.000 & 0.120 \\
+RTSP & Claude3 & 20 & 3 & 2 & 0.100 & 0.667 & 0.174 \\
+RTSP & Gemini2 & 17 & 3 & 2 & 0.118 & 0.667 & 0.201 \\
+RTSP & DS-V3 & 3 & 3 & 3 & 1.000 & 1.000 & 1.000 \\
+RTSP & QWQ & 3 & 3 & 0 & 0.000 & 0.000 & 0.000 \\
+RTSP & QWen3 & 3 & 3 & 3 & 1.000 & 1.000 & 1.000 \\
+RTSP & Gemma3 & 14 & 3 & 3 & 0.214 & 1.000 & 0.353 \\
+RTSP & Mistral & 22 & 3 & 1 & 0.045 & 0.333 & 0.079 \\
+\bottomrule
+\end{tabular}
+\end{table}

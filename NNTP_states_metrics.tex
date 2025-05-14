@@ -1,0 +1,19 @@
+\begin{table}
+\caption{NNTP Protocol States Extraction Metrics}
+\label{tab:nntp-states-matching-metrics}
+\begin{tabular}{llcccccc}
+\toprule
+Protocol & Model & Total Extracted & Total GT & Matched & Precision & Recall & F1-Score \\
+\midrule
+NNTP & DS-R1 & 12 & 10 & 3 & 0.250 & 0.300 & 0.273 \\
+NNTP & Gpt4o-Mini & 40 & 10 & 10 & 0.250 & 1.000 & 0.400 \\
+NNTP & Claude3 & 13 & 10 & 6 & 0.462 & 0.600 & 0.522 \\
+NNTP & Gemini2 & 29 & 10 & 7 & 0.241 & 0.700 & 0.359 \\
+NNTP & DS-V3 & 17 & 10 & 7 & 0.412 & 0.700 & 0.519 \\
+NNTP & QWQ & 3 & 10 & 0 & 0.000 & 0.000 & 0.000 \\
+NNTP & QWen3 & 4 & 10 & 0 & 0.000 & 0.000 & 0.000 \\
+NNTP & Gemma3 & 9 & 10 & 3 & 0.333 & 0.300 & 0.316 \\
+NNTP & Mistral & 3 & 10 & 0 & 0.000 & 0.000 & 0.000 \\
+\bottomrule
+\end{tabular}
+\end{table}
