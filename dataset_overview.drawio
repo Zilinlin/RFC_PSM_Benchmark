@@ -51,7 +51,7 @@
             <mxPoint x="-30" y="-100" as="targetPoint" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="bJqIoiY46qntyYds_emS-24" value="" style="shape=offPageConnector;whiteSpace=wrap;html=1;rotation=-90;fillColor=#CCCCCC;" vertex="1" parent="cRL4ZFd59OCphdYGc4o4-25">
+        <mxCell id="bJqIoiY46qntyYds_emS-24" value="" style="shape=offPageConnector;whiteSpace=wrap;html=1;rotation=-90;fillColor=#E6E6E6;" vertex="1" parent="cRL4ZFd59OCphdYGc4o4-25">
           <mxGeometry x="284" y="75" width="20" height="20" as="geometry" />
         </mxCell>
         <mxCell id="bJqIoiY46qntyYds_emS-1" value="" style="group" vertex="1" connectable="0" parent="1">
