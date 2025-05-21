@@ -135,152 +135,6 @@ def compute_similarity(a, b):
     return sim
 
 
-def extract_initial_state(fsm_file):
-    with open(fsm_file, 'r') as f:
-        fsm_data = json.load(f)
-    return fsm_data.get('initial_state', None)
-
-
-# this file is to calculate the similarity of the initial state between the ground truth and extracted FSMs
-def compare_initial_states(models, protocols, fsm_dir, threshold=0.5):
-    
-    score_matrix = pd.DataFrame(index=protocols, columns=models)
-
-    results = []
-    
-    # Iterate over each protocol
-    for protocol in protocols:
-        # Find the ground truth FSM file for the protocol
-        protocol_dir = os.path.join(protocol)
-        gt_file = None
-        for file in os.listdir(protocol_dir):
-            if file.endswith("_state_machine.json"):
-                gt_file = os.path.join(protocol_dir, file)
-                break
-
-        if not gt_file:
-            continue
-        
-        print("current protocol:", protocol)
-        gt_initial = preprocess_state_name(extract_initial_state(gt_file))
-
-        # Iterate over each model
-        for model in models:
-            print("current model:", model)
-            extracted_file = None
-
-            # Find the extracted FSM file for the protocol and model
-            for file in os.listdir(fsm_dir):
-                if protocol in file and model in file and file.endswith(".json"):
-                    extracted_file = os.path.join(fsm_dir, file)
-                    break
-
-            if not extracted_file:
-                continue
-
-            ext_initial = preprocess_state_name(extract_initial_state(extracted_file))
-
-            # Calculate similarity
-            model_name = model
-            protocol_name = protocol
-            sim_score = compute_similarity(gt_initial, ext_initial)
-
-            match = (gt_initial, ext_initial, sim_score) if sim_score >= threshold else (gt_initial, None, sim_score)
-            results.append((protocol_name, model_name, match))
-            # Add score to matrix
-            score_matrix.loc[protocol, model] = sim_score
-            
-
-    return results, score_matrix
-
-def plot_score_matrix(score_matrix, threshold=0.5, output_file='score_matrix.png'):
-    # Ensure the score matrix is numeric
-    numeric_matrix = score_matrix.astype(float).copy()
-    plt.figure(figsize=(24, 18))
-    # Custom color map with yellow for <=0.5 and green for >0.5
-    cmap = sns.diverging_palette(65, 145, s=85, l=65, sep=20, as_cmap=True)
-    # Ensure the score matrix is numeric
-    numeric_matrix = score_matrix.astype(float).copy()
-    plt.figure(figsize=(18, 12))
-    # Custom color map with green for >0.5 and yellow for <=0.5
-    colors = [(0.8, 0.8, 0.2), (0.2, 0.8, 0.2)]  # yellow to green
-    cmap = sns.blend_palette(colors, as_cmap=True)
-    # Ensure the score matrix is numeric
-    numeric_matrix = score_matrix.astype(float).copy()
-    plt.figure(figsize=(18, 12))
-    cmap = plt.get_cmap('YlGn')
-    # Use different color intensities for scores above and below the threshold
-    ax = sns.heatmap(numeric_matrix, 
-                     annot=True, 
-                     cmap=cmap, 
-                     linewidths=0.5, 
-                     center=threshold, 
-                     cbar_kws={"label": "Similarity Score"}, 
-                     vmin=0, 
-                     vmax=1,
-                     annot_kws={"size": 18})
-    plt.title("Initial State Matching Scores for Protocols and Models", fontsize=24, weight='bold')
-    plt.xticks(rotation=45, ha="right", fontsize=20, weight='bold')
-    plt.yticks(rotation=0, fontsize=20, weight='bold')
-    ax.figure.axes[-1].yaxis.label.set_size(20)
-    plt.tight_layout()
-    plt.savefig(output_file, dpi=300)
-    print(f"Score matrix saved as {output_file}")
-    plt.show()
-    
-
-# def match_transitions_fuzzy_states(trans1, trans2, threshold=0.5, allow_partial=True):
-#     """
-#     Compare transitions from two FSMs and classify matches as fully correct, partially correct, or unmatched.
-#     """
-#     matched = []
-#     unmatched = []
-#     fully_correct = 0
-#     partially_correct = 0
-#     trans2_copy = trans2.copy()
-
-#     for idx1, t1 in enumerate(trans1):
-#         found = False
-#         for idx2, t2 in enumerate(trans2_copy):
-#             from_score = compute_similarity(t1.get("from", ""), t2.get("from", ""))
-#             to_score = compute_similarity(t1.get("to", ""), t2.get("to", ""))
-#             event_score = compute_similarity(t1.get("event", ""), t2.get("event", ""))
-#             action_score = compute_similarity(t1.get("action", ""), t2.get("action", ""))
-
-#             from_match = from_score >= threshold
-#             to_match = to_score >= threshold
-#             event_match = event_score >= threshold
-#             action_match = action_score >= threshold
-
-#             # Debugging output
-#             print(f"\nComparing Transition {idx1} (trans1) with Transition {idx2} (trans2):")
-#             print(f"  From: '{t1.get('from')}' vs '{t2.get('from')}' | Match: {from_match} | Score: {from_score:.2f}")
-#             print(f"  To: '{t1.get('to')}' vs '{t2.get('to')}' | Match: {to_match} | Score: {to_score:.2f}")
-#             print(f"  Event: '{t1.get('event')}' vs '{t2.get('event')}' | Match: {event_match} | Score: {event_score:.2f}")
-#             print(f"  Action: '{t1.get('action')}' vs '{t2.get('action')}' | Match: {action_match} | Score: {action_score:.2f}")
-
-#             if from_match and to_match:
-#                 if event_match and action_match:
-#                     matched.append((t1, t2))
-#                     fully_correct += 1
-#                     trans2_copy.remove(t2)
-#                     found = True
-#                     print("  --> Fully Matched\n")
-#                     break
-#                 elif allow_partial and (event_match or action_match):
-#                     matched.append((t1, t2))
-#                     partially_correct += 1
-#                     trans2_copy.remove(t2)
-#                     found = True
-#                     print("  --> Partially Matched\n")
-#                     break
-#         if not found:
-#             unmatched.append(t1)
-#             print("  --> Not Matched\n")
-
-#     return matched, unmatched, fully_correct, partially_correct
-
-
 
 def match_transitions_combined_event_action(trans1, trans2, threshold=0.5,
                                             if_partial=True):
@@ -366,72 +220,6 @@ def evaluate_fsm_similarity(fsm1_json, fsm2_json, allow_partial=True, threshold=
         "partially_correct": partially_correct,
         "unmatched": len(unmatched),
     }
-
-
-
-# def batch_evaluate_fsm_similarity():
-#     # IMAP ground truth file is missing, need to handle this case.
-#     # "IMAP", 
-#     # "POP3" has bugs
-#     #protocols = ["IMAP", "POP3"]
-#     protocols = ["MQTT","PPP","PPTP", "BGP"] # check for testing
-#     #protocols = ["SIP", "RTSP", "DCCP", "DHCP", "FTP", "NNTP", "SMTP", "TCP"]
-#     # close_models = ["claude-3-7-sonnet-20250219"]
-#     # , "gemini-2.0-flash"
-#     close_models = ["deepseek-reasoner", "gpt-4o-mini", "claude-3-7-sonnet-20250219", "gemini-2.0-flash"]
-#     fsm_dir = "fsm"
-#     results = {}
-
-#     # Iterate over each protocol
-#     for protocol in protocols:
-#         protocol_dir = os.path.join(protocol)
-#         gt_file = None
-
-#         # Find the ground truth FSM file for the protocol
-#         for file in os.listdir(protocol_dir):
-#             if file.endswith("_state_machine.json"):
-#                 gt_file = os.path.join(protocol_dir, file)
-#                 break
-
-#         if not gt_file:
-#             continue
-
-#         # Load the ground truth FSM
-#         with open(gt_file, 'r') as f:
-#             ground_truth = json.load(f)
-
-#         # Iterate over each model
-#         for model in close_models:
-#             extracted_file = None
-
-#             # Find the extracted FSM file for the protocol and model
-#             for file in os.listdir(fsm_dir):
-#                 if protocol in file and model in file and file.endswith(".json"):
-#                     extracted_file = os.path.join(fsm_dir, file)
-#                     break
-
-#             if not extracted_file:
-#                 continue
-
-#             # Load the extracted FSM
-#             with open(extracted_file, 'r') as f:
-#                 extracted = json.load(f)
-
-#             # Evaluate the similarity between ground truth and extracted FSMs
-#             results_key = f"{protocol}_{model}"
-#             results[results_key] = {
-#                 "with_partial": evaluate_fsm_similarity(ground_truth, extracted, allow_partial=True),
-#                 "no_partial": evaluate_fsm_similarity(ground_truth, extracted, allow_partial=False)
-#             }
-
-#             # Print the evaluation results
-#             print(f"Evaluated {protocol} with model {model}")
-#             print(f"Results for {results_key}:")
-#             print(results[results_key])
-
-#             # Write the current results to the output file
-#             with open("fsm_evaluation_results.json", "w") as outfile:
-#                 json.dump(results, outfile, indent=2)
 
 
 def batch_evaluate_transitions_combined(
@@ -523,30 +311,12 @@ if __name__ == "__main__":
               "gemini-2.0-flash", "deepseek-chat",
               "qwq", "qwen3:32b","gemma3:27b","mistral-small3.1"]
     
-    
-    '''get the initial states results'''
-    # initial_state_results, score_matrix = compare_initial_states(models, protocols, fsm_dir="fsm", threshold=0.5)
-    # print("Initial State Results:", initial_state_results)
-    # print("Score Matrix:\n", score_matrix)
-    
-    # # Replace with your actual score matrix DataFrame
-    # score_matrix.columns = [model_name_mapping.get(col, col) for col in score_matrix.columns]
-    # plot_score_matrix(score_matrix, threshold=0.5, output_file='initial_state_score_matrix.png')
-    
-    # # Count the number of protocols with values > 0.5 for each model
-    # high_score_counts = (score_matrix > 0.5).sum()
-
-    # # Convert to DataFrame for easy viewing
-    # high_score_counts_df = high_score_counts.reset_index()
-    # high_score_counts_df.columns = ["Model", "High Score Count"]
-
-    # print(high_score_counts_df)
 
     '''get the state matches results'''
     all_matches, summary_df = match_all_states(models, protocols, fsm_dir="fsm", threshold=0.5)
     summary_df['Model'] = summary_df['Model'].replace(model_name_mapping)
     print("All Matches:\n", all_matches)
-    print("sumaary_df:\n", summary_df)
+    print("summary_df:\n", summary_df)
     import pandas as pd
 
     '''The following is to get the LaTeX table for each protocol'''
@@ -603,6 +373,8 @@ if __name__ == "__main__":
     # print("Model performance summary generated successfully.\n", latex_code)
     
     '''start the trasistion matching'''
-    transition_matches_df = batch_evaluate_transitions_combined(protocols=protocols, models=models, fsm_dir="fsm", if_partial=False)
+    transition_matches_df = batch_evaluate_transitions_combined(protocols=protocols, 
+                                                                models=models, fsm_dir="fsm", if_partial=False)
     transition_matches_df.to_csv("transitions_match_results_whole.csv", index=False)
+    print("transitio match results:", transition_matches_df)
     

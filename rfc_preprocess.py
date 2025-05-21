@@ -276,8 +276,8 @@ def split_within_token_limit(
 ):
     """
     1) Split into level-1 sections.
-    2) If a chunk ≤ max_tokens 👉 keep.
-       Else 👉 split on level-2, then greedily re-combine until each
+    2) If a chunk ≤ max_tokens  keep.
+       Else  split on level-2, then greedily re-combine until each
        combined piece ≤ max_tokens.
     Returns the final list of {"section", "tag", "content"} dicts.
     """

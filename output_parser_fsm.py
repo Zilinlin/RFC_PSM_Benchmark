@@ -14,62 +14,6 @@ client = OpenAI(
 )
 
 
-# def build_fsm_combination_prompt(partial_fsms: List[Union[str, dict]]) -> str:
-#     """
-#     Given a list of partial FSMs (JSON strings or dicts), returns a prompt
-#     instructing a GPT model to merge them into one global FSM.
-#     """
-#     # Normalize each partial to a JSON string and wrap in <partial> tags
-#     blocks = []
-#     for p in partial_fsms:
-#         text = p if isinstance(p, str) else json.dumps(p, ensure_ascii=False, indent=2)
-#         blocks.append(f"<partial>\n{text}\n</partial>")
-#     partials_block = "\n\n".join(blocks)
-
-#     prompt = f"""
-# You have multiple partial protocol state machines resposne extracted from different sections of an RFC. Each one is wrapped in `<partial>...</partial>`.
-
-# Your task: **merge** them into one **global** state machine. Follow these rules exactly:
-
-# 1. **states**: list all unique state names.
-# 2. **initial_state**: the state with no incoming transitions.
-# 3. **final_states**: any state with no outgoing transitions.
-# 4. **transitions**: list all transitions, removing duplicates.  
-#    Each transition must be an object with keys:
-#    - `"from"` (string)
-#    - `"to"` (string)
-#    - `"requisite"` (string; `""` if none)
-#    - `"actions"` (list of strings; `[]` if none)
-#    - `"response"` (string; `""` if none)
-# 5. Standardize synonyms (e.g. `"Init"` vs `"Initialization"`).
-# 6. Do **not** include any explanations, markdown, or code fences—output **only** the JSON object.
-
-# Output **exactly** in this format:
-
-# <json>
-# {{
-#   "states": ["state1", "state2", ...],
-#   "initial_state": "stateX",
-#   "final_states": ["stateY", ...],
-#   "transitions": [
-#     {{
-#       "from": "state1",
-#       "requisite": "conditionX",
-#       "to": "state2",
-#       "actions": ["action1"],
-#       "response": "response1"
-#     }}
-#   ]
-# }}
-# </json>
-
-# Here are the partial machines:
-
-# {partials_block}
-# """.strip()
-
-#     return prompt
-
 
 
 def extract_json_content(response: str) -> Optional[str]:
@@ -177,18 +121,19 @@ def extract_final_fsm(directory: str, model: str, protocol: str, output_dir: str
 
 
 if __name__ == "__main__":
-    # protocols = ["DCCP","DHCP", "FTP", "IMAP", 
-    #               "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP",
-    #               "MQTT", 'PPP', "PPTP", "BGP"]
-    protocols = ["NNTP"]
+    protocols = ["DCCP","DHCP", "FTP", "IMAP", 
+                  "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP",
+                  "MQTT", 'PPP', "PPTP", "BGP"]
+
     #protocols = ["SIP", "NNTP", "FTP"]
     # close_models = ["deepseek-reasoner","gpt-4o-mini", "claude-3-7-sonnet-20250219","gemini-2.0-flash"]
     # close_models = ["deepseek-chat"] , "qwen3:32b","gemma3:27b","mistral-small3.1" qwq
-    small_models = ["mistral-small3.1"] # 32b
+    models = ["deepseek-reasoner","deepseek-chat","gpt-4o-mini", "claude-3-7-sonnet-20250219","gemini-2.0-flash",
+              "mistral-small3.1","qwen3:32b","gemma3:27b","mistral-small3.1"] # 32b
     directory = "output"
     fsm_dir = "fsm"
     
-    for model in small_models:
+    for model in models:
         for protocol in protocols:
             try:
                 final_fsm = extract_final_fsm(directory, model, protocol, fsm_dir)

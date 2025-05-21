@@ -1,21 +1,13 @@
 {
-    "states": ["state1", "state2", "state3"],
-    "initial_state": "state1",
-    "final_states": ["state3"],
-    "transitions": [
-      {
-        "from": "state1",
-        "requisite": "requisiteX",
-        "to": "state2",
-        "actions": ["action1"],
-        "response":"response1"
-      },
-      {
-        "from": "state2",
-        "requisite": "requisiteX",
-        "to": "state3",
-        "actions": ["action2"],
-        "response":"response1"
-      }
-    ]
-  }
+  "states": ["state1", "state2"],
+  "initial_state": "stateX",
+  "final_states": ["stateY"],
+  "transitions": [
+    {
+      "from": "state1",
+      "event": "recv COMMAND",
+      "action": "reply CODE",
+      "to": "state2"
+    }
+  ]
+}

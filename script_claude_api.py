@@ -17,62 +17,6 @@ client = anthropic.Anthropic()
 
 # claude key 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
 
-# def build_fsm_extraction_prompt(protocol_name: str,
-#                                 section_title: str,
-#                                 section_text: str) -> str:
-#     """
-#     Returns a complete prompt for extracting FSM components from one section.
-#     """
-#     template = """
-# You will be given the section "{section_title}" of an RFC document for protocol "{protocol_name}".
-
-# **RESPONSE FORMAT (MANDATORY)**
-# - Your reply must consist **exclusively** of the JSON object representing the state machine.
-# - That JSON must be wrapped in <json> and </json> tags.
-# - Do **not** include any extra text, explanation, code fences, or formatting.
-
-# <section>
-# {section_text}
-# </section>
-
-# Steps:
-# 1. Determine if this section has any FSM information (states, transitions, diagrams).
-# 2. If **none**, reply exactly:
-#    <json>None</json>
-# 3. Otherwise, extract the partial FSM and format it **exactly** as:
-
-# {{
-#   "states": ["state1", "state2", "state3"],
-#   "transitions": [
-#     {{
-#       "from": "state1",
-#       "requisite": "conditionX",
-#       "to": "state2",
-#       "actions": ["action1"],
-#       "response": "response1"
-#     }},
-#     {{
-#       "from": "state2",
-#       "requisite": "conditionY",
-#       "to": "state3",
-#       "actions": ["action2"],
-#       "response": "response2"
-#     }}
-#   ]
-# }}
-
-# and then wrap that in <json>…</json> with nothing else.
-
-# Remember: **ONLY** the <json>…</json> block should appear in your final output.
-# """
-#     return template.format(
-#         protocol_name=protocol_name,
-#         section_title=section_title,
-#         section_text=section_text
-#     )
-
-
-
 def extract_json_content(response: str) -> Optional[str]:
     """
     Extracts the raw JSON string wrapped inside <json>...</json> in `response`.
@@ -108,83 +52,6 @@ def parse_json_from_response(response: str) -> Union[Any, None]:
     except json.JSONDecodeError as e:
         return json_text  # Return the raw text if JSON parsing fails
 
-
-
-# def build_fsm_combination_prompt(partial_fsms: List[Union[str, dict]]) -> str:
-#     """
-#     Given a list of partial FSMs (either JSON strings or dicts),
-#     returns a single prompt string ready to send to the LLM.
-#     """
-#     # Normalize each partial to a JSON string and wrap in <partial> tags
-#     fsm_blocks = []
-#     for p in partial_fsms:
-#         block = p if isinstance(p, str) else json.dumps(p, ensure_ascii=False, indent=2)
-#         fsm_blocks.append(f"<partial>\n{block}\n</partial>")
-
-#     partials_block = "\n\n".join(fsm_blocks)
-
-#     # Use an f-string and double all JSON braces to escape them!
-#     prompt = f"""
-# You will be provided with multiple **partial protocol state machines** extracted from different sections of an RFC. Each partial state machine is a JSON object with these fields:
-# - "states": list of state names  
-# - "transitions": list of transition objects, each with "from", "to", and optional "requisite", "actions", "response".
-
-# Your task is to **merge** them into one **global** state machine. Please respond _only_ with a single JSON object (no extra commentary) in the following format:
-
-# <json>
-# {{
-#   "states": ["state1", "state2", ...],
-#   "initial_state": "stateX",
-#   "final_states": ["stateY", ...],
-#   "transitions": [
-#     {{
-#       "from": "state1",
-#       "requisite": "conditionX",
-#       "to": "state2",
-#       "actions": ["action1"],
-#       "response": "response1"
-#     }}
-#   ]
-# }}
-# </json>
-
-# **Instructions**
-# 1. **Combine** all unique states (treat synonyms like "Init" vs "Initialization State" as one).  
-# 2. **Merge** transitions, dropping duplicates (even if phrased differently).  
-# 3. **Standardize** state names for consistency.  
-# 4. **Determine**  
-#    - "initial_state": the state with no incoming transitions  
-#    - "final_states": any state with no outgoing transitions  
-# 5. **Fill** missing "requisite"/"actions"/"response" with "" or [] as appropriate.
-
-# Here are the partial machines (each wrapped in `<partial>...</partial>`):
-
-# {partials_block}
-
-# Please output **only** the final merged JSON in the `<json>…</json>` block.
-# """
-#     return prompt
-
-
-
-
-# def call_ollama(model, prompt, temperature=0.0, max_tokens=10000):
-#     """
-#     Calls the local Ollama HTTP API and returns the generated text.
-#     """
-#     url = "http://localhost:11434/v1/completions"
-#     payload = {
-#         "model": model,
-#         "prompt": prompt,
-#         "temperature": temperature,
-#         "max_tokens": max_tokens
-#     }
-#     resp = requests.post(url, json=payload)
-#     resp.raise_for_status()  # will raise an HTTPError if the call failed
-#     data = resp.json()
-#     # Ollama uses the OpenAI-compatible response format:
-#     # { "choices": [ { "text": "..." } ], ... }
-#     return data["choices"][0]["text"]
 
 def call_api(model, prompt, temperature=0.0, max_tokens=8192):
     """
@@ -317,17 +184,10 @@ if __name__ == "__main__":
 
     # prompt = build_fsm_combination_prompt(partials)
     # print(prompt)
-    # "DCCP","DHCP", "FTP","IMAP",
-    #             "NNTP", "POP3",
-    # protocols = [  "RTSP", "SIP", "SMTP", "TCP"]
-    protocols = ["MQTT", "PPTP", "PPP", "BGP"]
-    # model = "deepseek-r1:14b"
-    # models = ["deepseek-r1:32b","qwen3:32b","gemma3:27b"]
-    # models = ["mistral-small3.1"] # this is 24b
-    # models = ["qwq"] # 32b
-    
-    # models = ["deepseek-reasoner"]
-    # models = ["gpt-4o-mini"]
+    protocols = ["DCCP","DHCP", "FTP","IMAP","NNTP", "POP3",
+                 "RTSP", "SIP", "SMTP", "TCP",
+                 "MQTT", "PPTP", "PPP", "BGP"]
+
     models = ["claude-3-7-sonnet-20250219"]
     for m in models:
         for d in protocols:

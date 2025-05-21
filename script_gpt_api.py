@@ -300,17 +300,10 @@ if __name__ == "__main__":
     # prompt = build_fsm_combination_prompt(partials)
     # print(prompt)
     
-    # protocols = ["DCCP","DHCP", "FTP", "IMAP", 
-    #              "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP"]
+    protocols = ["MQTT", "PPP", "PPTP", "BGP",
+                 "DCCP","DHCP", "FTP", "IMAP", 
+                 "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP"]
     
-    protocols = ["MQTT", "PPP", "PPTP", "BGP"]
-    
-    # model = "deepseek-r1:14b"
-    # models = ["deepseek-r1:32b","qwen3:32b","gemma3:27b"]
-    # models = ["mistral-small3.1"] # this is 24b
-    # models = ["qwq"] # 32b
-    
-    # models = ["deepseek-reasoner"]
     models = ["gpt-4o-mini"]
     for m in models:
         for d in protocols:
