@@ -1,0 +1,12 @@
+
+numpy
+pandas
+matplotlib
+seaborn
+tiktoken
+graphviz
+sentence-transformers
+openai
+anthropic
+google-generativeai
+requests
