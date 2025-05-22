@@ -10,7 +10,7 @@
       "REBINDING"
     ],
     "initial_state": "INIT",
-    "final_states": [],
+    "final_states": ["INIT"],
     "transitions": [
       {
         "from": "INIT",

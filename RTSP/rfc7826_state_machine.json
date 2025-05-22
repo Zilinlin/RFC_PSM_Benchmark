@@ -1,7 +1,7 @@
 {
   "states": ["Init", "Ready", "Play"],
   "initial_state": "Init",
-  "final_states": [],
+  "final_states": ["Init"],
   "transitions": [
     {
       "from": "Init",
