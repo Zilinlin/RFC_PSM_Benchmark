@@ -78,13 +78,13 @@ PPP/
 ```
 To run the preprocessing for a single protocol (e.g., `PPP`), execute:
 ```bash
-python3 rfc_preprocess.py FTP
+python3 rfc_preprocess.py PPP
 ```
 
 This will generate:
-- `FTP/<name>_cleaned.txt` – cleaned version of the raw RFC
-- `FTP/<name>_no_toc.txt` – cleaned text with TOC lines removed
-- `FTP/<name>_segments.json` – final segmented output for model input
+- `PPP/<name>_cleaned.txt` – cleaned version of the raw RFC
+- `PPP/<name>_no_toc.txt` – cleaned text with TOC lines removed
+- `PPP/<name>_segments.json` – final segmented output for model input
 
 ---
 ### ii. Running LLMs on RFC Segments
