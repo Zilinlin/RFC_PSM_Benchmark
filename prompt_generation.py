@@ -1,5 +1,5 @@
 from typing import Optional, Any, Union, List
-
+import json
 
 # This is updated prompt version to add more constraints
 def build_fsm_extraction_prompt(protocol_name: str,

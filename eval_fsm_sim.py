@@ -207,19 +207,19 @@ def compute_match_metrics(matched, gt_trans, ex_trans):
     return precision, recall, f1
 
 
-def evaluate_fsm_similarity(fsm1_json, fsm2_json, allow_partial=True, threshold=0.5):
-    matched, unmatched, fully_correct, partially_correct = match_transitions_fuzzy_states(
-        fsm1_json["transitions"], fsm2_json["transitions"], threshold=threshold, allow_partial=allow_partial)
-    precision, recall, f1 = compute_match_metrics(matched, fsm1_json["transitions"], fsm2_json["transitions"])
-    return {
-        "precision": precision,
-        "recall": recall,
-        "f1_score": f1,
-        "matched": len(matched),
-        "fully_correct": fully_correct,
-        "partially_correct": partially_correct,
-        "unmatched": len(unmatched),
-    }
+# def evaluate_fsm_similarity(fsm1_json, fsm2_json, allow_partial=True, threshold=0.5):
+#     matched, unmatched, fully_correct, partially_correct = match_transitions_fuzzy_states(
+#         fsm1_json["transitions"], fsm2_json["transitions"], threshold=threshold, allow_partial=allow_partial)
+#     precision, recall, f1 = compute_match_metrics(matched, fsm1_json["transitions"], fsm2_json["transitions"])
+#     return {
+#         "precision": precision,
+#         "recall": recall,
+#         "f1_score": f1,
+#         "matched": len(matched),
+#         "fully_correct": fully_correct,
+#         "partially_correct": partially_correct,
+#         "unmatched": len(unmatched),
+#     }
 
 
 def batch_evaluate_transitions_combined(
