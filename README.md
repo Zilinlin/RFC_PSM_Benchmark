@@ -52,6 +52,12 @@ This repository contains the codebase for our NeurIPS 2025 submission, which ben
 └── state_machine_format.json               # JSON schema used for protocol state machines
 ```
 
+## How to Set Up Environment
+You can create a new conda environment with `python=3.11`,
+then install the needed packages.
+```
+pip install -r requirements.txt
+```
 
 ## How to Run
 
