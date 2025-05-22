@@ -13,7 +13,7 @@ from openai import OpenAI # type: ignore
 
 
 client = OpenAI(
-    api_key="sk-35b8120118e0433f81de38de44d5e678",
+    api_key="api_key",
     base_url="https://api.deepseek.com"
 )
 
@@ -183,7 +183,7 @@ if __name__ == "__main__":
     
     #["deepseek-reasoner"]
     # DeepSeek-V3-0324
-    models = ["deepseek-chat"]
+    models = ["deepseek-chat", "deepseek-reasoner"]
     for m in models:
         for d in protocols:
             process_protocol(d, m, verbose=True)

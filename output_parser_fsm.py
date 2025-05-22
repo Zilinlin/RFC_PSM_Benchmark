@@ -129,7 +129,7 @@ if __name__ == "__main__":
     # close_models = ["deepseek-reasoner","gpt-4o-mini", "claude-3-7-sonnet-20250219","gemini-2.0-flash"]
     # close_models = ["deepseek-chat"] , "qwen3:32b","gemma3:27b","mistral-small3.1" qwq
     models = ["deepseek-reasoner","deepseek-chat","gpt-4o-mini", "claude-3-7-sonnet-20250219","gemini-2.0-flash",
-              "mistral-small3.1","qwen3:32b","gemma3:27b","mistral-small3.1"] # 32b
+              "mistral-small3.1","qwen3:32b","gemma3:27b","qwq"] # 32b
     directory = "output"
     fsm_dir = "fsm"
     

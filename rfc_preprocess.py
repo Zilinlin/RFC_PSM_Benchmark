@@ -5,7 +5,7 @@ This file is to preprocess the document of RFC files
 import re
 import json
 import os
-
+import sys
 import tiktoken
 
 # A small helper to count tokens with the same encoding your LLM uses.
@@ -350,91 +350,77 @@ if __name__ == "__main__":
     #         "NNTP", "POP3", "RTSP", "SIP", "SMTP", "TCP"]
     # "MQTT", "PPTP", "BGP", "PPP"
     
-    dirs = ["PPP"]
-    '''---------------clean RFC file------------------------------'''
-    for prot in dirs:
-        # check directory exists
-        if not os.path.isdir(prot):
-            print(f"Skipping '{prot}': not a directory.")
-            continue
+    if len(sys.argv) != 2:
+        print("Usage: python rfc_preprocess.py <protocol>")
+        sys.exit(1)
 
-        # find all *_raw.txt files in this directory
-        raw_files = [f for f in os.listdir(prot) if f.endswith("_raw.txt")]
-        if not raw_files:
-            print(f"No '_raw.txt' files found in '{prot}/'.")
-            continue
+    prot = sys.argv[1]
 
-        # process each raw file
-        for raw_fn in raw_files:
-            raw_path = os.path.join(prot, raw_fn)
-            with open(raw_path, "r", encoding="utf-8") as f_in:
-                raw_text = f_in.read()
+    if not os.path.isdir(prot):
+        print(f"Error: '{prot}' is not a valid directory.")
+        sys.exit(1)
 
-            clean_text = clean_rfc_headers(raw_text)
+    # === Step 1: Clean RFC raw text files ===
+    raw_files = [f for f in os.listdir(prot) if f.endswith("_raw.txt")]
+    if not raw_files:
+        print(f"No '_raw.txt' files found in '{prot}/'.")
+        sys.exit(0)
 
-            # build cleaned filename by swapping suffix
-            cleaned_fn  = raw_fn.replace("_raw.txt", "_cleaned.txt")
-            cleaned_path = os.path.join(prot, cleaned_fn)
+    for raw_fn in raw_files:
+        raw_path = os.path.join(prot, raw_fn)
+        with open(raw_path, "r", encoding="utf-8") as f_in:
+            raw_text = f_in.read()
 
-            with open(cleaned_path, "w", encoding="utf-8") as f_out:
-                f_out.write(clean_text)
+        clean_text = clean_rfc_headers(raw_text)
+        cleaned_fn = raw_fn.replace("_raw.txt", "_cleaned.txt")
+        cleaned_path = os.path.join(prot, cleaned_fn)
 
-            print(f"{prot}/{raw_fn} → {prot}/{cleaned_fn}")
-    
-    '''---------------extract the sections------------------------------'''
-    for prot in dirs:
-        # check directory exists
-        if not os.path.isdir(prot):
-            print(f"Skipping '{prot}': not a directory.")
-            continue
+        with open(cleaned_path, "w", encoding="utf-8") as f_out:
+            f_out.write(clean_text)
 
-        # find all *_cleaned.txt files in this directory
-        cleaned_files = [f for f in os.listdir(prot) if f.endswith("_cleaned.txt")]
-        if not cleaned_files:
-            print(f"No '_cleaned.txt' files found in '{prot}/'.")
-            continue
-        
-        #no_toc_files = [f for f in os.listdir(prot) if f.endswith("_no_toc.txt")]
-    
-        # process each cleaned file
-        for cleaned_fn in cleaned_files:
-            # Load the cleaned RFC file.
-            input_file = os.path.join(prot, cleaned_fn)      # The original file with TOC lines.
-            output_file  = input_file.replace("_cleaned.txt", "_no_toc.txt")
-            
-            # Process the file, extract TOC sections, and write the cleaned file.
-            sections = process_toc_file(input_file, output_file)
-            
-            # Print the number of extracted sections and their details.
-            print(f"Extracted {len(sections)} TOC entries (level-two sections):")
-            for section_number, section_name in sections:
-                print(f"  Section Number: {section_number}, Section Name: {section_name}")
-            
-            print(f"\nThe updated file without TOC lines has been saved as '{output_file}'.")
-            
-            with open(output_file) as f:
-                text = f.read()
-            
-            segments = split_within_token_limit(sections, text, max_tokens=40000)
-            
-            for seg in segments:
-                print(seg["tag"], "→", count_tokens(seg["content"]), "tokens\n","the first 20 chars content:", seg["content"][:20])
-            
-            # then save the segments to a JSON file
-            normalized = []
-            for seg in segments:
-                sec_num, sec_name = seg["section"]
-                normalized.append({
-                    "section_number": sec_num,
-                    "section_name":   sec_name,
-                    "tag":            seg["tag"],
-                    "content":        seg["content"]
-                })
-            
-            segment_json_file = output_file.replace("_no_toc.txt", "_segments.json")
-            with open(segment_json_file, "w", encoding="utf-8") as json_file:
-                json.dump(normalized, json_file, indent=2)
-            print(f"\nThe segments have been saved to '{segment_json_file}'.")
+        print(f"{prot}/{raw_fn} → {prot}/{cleaned_fn}")
+
+    # === Step 2: Process cleaned files and extract TOC sections ===
+    cleaned_files = [f for f in os.listdir(prot) if f.endswith("_cleaned.txt")]
+    if not cleaned_files:
+        print(f"No '_cleaned.txt' files found in '{prot}/'.")
+        sys.exit(0)
+
+    for cleaned_fn in cleaned_files:
+        input_file = os.path.join(prot, cleaned_fn)
+        output_file = input_file.replace("_cleaned.txt", "_no_toc.txt")
+
+        sections = process_toc_file(input_file, output_file)
+        print(f"Extracted {len(sections)} TOC entries (level-two sections):")
+        for section_number, section_name in sections:
+            print(f"  Section Number: {section_number}, Section Name: {section_name}")
+
+        print(f"\nThe updated file without TOC lines has been saved as '{output_file}'.")
+
+        with open(output_file) as f:
+            text = f.read()
+
+        segments = split_within_token_limit(sections, text, max_tokens=40000)
+
+        for seg in segments:
+            print(seg["tag"], "→", count_tokens(seg["content"]), "tokens\n",
+                  "the first 20 chars content:", seg["content"][:20])
+
+        normalized = []
+        for seg in segments:
+            sec_num, sec_name = seg["section"]
+            normalized.append({
+                "section_number": sec_num,
+                "section_name": sec_name,
+                "tag": seg["tag"],
+                "content": seg["content"]
+            })
+
+        segment_json_file = output_file.replace("_no_toc.txt", "_segments.json")
+        with open(segment_json_file, "w", encoding="utf-8") as json_file:
+            json.dump(normalized, json_file, indent=2)
+
+        print(f"\nThe segments have been saved to '{segment_json_file}'.")
                         
             
             

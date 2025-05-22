@@ -15,8 +15,6 @@ import anthropic
 
 client = anthropic.Anthropic()
 
-# claude key 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
-
 def extract_json_content(response: str) -> Optional[str]:
     """
     Extracts the raw JSON string wrapped inside <json>...</json> in `response`.
