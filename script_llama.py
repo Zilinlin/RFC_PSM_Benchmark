@@ -12,7 +12,7 @@ from prompt_generation import build_fsm_extraction_prompt, build_fsm_combination
 from groq import Groq
 
 client = Groq(
-    api_key="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",
+    api_key="api-key",
 )
 
 
