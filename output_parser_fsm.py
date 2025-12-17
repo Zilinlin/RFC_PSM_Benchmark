@@ -10,7 +10,7 @@ import re
 from openai import OpenAI
 from prompt_generation import build_fsm_combination_prompt
 client = OpenAI(
-  api_key="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"
+  api_key=<api_key>
 )
 
 
